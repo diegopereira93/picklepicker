@@ -33,7 +33,7 @@ Plataforma de inteligência de dados e IA para o mercado brasileiro de picklebal
 
 Plans:
 - [x] 01-01: Monorepo setup (backend/ + frontend/ + pipeline/), Docker Compose PostgreSQL, .env.example, provisionar Supabase staging
-- [ ] 01-02: Schema PostgreSQL — tabelas paddles, retailers, price_snapshots, latest_prices, paddle_specs, paddle_embeddings, review_queue, users, price_alerts
+- [x] 01-02: Schema PostgreSQL — tabelas paddles, retailers, price_snapshots, latest_prices, paddle_specs, paddle_embeddings, review_queue, users, price_alerts
 - [ ] 01-03: Crawler Brazil Pickleball Store via Firecrawl /extract com retry 3x backoff, alerta Telegram em falha persistente
 - [ ] 01-04: Mercado Livre Afiliados integration — busca via ML API, extração item_id/preço/URL afiliado, salvar em price_snapshots
 
@@ -135,7 +135,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Data Infrastructure | 1/4 | In Progress|  |
+| 1. Foundation & Data Infrastructure | 2/4 | In Progress|  |
 | 2. Full Data Pipeline | 0/5 | Not started | - |
 | 3. RAG Agent & AI Core | 0/5 | Not started | - |
 | 4. Frontend Chat & Product UI | 0/5 | Not started | - |

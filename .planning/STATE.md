@@ -3,25 +3,25 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-03-26T23:39:50.191Z"
+last_updated: "2026-03-26T23:42:36.397Z"
 last_activity: 2026-03-26
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 4
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # PickleIQ — Project State
 
 **Última atualização:** 2026-03-26
-**Status:** Executing — Plan 2 of 4 (Phase 1)
-**Last session:** 2026-03-26T23:37:39Z — Completed 01-01-PLAN.md
+**Status:** Ready to execute
+**Last session:** 2026-03-26T23:42:36.382Z
 
 ## Current Position
 
 Phase: 1 (Foundation & Data Infrastructure) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 
 - **Milestone:** v1.0 (MVP → Beta Launch)
 - **Phase:** 0 (não iniciado)
@@ -58,12 +58,14 @@ Plan: 2 of 4
 - [01-01] psycopg3 AsyncConnectionPool singleton with open()/close() lifecycle for pipeline DB access
 - [01-01] Telegram alert helper fails gracefully (logs warning) when credentials absent
 - [01-01] pytest asyncio_mode=auto eliminates per-test @pytest.mark.asyncio decorators
+- [Phase 01-02]: latest_prices uses DISTINCT ON with ORDER BY scraped_at DESC and unique index for CONCURRENTLY refresh support
 
 ## Performance Metrics
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
 | 01    | 01   | 4 min    | 2/2   | 14    |
+| Phase 01 P02 | 1 min | 2 tasks | 1 files |
 
 ## Open Questions (não bloqueantes para Phase 1)
 
