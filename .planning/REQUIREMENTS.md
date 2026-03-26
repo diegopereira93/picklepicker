@@ -73,7 +73,7 @@ Tabelas obrigatórias:
 - Workflow `.github/workflows/scrape.yml` com `schedule: cron('0 6 * * *')` (6h BRT)
 - Jobs separados por varejista: `scrape-brazil-pickleball`, `scrape-franklin-br`, `scrape-head-br`, `scrape-joola-br`, `scrape-mercadolivre`, `enrich-specs`
 - Retry: 3 tentativas com exponential backoff via `retry` action ou lógica Python nativa
-- Falha persistente (3 retries): send email via GitHub Actions + Resend API
+- Falha persistente (3 retries): alerta via Telegram bot (não e-mail)
 - Logs estruturados enviados para Railway (stdout JSON)
 - **Migrar para Prefect apenas se:** jobs exceederem 6h runtime ou dependências complexas entre varejistas surgirem
 
@@ -209,7 +209,7 @@ review_queue: id, type (duplicate|spec_unmatched|price_anomaly),
 - **Clerk v5 introduzido aqui** com `clerkMiddleware()` — primeira necessidade concreta de auth
 - Usuário favorita produto + define preço-alvo (requer login)
 - Histórico de conversas e perfil salvo persistentemente pós-login (upgrade do sessionStorage anônimo)
-- Worker Prefect verifica `latest_prices` vs `price_alerts` a cada 24h
+- Worker GitHub Actions verifica `latest_prices` vs `price_alerts` a cada 24h
 - E-mail transacional via Resend (free tier: 3K/mês) com React Email
 - Unsubscribe link em todos os e-mails (compliance)
 
