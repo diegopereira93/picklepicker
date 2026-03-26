@@ -1,0 +1,179 @@
+import os
+import json
+import logging
+import httpx
+from pipeline.db.connection import get_connection
+from pipeline.alerts.telegram import send_telegram_alert
+
+logger = logging.getLogger(__name__)
+
+ML_SEARCH_URL = "https://api.mercadolibre.com/sites/MLB/search"
+ML_DEFAULT_QUERY = "raquete pickleball"
+ML_CATEGORY = "MLB1276"  # Esportes e Fitness
+
+
+def build_affiliate_url(permalink: str, affiliate_tag: str) -> str:
+    """Append ML affiliate tag to product permalink.
+
+    NOTE: Parameter name 'matt_id' needs verification against ML Afiliados portal.
+    Fallback: if tag is empty, return permalink as-is (no commission but link works).
+    """
+    if not affiliate_tag:
+        return permalink
+    separator = "&" if "?" in permalink else "?"
+    return f"{permalink}{separator}matt_id={affiliate_tag}"
+
+
+async def search_pickleball_paddles(
+    limit: int = 50,
+    offset: int = 0,
+    fetch_all: bool = False,
+) -> dict:
+    """Search ML for pickleball paddles. Public API — no auth required.
+
+    If fetch_all=True, paginates through all results.
+    Returns dict with 'results' list and 'paging' info.
+    """
+    all_results = []
+    current_offset = offset
+
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        while True:
+            params = {
+                "q": ML_DEFAULT_QUERY,
+                "category": ML_CATEGORY,
+                "limit": limit,
+                "offset": current_offset,
+            }
+            response = await client.get(ML_SEARCH_URL, params=params)
+            response.raise_for_status()
+            data = response.json()
+
+            results = data.get("results", [])
+            all_results.extend(results)
+
+            if not fetch_all:
+                return data
+
+            paging = data.get("paging", {})
+            total = paging.get("total", 0)
+            current_offset += limit
+
+            if current_offset >= total:
+                break
+
+    return {
+        "results": all_results,
+        "paging": {
+            "total": len(all_results),
+            "offset": 0,
+            "limit": len(all_results),
+        },
+    }
+
+
+async def save_ml_items_to_db(items: list[dict], affiliate_tag: str, conn) -> int:
+    """Save ML search items to price_snapshots.
+
+    Skips items with missing/zero price.
+    Returns count of saved snapshots.
+    """
+    saved = 0
+    retailer_id = 2  # Mercado Livre from seed data (id=2)
+
+    for item in items:
+        price = item.get("price")
+        if not price:  # None or 0
+            logger.warning(
+                "Skipping ML item %s: missing or zero price",
+                item.get("id", "unknown"),
+            )
+            continue
+
+        title = item.get("title", "")
+        permalink = item.get("permalink", "")
+        affiliate_url = build_affiliate_url(permalink, affiliate_tag)
+
+        # Upsert paddle by name (title) — dedup handled in Phase 2
+        result = await conn.execute(
+            """
+            INSERT INTO paddles (name, brand, model, images)
+            VALUES (%(name)s, %(brand)s, %(model)s, %(images)s)
+            ON CONFLICT DO NOTHING
+            RETURNING id
+            """,
+            {
+                "name": title,
+                "brand": "",  # ML search doesn't always have a separate brand field
+                "model": title,
+                "images": [item.get("thumbnail", "")],
+            },
+        )
+        row = await result.fetchone()
+        if row is None:
+            # Row already existed — fetch its id
+            result = await conn.execute(
+                "SELECT id FROM paddles WHERE name = %(name)s",
+                {"name": title},
+            )
+            row = await result.fetchone()
+            if row is None:
+                logger.error("Could not find or create paddle: %s", title)
+                continue
+
+        paddle_id = row[0]
+
+        await conn.execute(
+            """
+            INSERT INTO price_snapshots
+                (paddle_id, retailer_id, price_brl, currency, in_stock,
+                 affiliate_url, scraped_at, source_raw)
+            VALUES
+                (%(paddle_id)s, %(retailer_id)s, %(price_brl)s, 'BRL',
+                 %(in_stock)s, %(affiliate_url)s, NOW(), %(source_raw)s)
+            """,
+            {
+                "paddle_id": paddle_id,
+                "retailer_id": retailer_id,
+                "price_brl": price,
+                "in_stock": (item.get("available_quantity", 0) > 0),
+                "affiliate_url": affiliate_url,
+                "source_raw": json.dumps(item),
+            },
+        )
+        saved += 1
+
+    return saved
+
+
+async def run_mercado_livre_crawler() -> int:
+    """Main entry point: search ML, save to DB with affiliate URLs.
+
+    Returns count of saved snapshots.
+    """
+    affiliate_tag = os.environ.get("ML_AFFILIATE_TAG", "")
+    if not affiliate_tag:
+        logger.warning(
+            "ML_AFFILIATE_TAG not set — saving plain permalinks without affiliate commission"
+        )
+
+    try:
+        data = await search_pickleball_paddles(limit=50, offset=0, fetch_all=True)
+    except Exception as e:
+        await send_telegram_alert(f"Mercado Livre crawler failed: {e}")
+        raise
+
+    items = data.get("results", [])
+    logger.info("Fetched %d items from Mercado Livre", len(items))
+
+    if not items:
+        logger.warning("No items found on Mercado Livre")
+        return 0
+
+    async with get_connection() as conn:
+        saved = await save_ml_items_to_db(items, affiliate_tag, conn)
+        await conn.execute("REFRESH MATERIALIZED VIEW CONCURRENTLY latest_prices")
+        await conn.commit()
+
+    logger.info("Saved %d ML items to price_snapshots", saved)
+    return saved

@@ -39,7 +39,7 @@ class TestAffiliateUrl:
 class TestSearch:
     async def test_search_returns_items(self, mock_ml_search_response):
         """ML search API returns items with expected fields."""
-        mock_response = AsyncMock()
+        mock_response = MagicMock()
         mock_response.json.return_value = mock_ml_search_response
         mock_response.raise_for_status = MagicMock()
 
@@ -98,10 +98,10 @@ class TestPagination:
             "paging": {"total": 75, "offset": 50, "limit": 50}
         }
 
-        mock_resp1 = AsyncMock()
+        mock_resp1 = MagicMock()
         mock_resp1.json.return_value = page1
         mock_resp1.raise_for_status = MagicMock()
-        mock_resp2 = AsyncMock()
+        mock_resp2 = MagicMock()
         mock_resp2.json.return_value = page2
         mock_resp2.raise_for_status = MagicMock()
 
