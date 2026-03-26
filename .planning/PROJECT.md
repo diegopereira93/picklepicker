@@ -96,9 +96,24 @@ Receita via comissões de afiliados (10-40% por venda). Distribuição primária
 - SEO + Clerk auth + alertas de preço (Resend) + histórico de preços
 - Deploy prod + CI/CD + 50-user beta
 
+## Current State
+
+**Phase 1 complete — 2026-03-26**
+
+- Monorepo skeleton: `backend/`, `frontend/`, `pipeline/` with Docker Compose (`pgvector/pgvector:pg16`)
+- PostgreSQL schema: 8 tables + `latest_prices` materialized view + pgvector extension + retailer seed data
+- Brazil Pickleball Store crawler: Firecrawl `/extract`, Tenacity 3x backoff, Telegram alert, saves to `price_snapshots`
+- Mercado Livre integration: public search API, affiliate URL via `matt_id`, saves to `price_snapshots`
+- 11/11 unit tests passing (pytest-asyncio)
+- Pending (human): Supabase staging provisioning, ML Afiliados tag confirmation, live crawl run
+
+**Next:** Phase 2 — Full Data Pipeline
+
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
+
+*Last updated: 2026-03-26 — Phase 1: Foundation & Data Infrastructure complete*
 
 **After each phase transition** (via `/gsd:transition`):
 1. Requirements invalidated? → Move to Out of Scope with reason
