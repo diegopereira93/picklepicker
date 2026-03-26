@@ -4,9 +4,10 @@
 
 | Campo | Detalhe |
 |---|---|
-| Status | Draft — Para Revisão |
+| Status | v1.0 — Final (CEO + Eng Review Applied) |
 | Versão | 1.0 |
 | Público-alvo | Equipe de Desenvolvimento |
+| Última atualização | 2026-03-26 |
 
 ---
 
