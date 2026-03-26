@@ -1,140 +1,146 @@
-# PickleIQ — Roadmap
+# Roadmap: PickleIQ
 
-**Projeto:** PickleIQ — Plataforma de Inteligência de Dados & IA para Pickleball
-**Versão:** 1.0 (MVP → Beta)
-**Granularidade:** Standard
-**Modo:** YOLO | Paralelo | Research habilitado | Plan Check habilitado
+## Overview
 
----
+Plataforma de inteligência de dados e IA para o mercado brasileiro de pickleball. Pipeline de scraping de preços BR → catálogo com pgvector embeddings → agente RAG conversacional → frontend Next.js com quiz de onboarding, comparador e links de afiliado ativos. Beta com 50 usuários em 12 semanas.
 
-## Milestone 1: MVP → Beta Launch
+## Phases
 
-**Objetivo:** Plataforma completa em produção com o máximo de raquetes cobertas pelos crawlers ativos, agente de IA funcional e links de afiliado ativos.
+**Phase Numbering:**
+- Integer phases (1, 2, 3): Planned milestone work
+- Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-**Critério de conclusão:** 50 usuários beta usando a plataforma, affiliate links gerando cliques, NPS ≥ 50 após 30 dias de beta.
+- [ ] **Phase 1: Foundation & Data Infrastructure** - Dev environment + schema + primeiro crawler + Mercado Livre integration
+- [ ] **Phase 2: Full Data Pipeline** - Crawlers BR completos, deduplicação SKU, embeddings pgvector, FastAPI endpoints
+- [ ] **Phase 3: RAG Agent & AI Core** - Agente conversacional PT-BR com eval gate de modelo, streaming SSE, latência P95 < 3s
+- [ ] **Phase 4: Frontend Chat & Product UI** - Next.js 14 com quiz onboarding, chat widget, comparador de raquetes e admin panel
+- [ ] **Phase 5: SEO & Growth Features** - Páginas SSR indexáveis, price alerts com Clerk + Resend, histórico de preços
+- [ ] **Phase 6: Launch & Deploy** - Produção estável, CI/CD, observabilidade, beta 50 usuários
 
----
+## Phase Details
 
-### Phase 1 — Foundation & Data Infrastructure
-**Goal:** Ambiente de desenvolvimento configurado e primeiro crawler funcional salvando dados no PostgreSQL.
+### Phase 1: Foundation & Data Infrastructure
+**Goal**: Ambiente de desenvolvimento configurado e primeiro crawler funcional salvando dados no PostgreSQL.
+**Depends on**: Nothing (first phase)
+**Requirements**: R1.1, R1.2, R1.3, R1.4
+**Success Criteria** (what must be TRUE):
+  1. Docker Compose sobe PostgreSQL com schema completo aplicado (todas as 8 tabelas + materialized view)
+  2. Supabase provisionado (staging) com pgvector nativo disponível
+  3. Crawler Brazil Pickleball Store extrai raquetes via Firecrawl, salva em price_snapshots com retry + alerta Telegram
+  4. Mercado Livre Afiliados indexa raquetes com tag de afiliado ativa em price_snapshots
+  5. ≥ 50 raquetes indexadas no total entre varejistas BR + Mercado Livre
+**Plans**: 4 plans
 
-| Plan | Descrição | Prioridade |
-|------|-----------|-----------|
-| 1.1 | Monorepo setup: estrutura `backend/` + `frontend/` + `pipeline/`, Docker Compose (PostgreSQL), `.env.example` + **provisionar Supabase** (pgvector nativo, staging desde Phase 1) | P0 |
-| 1.2 | Schema PostgreSQL: tabelas `paddles`, `retailers`, `price_snapshots`, `paddle_specs`, `paddle_embeddings`, `review_queue`, `users`, `price_alerts` + materialized view `latest_prices` | P0 |
-| 1.3 | Crawler Brazil Pickleball Store via Firecrawl `/extract` com retry (3x backoff), alerta Telegram em falha persistente e persistência no banco | P0 |
-| 1.4 | Mercado Livre Afiliados integration: busca de raquetes via ML API, extração de dados (ASIN/item_id, preço, disponibilidade, URL com tag de afiliado), salvar em `price_snapshots` | P1 |
+Plans:
+- [ ] 01-01: Monorepo setup (backend/ + frontend/ + pipeline/), Docker Compose PostgreSQL, .env.example, provisionar Supabase staging
+- [ ] 01-02: Schema PostgreSQL — tabelas paddles, retailers, price_snapshots, latest_prices, paddle_specs, paddle_embeddings, review_queue, users, price_alerts
+- [ ] 01-03: Crawler Brazil Pickleball Store via Firecrawl /extract com retry 3x backoff, alerta Telegram em falha persistente
+- [ ] 01-04: Mercado Livre Afiliados integration — busca via ML API, extração item_id/preço/URL afiliado, salvar em price_snapshots
 
-**Dependências:** Nenhuma (fase inicial)
-**Entregáveis:** Dev environment funcional, schema criado, ≥ 50 raquetes dos varejistas BR (+ Mercado Livre) indexadas
+### Phase 2: Full Data Pipeline
+**Goal**: Pipeline completo cobrindo todos os varejistas BR, com deduplicação, spec enrichment e embeddings pgvector.
+**Depends on**: Phase 1
+**Requirements**: R2.1, R2.2, R2.3, R2.4, R2.5
+**Success Criteria** (what must be TRUE):
+  1. Crawlers Drop Shot Brasil + expansão Mercado Livre rodando via GH Actions schedule 24h
+  2. Deduplicação SKU 3-tier funcionando com fila de revisão manual para matches abaixo do threshold
+  3. pgvector embeddings populados (text-embedding-3-small, índice HNSW) com re-embedding assíncrono
+  4. FastAPI com todos os 5 endpoints GET /paddles funcionando + GET /health
+  5. Railway provisionado para API staging
+**Plans**: 5 plans
 
-> **Nota sobre varejistas internacionais:** Sites como PickleballCentral, Fromuth Pickleball, Johnkew e PickleballEffect são usados exclusivamente para **enriquecimento de specs técnicas** (swingweight, twistweight, etc.) — não como varejistas de preço. O mercado-alvo é brasileiro.
+Plans:
+- [ ] 02-01: Crawlers Drop Shot Brasil + Mercado Livre expansão via Firecrawl /extract
+- [ ] 02-02: Normalização + deduplicação SKU 3-tier (SKU fabricante → title hash → RapidFuzz ≥ 0.85) + fila de revisão manual
+- [ ] 02-03: GitHub Actions schedule (cron 24h) — orquestração crawlers, retry exponential backoff, alerta Telegram + provisionar Railway
+- [ ] 02-04: pgvector embeddings — extensão vector Supabase, text-embedding-3-small, índice HNSW, re-embedding assíncrono via needs_reembed flag
+- [ ] 02-05: FastAPI endpoints — GET /paddles, GET /paddles/{id}, GET /paddles/{id}/prices, GET /paddles/{id}/latest-prices, GET /health
 
----
+### Phase 3: RAG Agent & AI Core
+**Goal**: Agente conversacional recomendando raquetes com latência < 3s, com observabilidade via Langfuse.
+**Depends on**: Phase 2
+**Requirements**: R3.1, R3.2, R3.3, R3.4
+**Success Criteria** (what must be TRUE):
+  1. Eval gate executado: 10 queries PT-BR avaliadas, modelo selecionado (OSS Groq se ≥ 4.0, Claude Sonnet se < 4.0), resultado documentado
+  2. POST /chat com streaming SSE retorna top-3 recomendações em P95 < 3s
+  3. Sistema de prompt traduz swingweight/twistweight/core/face para linguagem simples PT-BR
+  4. Degraded mode: se LLM timeout em 8s → SSE event type:degraded com top-3 por preço
+  5. Langfuse traces de latência, tokens e custo por query
+**Plans**: 5 plans
 
-### Phase 2 — Full Data Pipeline
-**Goal:** Pipeline completo cobrindo todos os varejistas BR, com deduplicação, spec enrichment e embeddings pgvector.
+Plans:
+- [ ] 03-01: Estrutura agente RAG — eval gate modelo (10 queries PT-BR, score ≥ 4.0 → Groq, < 4.0 → Claude Sonnet) + busca pgvector
+- [ ] 03-02: Sistema de prompt — tradução de métricas (swingweight/twistweight/core/face) + regras affiliate URL + perfil do quiz
+- [ ] 03-03: Endpoint POST /chat com streaming SSE, filtros SQL + pgvector, top-3 recomendações
+- [ ] 03-04: Otimização latência — Redis cache queries frequentes (TTL 3600s), budget P95 < 3s, degraded mode 8s timeout
+- [ ] 03-05: Langfuse — traces LLM, dashboard latência/tokens/custo, alertas P95 > 3s
 
-| Plan | Descrição | Prioridade |
-|------|-----------|-----------|
-| 2.1 | Crawlers Drop Shot Brasil + Mercado Livre (expansão) via Firecrawl `/extract` | P0 |
-| 2.2 | Normalização + deduplicação SKU 3-tier (SKU fabricante → title hash → RapidFuzz) + fila de revisão manual | P0 |
-| 2.3 | GitHub Actions schedule (cron 24h): orquestração de todos os crawlers, retry com exponential backoff, alerta Telegram em falha persistente + **provisionar Railway** (API staging) | P0 |
-| 2.4 | pgvector embeddings: extensão `vector` no Supabase, embeddings `text-embedding-3-small` (200-400 tokens/doc), índice HNSW, re-embedding assíncrono via flag `needs_reembed` + job noturno | P1 |
-| 2.5 | FastAPI endpoints: `GET /paddles`, `GET /paddles/{id}`, `GET /paddles/{id}/prices`, `GET /paddles/{id}/latest-prices`, `GET /health` | P0 |
+### Phase 4: Frontend Chat & Product UI
+**Goal**: Interface web completa com chat de IA, comparador de raquetes e tracking de afiliados.
+**Depends on**: Phase 3
+**Requirements**: R4.1, R4.2, R4.3, R4.4, R4.5
+**Success Criteria** (what must be TRUE):
+  1. Next.js 14 App Router deployado no Vercel (preview) com Tailwind + shadcn/ui
+  2. Quiz onboarding 3 steps (nível → estilo → orçamento) → chat widget funcional com produto cards inline
+  3. Comparador de raquetes com search/autocomplete, tabela side-by-side e RadarChart
+  4. Affiliate click tracking com keepalive fetch + Edge Route Handler logging
+  5. Admin panel /admin/queue + /admin/catalog protegido por ADMIN_SECRET
+**Plans**: 5 plans
 
-**Dependências:** Phase 1 completa
-**Entregáveis:** Catálogo indexado (máximo de raquetes cobertas pelos varejistas ativos), API funcional, pgvector populado, pipeline rodando 24h
+Plans:
+- [ ] 04-01: Next.js 14 scaffolding — App Router + Tailwind + shadcn/ui + layout base (anônimo-first, sem auth)
+- [ ] 04-02: Quiz onboarding (3 steps) + Chat widget (Route Handler proxy → FastAPI, useChat, SSE transform, product cards inline)
+- [ ] 04-03: Página de comparação — search/autocomplete, tabela side-by-side, RadarChart Recharts (ssr: false)
+- [ ] 04-04: Tracking de afiliados — fetch keepalive, Edge Route Handler logging, UTM params preservados
+- [ ] 04-05: Admin Panel — /admin/queue (review queue) + /admin/catalog (CRUD paddles) protegido por ADMIN_SECRET
 
----
+### Phase 5: SEO & Growth Features
+**Goal**: Páginas SSR/SEO indexáveis, alertas de preço funcionais e histórico de preços visível.
+**Depends on**: Phase 4
+**Requirements**: R5.1, R5.2, R5.3, R5.4
+**Success Criteria** (what must be TRUE):
+  1. Páginas de produto com generateMetadata() + Schema.org JSON-LD indexadas pelo Google
+  2. Clerk v5 auth + price alerts enviando e-mails via Resend após worker GH Actions 24h
+  3. Gráfico de histórico de preços 90/180 dias com indicador "Bom momento para comprar" (≤ P20)
+  4. Pillar page "Best Pickleball Paddles for Beginners" com FTC disclosure acima do primeiro link
+**Plans**: 4 plans
 
-### Phase 3 — RAG Agent & AI Core
-**Goal:** Agente conversacional recomendando raquetes com latência < 3s, com observabilidade via Langfuse.
+Plans:
+- [ ] 05-01: Páginas produto SSR — generateMetadata(), Schema.org/Product JSON-LD, slug /paddles/[brand]/[model], ISR listings
+- [ ] 05-02: Auth Clerk v5 + price alerts — clerkMiddleware(), favoritar produto, worker GH Actions 24h, e-mail Resend + React Email
+- [ ] 05-03: Histórico de preços — gráfico linha 90/180 dias, indicador "Bom momento para comprar" (≤ P20 últimos 90 dias)
+- [ ] 05-04: Pillar page SEO — "Best Pickleball Paddles for Beginners" + FTC disclosure obrigatória em todas as páginas com afiliados
 
-| Plan | Descrição | Prioridade |
-|------|-----------|-----------|
-| 3.1 | Estrutura do agente RAG: **eval gate de modelo** (10 queries PT-BR, score ≥ 4.0/5.0 → OSS via Groq; < 4.0 → Claude Sonnet) + busca pgvector + geração de recomendação | P0 |
-| 3.2 | Sistema de prompt: tradução de métricas (swingweight, twistweight, core, face) + regras de affiliate URL + uso de perfil vindo do quiz de onboarding | P0 |
-| 3.3 | Endpoint `POST /chat` com streaming SSE, filtros SQL + pgvector, top-3 recomendações | P0 |
-| 3.4 | Otimização de latência: cache de queries frequentes (Redis adicionado aqui), budget P95 < 3s (pgvector < 50ms + context assembly < 100ms + LLM < 2.5s) | P1 |
-| 3.5 | Langfuse: traces de LLM, dashboard de latência/tokens/custo, alertas de P95 > 3s | P1 |
+### Phase 6: Launch & Deploy
+**Goal**: Plataforma em produção, CI/CD configurado, beta com 50 usuários iniciado.
+**Depends on**: Phase 5
+**Requirements**: R6.1, R6.2, R6.3, R6.4
+**Success Criteria** (what must be TRUE):
+  1. Supabase + Railway promovidos para produção com todas as env vars configuradas
+  2. CI/CD GitHub Actions: lint + testes em PR, cobertura ≥ 80% pipeline Python, deploy automático main → Vercel
+  3. Observabilidade: logs estruturados JSON, alertas Telegram, Langfuse produção, health checks
+  4. Beta ativo: ≥ 200 raquetes indexadas, 50 usuários onboarded, NPS baseline coletado após 30 dias
+**Plans**: 4 plans
 
-**Dependências:** Phase 2 completa (pgvector populado + API rodando)
-**Entregáveis:** Agente funcional P95 < 3s, modelo escolhido via eval gate, traces no Langfuse, testes de qualidade de recomendação
+Plans:
+- [ ] 06-01: Infraestrutura produção — Supabase + Railway pro, variáveis env via painéis, domínio configurado
+- [ ] 06-02: CI/CD GitHub Actions — lint + testes PR, cobertura ≥ 80% Python, deploy automático main → Vercel + preview PRs
+- [ ] 06-03: Observabilidade produção — logs estruturados, alertas Telegram scraping, Langfuse produção, health checks
+- [ ] 06-04: Beta launch — deploy dados reais, onboarding 50 usuários beta, coleta NPS após 30 dias
 
----
+## Progress
 
-### Phase 4 — Frontend: Chat & Product UI
-**Goal:** Interface web completa com chat de IA, comparador de raquetes e tracking de afiliados.
+**Execution Order:**
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
-| Plan | Descrição | Prioridade |
-|------|-----------|-----------|
-| 4.1 | Next.js 14 scaffolding: App Router + Tailwind + shadcn/ui + layout base (sem auth — anônimo-first) | P0 |
-| 4.2 | Quiz de onboarding (3 steps: nível → estilo → orçamento) + Chat widget via Route Handler proxy (Next.js → FastAPI) + Vercel AI SDK `useChat` + cards de produto inline | P0 |
-| 4.3 | Página de comparação: search/autocomplete, tabela side-by-side, RadarChart (Recharts, `ssr: false`) | P0 |
-| 4.4 | Tracking de afiliados: `fetch` com `keepalive: true`, Edge Route Handler, logs server-side | P1 |
-| 4.5 | Admin Panel: `/admin/queue` (duplicatas, specs não-matched, anomalias de preço — ação obrigatória) + `/admin/catalog` (CRUD de paddles, ajuste fino livre) — protegido por `ADMIN_SECRET` env var | P1 |
-
-**Dependências:** Phase 3 completa (endpoint `/chat` funcional)
-**Entregáveis:** Frontend deployado no Vercel (preview), chat funcional com recomendações, comparador operacional
-
----
-
-### Phase 5 — SEO & Growth Features
-**Goal:** Páginas SSR/SEO indexáveis, alertas de preço funcionais e histórico de preços visível.
-
-| Plan | Descrição | Prioridade |
-|------|-----------|-----------|
-| 5.1 | Páginas de produto SSR: `generateMetadata()`, Schema.org/Product JSON-LD, slug `/paddles/[brand]/[model]`, ISR para listings | P0 |
-| 5.2 | Auth + Price alerts: Clerk v5 com `clerkMiddleware()` + favoritar produto + preço-alvo, worker GH Actions 24h, e-mail Resend + React Email | P1 |
-| 5.3 | Histórico de preços: gráfico de linha 90/180 dias, indicador "Bom momento para comprar" (≤ P20) | P1 |
-| 5.4 | Pillar page SEO: "Best Pickleball Paddles for Beginners" + FTC disclosure em todas as páginas com afiliados | P0 |
-
-**Dependências:** Phase 4 completa (frontend base funcionando)
-**Entregáveis:** Páginas indexáveis pelo Google, price alerts enviando e-mails, gráfico de histórico visível
-
----
-
-### Phase 6 — Launch & Deploy
-**Goal:** Plataforma em produção, CI/CD configurado, beta com 50 usuários iniciado.
-
-| Plan | Descrição | Prioridade |
-|------|-----------|-----------|
-| 6.1 | Infraestrutura produção: promover Supabase (provisionado em Phase 1) e Railway (Phase 2) para produção + variáveis de env via painéis | P0 |
-| 6.2 | CI/CD GitHub Actions: lint + testes em PR, cobertura ≥ 80% no pipeline Python, deploy automático main → Vercel | P0 |
-| 6.3 | Observabilidade produção: logs estruturados, alertas de falha de scraping, Langfuse produção, health checks | P0 |
-| 6.4 | Beta launch: deploy com dados reais (máximo de raquetes disponíveis), onboarding de 50 usuários, coleta de NPS | P0 |
-
-**Dependências:** Phases 1-5 completas
-**Entregáveis:** Produção estável, beta ativo, NPS baseline coletado
-
----
-
-## Backlog (Milestone 2+)
-
-| ID | Feature | Fase Origem PRD |
-|----|---------|----------------|
-| B1 | Expansão de catálogo: bolas, redes, calçados, vestuário | Fase 4 PRD |
-| B2 | Analytics avançado: tendências de mercado e preferências de consumidores | Fase 4 PRD |
-| B3 | Painel B2B para fabricantes e varejistas (modelo pago) | Fase 4 PRD |
-| B4 | Contribuições da comunidade com moderação de specs técnicas | Risco PRD |
-| B5 | Histórico de preços 180+ dias com análise de tendência | US-06 PRD |
-| B6 | Integração com mais varejistas (expansão além dos 4 iniciais) | Escalabilidade |
-
----
-
-## Timeline Estimada
-
-| Fase | Duração Estimada | Acumulado |
-|------|-----------------|-----------|
-| Phase 1 | 2 semanas | Semana 2 |
-| Phase 2 | 3 semanas | Semana 5 |
-| Phase 3 | 2 semanas | Semana 7 |
-| Phase 4 | 2 semanas | Semana 9 |
-| Phase 5 | 2 semanas | Semana 11 |
-| Phase 6 | 1 semana | Semana 12 |
-
-**Beta launch estimado: Semana 12 (mês 3 de desenvolvimento)**
+| Phase | Plans Complete | Status | Completed |
+|-------|----------------|--------|-----------|
+| 1. Foundation & Data Infrastructure | 0/4 | Not started | - |
+| 2. Full Data Pipeline | 0/5 | Not started | - |
+| 3. RAG Agent & AI Core | 0/5 | Not started | - |
+| 4. Frontend Chat & Product UI | 0/5 | Not started | - |
+| 5. SEO & Growth Features | 0/4 | Not started | - |
+| 6. Launch & Deploy | 0/4 | Not started | - |
 
 ---
 
@@ -142,11 +148,19 @@
 
 | Métrica | Meta | Verificar em |
 |---------|------|-------------|
-| Raquetes indexadas | Máximo dos varejistas ativos | Fim Phase 2 |
+| Raquetes indexadas | ≥ 200 (meta: 500) | Fim Phase 2 |
 | Freshness de preços | Atualização a cada 24h | Fim Phase 2 |
 | Latência agente IA (P95) | < 3s | Fim Phase 3 |
 | Usuários beta | 50 | Fim Phase 6 |
-| MAU (mês 3 pós-launch) | 500 | 3 meses após Phase 6 |
-| Taxa de conversão afiliado | ≥ 3% clique→compra | 60 dias pós-launch |
-| NPS | ≥ 50 | 90 dias pós-launch |
-| MRR | USD 1.000 | Mês 9 |
+| NPS | ≥ 50 | 90 dias após Phase 6 |
+| Taxa conversão afiliado | ≥ 3% clique→compra | 60 dias pós-launch |
+
+## Backlog (Milestone 2+)
+
+- B1: Expansão catálogo — bolas, redes, calçados, vestuário
+- B2: Analytics avançado — tendências mercado e preferências consumidores
+- B3: Painel B2B para fabricantes e varejistas (modelo pago)
+- B4: Contribuições comunidade com moderação de specs técnicas
+- B5: Histórico preços 180+ dias com análise de tendência
+- B6: Integração com mais varejistas (expansão além dos iniciais)
+- B7: Amazon PA-API (requer 3 vendas qualificadas para ativar)
