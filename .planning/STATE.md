@@ -1,14 +1,32 @@
+---
+gsd_state_version: 1.0
+milestone: v1.0
+milestone_name: milestone
+status: executing
+last_updated: "2026-03-26T23:39:50.191Z"
+last_activity: 2026-03-26
+progress:
+  total_phases: 6
+  completed_phases: 0
+  total_plans: 4
+  completed_plans: 1
+---
+
 # PickleIQ — Project State
 
 **Última atualização:** 2026-03-26
-**Status:** Milestone v1.0 started — Ready for Phase 1
+**Status:** Executing — Plan 2 of 4 (Phase 1)
+**Last session:** 2026-03-26T23:37:39Z — Completed 01-01-PLAN.md
 
 ## Current Position
+
+Phase: 1 (Foundation & Data Infrastructure) — EXECUTING
+Plan: 2 of 4
 
 - **Milestone:** v1.0 (MVP → Beta Launch)
 - **Phase:** 0 (não iniciado)
 - **Status:** Defining Phase 1
-- **Last activity:** 2026-03-26 — Milestone v1.0 started
+- **Last activity:** 2026-03-26
 - **Next action:** `/gsd:plan-phase 1`
 
 ## Completed
@@ -19,6 +37,7 @@
 - [x] REQUIREMENTS.md criado (6 fases, 24 plans)
 - [x] ROADMAP.md criado
 - [x] Git inicializado
+- [x] Plan 01-01: Monorepo skeleton, Docker Compose, pipeline project (2 tasks, 14 files)
 
 ## Research Findings — Critical Decisions
 
@@ -32,6 +51,19 @@
 8. **FTC**: disclosure acima do primeiro link em cada página (não apenas footer)
 9. **Embedding**: narrativo por raquete (200-400 tokens), metadata estruturada no Pinecone
 10. **Latência**: dois estágios — Haiku para perfil (turns 1-3) + Sonnet para recomendação
+
+## Decisions
+
+- [01-01] pgvector/pgvector:pg16 Docker image selected (not postgres:16) to get pgvector pre-installed
+- [01-01] psycopg3 AsyncConnectionPool singleton with open()/close() lifecycle for pipeline DB access
+- [01-01] Telegram alert helper fails gracefully (logs warning) when credentials absent
+- [01-01] pytest asyncio_mode=auto eliminates per-test @pytest.mark.asyncio decorators
+
+## Performance Metrics
+
+| Phase | Plan | Duration | Tasks | Files |
+|-------|------|----------|-------|-------|
+| 01    | 01   | 4 min    | 2/2   | 14    |
 
 ## Open Questions (não bloqueantes para Phase 1)
 
