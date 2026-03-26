@@ -1,12 +1,14 @@
 # PickleIQ — Project State
 
 **Última atualização:** 2026-03-26
-**Status:** Initialized — Ready for Phase 1
+**Status:** Milestone v1.0 started — Ready for Phase 1
 
 ## Current Position
 
-- **Milestone:** 1 (MVP → Beta Launch)
+- **Milestone:** v1.0 (MVP → Beta Launch)
 - **Phase:** 0 (não iniciado)
+- **Status:** Defining Phase 1
+- **Last activity:** 2026-03-26 — Milestone v1.0 started
 - **Next action:** `/gsd:plan-phase 1`
 
 ## Completed
