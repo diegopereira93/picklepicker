@@ -10,7 +10,7 @@ Plataforma de inteligência de dados e IA para o mercado brasileiro de picklebal
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 1: Foundation & Data Infrastructure** - Dev environment + schema + primeiro crawler + Mercado Livre integration
+- [x] **Phase 1: Foundation & Data Infrastructure** - Dev environment + schema + primeiro crawler + Mercado Livre integration (completed 2026-03-26)
 - [ ] **Phase 2: Full Data Pipeline** - Crawlers BR completos, deduplicação SKU, embeddings pgvector, FastAPI endpoints
 - [ ] **Phase 3: RAG Agent & AI Core** - Agente conversacional PT-BR com eval gate de modelo, streaming SSE, latência P95 < 3s
 - [ ] **Phase 4: Frontend Chat & Product UI** - Next.js 14 com quiz onboarding, chat widget, comparador de raquetes e admin panel
@@ -135,7 +135,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Data Infrastructure | 3/4 | In Progress|  |
+| 1. Foundation & Data Infrastructure | 3/4 | Complete    | 2026-03-26 |
 | 2. Full Data Pipeline | 0/5 | Not started | - |
 | 3. RAG Agent & AI Core | 0/5 | Not started | - |
 | 4. Frontend Chat & Product UI | 0/5 | Not started | - |
