@@ -5,7 +5,10 @@ requires-python = ">=3.12"
 dependencies = [
     "fastapi==0.135.2",
     "uvicorn",
+    "pydantic>=2.0",
+    "pytest-asyncio>=0.21.0",
 ]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+asyncio_mode = "auto"
