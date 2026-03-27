@@ -1,1 +1,3 @@
 .gitstack
+.venv
+.env
