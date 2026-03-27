@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.1.0] - 2026-03-27
+
+### Added
+- **Phase 3: RAG Agent & AI Core** — Conversational pickleball paddle recommendations in Portuguese
+- LLM evaluation gate: 10-query Portuguese evaluation selecting Groq (avg 4.25/5.0) vs Claude Sonnet fallback
+- RAG agent skeleton with semantic search (pgvector cosine similarity), 3-tier filtering (stock/budget/skill_level), and top-3 recommendation ranking
+- Conversational chat endpoint (POST /chat) with SSE streaming, input validation, and timeout handling (>8s degraded mode)
+- Portuguese system prompt + metric translation (swingweight, twistweight → plain language) using metrics.py
+- Redis caching layer (3600s TTL, deterministic MD5 key generation) with LatencyTracker for P95 <3s enforcement
+- Langfuse observability integration: traces with model selection, cache hits, degraded mode flags, token counts, and latency percentiles
+- End-to-end testing (E2E): happy path, cache hits, degraded mode, concurrent request handling
+- Production readiness validation: error handling, input validation, header management, no Phase 2 regressions
+- 89 new tests across 5 waves (eval_gate, rag_agent, prompts, chat endpoint, cache, observability, langfuse, E2E, production)
+
+### Changed
+- Updated backend/pyproject.toml with test dependencies (pytest-asyncio, httpx[http2])
+- Extended backend/app/main.py with RAG chat router and Langfuse middleware
+- Updated .planning/STATE.md with Phase 3 progress tracking
+- Updated .planning/ROADMAP.md with Phase 3 completion and Phase 4 next
+
+### Test Coverage
+- 17 tests for Wave 1 (LLM eval gate + RAG agent skeleton)
+- 8 tests for Wave 2 (prompts + metric translation)
+- 11 tests for Wave 3 (chat endpoint + SSE)
+- 17 tests for Wave 4 (cache + observability)
+- 36 tests for Wave 5 (Langfuse integration, E2E, production)
+- Phase 2 regression: 14 tests confirming no regressions
+- **Total: 103 tests passing, 89 new**
+
 ## [0.1.0.0] - 2026-03-27
 
 ### Added

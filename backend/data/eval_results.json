@@ -1,0 +1,60 @@
+{
+  "eval_date": "2026-03-27T12:07:57.695796+00:00",
+  "queries_count": 10,
+  "queries": [
+    {
+      "id": 1,
+      "pt_query": "Sou iniciante, orçamento até R$ 500. Qual raquete você recomenda?",
+      "score": 4.5
+    },
+    {
+      "id": 2,
+      "pt_query": "Prefiro raquete mais pesada para melhor controle. O que você sugere?",
+      "score": 4.3
+    },
+    {
+      "id": 3,
+      "pt_query": "Sou intermediário com orçamento de R$ 700. Qual o melhor custo-benefício?",
+      "score": 4.1
+    },
+    {
+      "id": 4,
+      "pt_query": "Quero uma raquete leve e rápida para potência máxima. Ideias?",
+      "score": 4.4
+    },
+    {
+      "id": 5,
+      "pt_query": "Sou avançado, sem limite de orçamento. Qual é a melhor raquete?",
+      "score": 4.2
+    },
+    {
+      "id": 6,
+      "pt_query": "Procuro algo equilibrado entre controle e potência, até R$ 800.",
+      "score": 4.0
+    },
+    {
+      "id": 7,
+      "pt_query": "Iniciante com estilo defensivo. O que devo comprar?",
+      "score": 4.3
+    },
+    {
+      "id": 8,
+      "pt_query": "Qual raquete é melhor para jogadores com braço mais fraco?",
+      "score": 4.2
+    },
+    {
+      "id": 9,
+      "pt_query": "Recomende uma raquete para clima quente e úmido (Brasil).",
+      "score": 4.4
+    },
+    {
+      "id": 10,
+      "pt_query": "Sou em cadeira de rodas, qual raquete é mais acessível?",
+      "score": 4.1
+    }
+  ],
+  "groq_avg": 4.25,
+  "claude_avg": null,
+  "selected_model": "groq",
+  "reasoning": "Groq average score 4.25 >= 4.0 threshold (cost-effective)"
+}
