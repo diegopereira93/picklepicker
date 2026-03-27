@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pickleiq-pipeline"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    "firecrawl-py==4.21.0",
+    "psycopg[binary,pool]==3.3.3",
+    "tenacity==9.1.4",
+    "python-telegram-bot==22.7",
+    "httpx==0.28.1",
+    "pydantic>=2.0",
+    "python-dotenv",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==9.0.2",
+    "pytest-asyncio==0.23.8",
+    "pytest-cov",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pipeline*", "db*", "alerts*", "crawlers*"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
