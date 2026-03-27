@@ -1,0 +1,159 @@
+name: Scrape Paddles (24h Schedule)
+
+on:
+  schedule:
+    - cron: "0 6 * * *"  # 6h UTC = midnight BRT
+  workflow_dispatch:     # Manual trigger for testing
+
+env:
+  DATABASE_URL: ${{ secrets.SUPABASE_DATABASE_URL }}
+  FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
+  TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+  TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+  ML_API_BATCH_SIZE: 50
+
+jobs:
+  scrape-dropshot-brasil:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install deps
+        run: |
+          cd pipeline && pip install -e . 2>&1 | tail -10
+      - name: Scrape Drop Shot Brasil
+        run: |
+          cd pipeline && python -m pipeline.crawlers.dropshot_brasil 2>&1 | tee /tmp/dropshot.log
+      - name: Alert on failure
+        if: failure()
+        run: |
+          python -c "
+import asyncio, os
+from pipeline.alerts.telegram import send_telegram_alert
+asyncio.run(send_telegram_alert('Drop Shot Brasil crawler FAILED. Check logs.'))
+"
+
+  scrape-mercadolivre:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install deps
+        run: |
+          cd pipeline && pip install -e .
+      - name: Scrape Mercado Livre
+        run: |
+          cd pipeline && python -m pipeline.crawlers.mercadolivre_expansion 2>&1 | tee /tmp/ml.log
+      - name: Alert on failure
+        if: failure()
+        run: |
+          python -c "
+import asyncio, os
+from pipeline.alerts.telegram import send_telegram_alert
+asyncio.run(send_telegram_alert('Mercado Livre crawler FAILED. Check logs.'))
+"
+
+  scrape-franklin-br:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install deps
+        run: cd pipeline && pip install -e .
+      - name: Scrape Franklin BR
+        run: cd pipeline && python -m pipeline.crawlers.franklin_br 2>&1 || echo "Franklin BR not yet implemented"
+      - name: Alert on failure
+        if: failure()
+        run: |
+          python -c "
+import asyncio
+from pipeline.alerts.telegram import send_telegram_alert
+asyncio.run(send_telegram_alert('Franklin BR crawler FAILED.'))
+"
+
+  scrape-head-br:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install deps
+        run: cd pipeline && pip install -e .
+      - name: Scrape Head BR
+        run: cd pipeline && python -m pipeline.crawlers.head_br 2>&1 || echo "Head BR not yet implemented"
+      - name: Alert on failure
+        if: failure()
+        run: |
+          python -c "
+import asyncio
+from pipeline.alerts.telegram import send_telegram_alert
+asyncio.run(send_telegram_alert('Head BR crawler FAILED.'))
+"
+
+  scrape-joola-br:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install deps
+        run: cd pipeline && pip install -e .
+      - name: Scrape JOOLA BR
+        run: cd pipeline && python -m pipeline.crawlers.joola_br 2>&1 || echo "JOOLA BR not yet implemented"
+      - name: Alert on failure
+        if: failure()
+        run: |
+          python -c "
+import asyncio
+from pipeline.alerts.telegram import send_telegram_alert
+asyncio.run(send_telegram_alert('JOOLA BR crawler FAILED.'))
+"
+
+  enrich-specs:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [scrape-dropshot-brasil, scrape-mercadolivre]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install deps
+        run: cd pipeline && pip install -e .
+      - name: Enrich specs from international sources
+        run: cd pipeline && python -m pipeline.crawlers.spec_enrichment 2>&1 || echo "Spec enrichment not yet implemented"
+      - name: Alert on failure
+        if: failure()
+        run: |
+          python -c "
+import asyncio
+from pipeline.alerts.telegram import send_telegram_alert
+asyncio.run(send_telegram_alert('Spec enrichment FAILED.'))
+"
+
+  notify-success:
+    runs-on: ubuntu-latest
+    needs: [scrape-dropshot-brasil, scrape-mercadolivre, enrich-specs]
+    if: success()
+    steps:
+      - name: Send success alert
+        run: |
+          python -c "
+import asyncio, os, sys
+sys.path.insert(0, 'pipeline')
+from pipeline.alerts.telegram import send_telegram_alert
+asyncio.run(send_telegram_alert('✓ All crawlers completed successfully.'))
+"

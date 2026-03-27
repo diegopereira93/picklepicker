@@ -1,0 +1,22 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+
+# Copy backend
+COPY backend/ /app/backend/
+
+# Copy pipeline (for shared modules if needed)
+COPY pipeline/ /app/pipeline/
+
+# Install backend deps
+RUN pip install --no-cache-dir fastapi uvicorn psycopg[binary] httpx pydantic python-dotenv openai
+
+# Expose port (Railway will route via $PORT env var)
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/health').read()" || exit 1
+
+# Start FastAPI
+CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
