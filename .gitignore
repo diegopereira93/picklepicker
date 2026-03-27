@@ -1,3 +1,6 @@
 .gitstack
 .venv
 .env
+*.egg-info
+.claude
+__pycache__
