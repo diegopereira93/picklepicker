@@ -88,11 +88,11 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-- [ ] 04-01: Next.js 14 scaffolding — App Router + Tailwind + shadcn/ui + layout base (anônimo-first, sem auth)
+- [x] 04-01: Next.js 14 scaffolding — App Router + Tailwind + shadcn/ui + layout base (anônimo-first, sem auth)
 - [ ] 04-02: Quiz onboarding (3 steps) + Chat widget (Route Handler proxy → FastAPI, useChat, SSE transform, product cards inline)
 - [ ] 04-03: Página de comparação — search/autocomplete, tabela side-by-side, RadarChart Recharts (ssr: false)
 - [ ] 04-04: Tracking de afiliados — fetch keepalive, Edge Route Handler logging, UTM params preservados
-- [ ] 04-05: Admin Panel — /admin/queue (review queue) + /admin/catalog (CRUD paddles) protegido por ADMIN_SECRET
+- [x] 04-05: Admin Panel — /admin/queue (review queue) + /admin/catalog (CRUD paddles) protegido por ADMIN_SECRET
 
 ### Phase 5: SEO & Growth Features
 **Goal**: Páginas SSR/SEO indexáveis, alertas de preço funcionais e histórico de preços visível.
@@ -138,7 +138,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 1. Foundation & Data Infrastructure | 3/4 | Complete    | 2026-03-26 |
 | 2. Full Data Pipeline | 0/5 | Not started | - |
 | 3. RAG Agent & AI Core | 0/5 | Not started | - |
-| 4. Frontend Chat & Product UI | 0/5 | Not started | - |
+| 4. Frontend Chat & Product UI | 2/6 | In Progress|  |
 | 5. SEO & Growth Features | 0/4 | Not started | - |
 | 6. Launch & Deploy | 0/4 | Not started | - |
 
