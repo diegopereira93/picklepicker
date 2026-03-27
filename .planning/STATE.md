@@ -1,12 +1,32 @@
+---
+gsd_state_version: 1.0
+milestone: v1.0
+milestone_name: milestone
+status: planning
+last_updated: "2026-03-26T23:58:01.100Z"
+last_activity: 2026-03-26
+progress:
+  total_phases: 6
+  completed_phases: 1
+  total_plans: 4
+  completed_plans: 4
+---
+
 # PickleIQ — Project State
 
 **Última atualização:** 2026-03-26
-**Status:** Initialized — Ready for Phase 1
+**Status:** Ready to plan
+**Last session:** 2026-03-26T23:49:08.341Z
 
 ## Current Position
 
-- **Milestone:** 1 (MVP → Beta Launch)
-- **Phase:** 0 (não iniciado)
+Phase: 1 (Foundation & Data Infrastructure) — EXECUTING
+Plan: Not started
+
+- **Milestone:** v1.0 (MVP → Beta Launch)
+- **Phase:** 2
+- **Status:** Defining Phase 1
+- **Last activity:** 2026-03-26
 - **Next action:** `/gsd:plan-phase 1`
 
 ## Completed
@@ -17,6 +37,7 @@
 - [x] REQUIREMENTS.md criado (6 fases, 24 plans)
 - [x] ROADMAP.md criado
 - [x] Git inicializado
+- [x] Plan 01-01: Monorepo skeleton, Docker Compose, pipeline project (2 tasks, 14 files)
 
 ## Research Findings — Critical Decisions
 
@@ -30,6 +51,28 @@
 8. **FTC**: disclosure acima do primeiro link em cada página (não apenas footer)
 9. **Embedding**: narrativo por raquete (200-400 tokens), metadata estruturada no Pinecone
 10. **Latência**: dois estágios — Haiku para perfil (turns 1-3) + Sonnet para recomendação
+
+## Decisions
+
+- [01-01] pgvector/pgvector:pg16 Docker image selected (not postgres:16) to get pgvector pre-installed
+- [01-01] psycopg3 AsyncConnectionPool singleton with open()/close() lifecycle for pipeline DB access
+- [01-01] Telegram alert helper fails gracefully (logs warning) when credentials absent
+- [01-01] pytest asyncio_mode=auto eliminates per-test @pytest.mark.asyncio decorators
+- [Phase 01-02]: latest_prices uses DISTINCT ON with ORDER BY scraped_at DESC and unique index for CONCURRENTLY refresh support
+- [Phase 01-03]: paddle_id left NULL in price_snapshots Phase 1 — dedup/matching deferred to Phase 2
+- [Phase 01-03]: pipeline/__init__.py added to make pipeline importable as namespace package from project root
+- [Phase 01-04]: matt_id used as ML Afiliados affiliate parameter — needs portal confirmation before production
+- [Phase 01-04]: psycopg[binary,pool] required — pool extra must be explicit in pyproject.toml
+- [Phase 01-04]: httpx response.json() is sync — test mocks for httpx responses use MagicMock not AsyncMock
+
+## Performance Metrics
+
+| Phase | Plan | Duration | Tasks | Files |
+|-------|------|----------|-------|-------|
+| 01    | 01   | 4 min    | 2/2   | 14    |
+| Phase 01 P02 | 1 min | 2 tasks | 1 files |
+| Phase 01 P03 | 6 min | 1 tasks | 5 files |
+| Phase 01 P04 | 7 min | 1 tasks | 4 files |
 
 ## Open Questions (não bloqueantes para Phase 1)
 
