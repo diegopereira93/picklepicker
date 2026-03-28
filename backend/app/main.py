@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 import logging
+import os
+from datetime import datetime
 from backend.app.api.paddles import router as paddles_router
 from backend.app.api.chat import router as chat_router
 
@@ -27,4 +29,10 @@ app.include_router(chat_router)
 
 @app.get("/health")
 async def health():
-    return {"status": "ok"}
+    """Production health check endpoint with environment and version info"""
+    return {
+        "status": "ok",
+        "timestamp": datetime.utcnow().isoformat(),
+        "environment": os.getenv("ENVIRONMENT", "development"),
+        "version": os.getenv("RAILWAY_GIT_COMMIT_SHA", "unknown")[:8] if os.getenv("RAILWAY_GIT_COMMIT_SHA") else "local"
+    }
