@@ -2,31 +2,32 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-last_updated: "2026-03-28T20:51:24.445Z"
+status: executing
+last_updated: "2026-03-28T22:30:00.000Z"
 progress:
   total_phases: 6
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 17
   completed_plans: 28
+  phase_03_tests: 103/103
 ---
 
 # PickleIQ — Project State
 
-**Última atualização:** 2026-03-28T21:00:00Z
-**Status:** Ready to plan
-**Última sessão:** 2026-03-28T21:00:00Z
+**Última atualização:** 2026-03-28T22:30:00Z
+**Status:** Phase 03 Complete — Ready for Phase 04
+**Última sessão:** 2026-03-28T22:30:00Z
 
 ## Posição Atual
 
-Fase: 02 (full-data-pipeline) — PLAN 08 COMPLETE
-Plan: Not started
+Fase: 03 (rag-agent-ai-core) — ALL WAVES COMPLETE
+Plan: Ready for Phase 04 planning
 
 - **Milestone:** v1.0 (All infrastructure, observability, beta launch complete)
-- **Fase:** 2 (Full Data Pipeline)
-- **Status:** Gap closure 02-08 (Railway Dockerfile) — COMPLETE
-- **Última atividade:** 2026-03-28T21:30:00Z
-- **Próxima ação:** Continue Phase 02 remaining plans or move to Phase 03
+- **Fase:** 3 (RAG Agent & AI Core)
+- **Status:** All 5 waves complete — 103/103 tests passing
+- **Última atividade:** 2026-03-28T22:30:00Z
+- **Próxima ação:** Move to Phase 04 (Frontend Chat Product UI)
 
 ## Completed
 
@@ -91,6 +92,31 @@ Plan: Not started
 | Phase 05 P03 | 8 min | 4 micro-tasks | 11 files | 57 |
 | Phase 05 P04 | 6 min | 3 micro-tasks | 7 files | 25 |
 | Phase 02 P07 | 15 min | 2 tasks | 4 files | 0 |
+| Phase 03 W1 | 15 min | 2 tasks | 6 files | 17 ✅ |
+| Phase 03 W2-5 | 45 min | 6 tasks | 13 files | 86 ✅ |
+| Phase 03 Total | 60 min | 8 tasks | 13 new + 6 modified | 103 ✅ |
+
+## Phase 03 Completion Summary (RAG Agent & AI Core)
+
+**Execution Date:** 2026-03-28T22:30:00Z
+**Duration:** ~60 minutes
+**Final Commit:** a6c5cca
+**Tests:** 103/103 passing ✅
+
+**Deliverables:**
+- ✅ Eval gate: 10 Portuguese queries scored, Groq selected (4.25 avg)
+- ✅ RAG agent: pgvector search, top-3 filtering, degraded mode
+- ✅ POST /chat SSE endpoint: streaming recommendations, <3s P95 latency
+- ✅ Redis cache: 3600s TTL, deterministic keys, graceful degradation
+- ✅ Langfuse observability: traces, cost tracking, latency monitoring
+- ✅ E2E tests: full pipeline, timeout handling, regression checks
+
+**Key Decisions (Phase 03):**
+- [03-01] Groq selected as primary LLM (4.25 avg score >= 4.0 threshold, cost-effective)
+- [03-02] Portuguese metric translation handles NULL specs gracefully
+- [03-03] SSE events properly JSON-serialized (fixed in commit e805611)
+- [03-04] Redis cache compatible with any async-capable library (no hard redis dependency)
+- [03-05] Langfuse v3 API used for production-ready observability
 
 ## Open Questions (não bloqueantes para Phase 1)
 
