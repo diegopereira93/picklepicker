@@ -11,7 +11,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
-import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs"
+import { SignInButton, UserButton, useAuth } from "@clerk/nextjs"
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -21,6 +21,7 @@ const navLinks = [
 
 export function Header() {
   const [open, setOpen] = useState(false)
+  const { isSignedIn } = useAuth()
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -48,14 +49,14 @@ export function Header() {
           <Button asChild size="sm">
             <Link href="/chat">Encontrar raquete</Link>
           </Button>
-          <SignedOut>
+          {!isSignedIn && (
             <SignInButton mode="modal">
               <Button variant="outline" size="sm">Entrar</Button>
             </SignInButton>
-          </SignedOut>
-          <SignedIn>
+          )}
+          {isSignedIn && (
             <UserButton afterSignOutUrl="/" />
-          </SignedIn>
+          )}
         </div>
 
         {/* Mobile hamburger */}
@@ -90,16 +91,16 @@ export function Header() {
                     Encontrar raquete
                   </Link>
                 </Button>
-                <SignedOut>
+                {!isSignedIn && (
                   <SignInButton mode="modal">
                     <Button variant="outline" className="mt-2 w-full">Entrar</Button>
                   </SignInButton>
-                </SignedOut>
-                <SignedIn>
+                )}
+                {isSignedIn && (
                   <div className="mt-2">
                     <UserButton afterSignOutUrl="/" />
                   </div>
-                </SignedIn>
+                )}
               </nav>
             </SheetContent>
           </Sheet>
