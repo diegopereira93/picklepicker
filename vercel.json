@@ -6,6 +6,12 @@
     },
     "NEXT_PUBLIC_LANGFUSE_KEY": {
       "description": "Langfuse public key for tracing (set in Vercel Dashboard)"
+    },
+    "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY": {
+      "description": "Clerk public key for auth (set in Vercel Dashboard - get from Clerk Dashboard)"
+    },
+    "CLERK_SECRET_KEY": {
+      "description": "Clerk secret key for auth (set in Vercel Dashboard - get from Clerk Dashboard)"
     }
   },
   "rewrites": [
@@ -72,7 +78,9 @@
   "build": {
     "env": {
       "NEXT_PUBLIC_FASTAPI_URL": "@changeme",
-      "NEXT_PUBLIC_LANGFUSE_KEY": "@changeme"
+      "NEXT_PUBLIC_LANGFUSE_KEY": "@changeme",
+      "NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY": "@changeme",
+      "CLERK_SECRET_KEY": "@changeme"
     }
   }
 }
