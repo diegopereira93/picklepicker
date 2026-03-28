@@ -19,6 +19,15 @@ export interface Paddle {
   specs?: PaddleSpecs
   price_min_brl?: number
   created_at: string
+  // SEO / product detail fields (Phase 05-02)
+  model?: string
+  model_slug?: string
+  description?: string
+  price_brl?: number
+  skill_level?: string
+  rating?: number
+  review_count?: number
+  in_stock?: boolean
 }
 
 export interface PaddleListResponse {
