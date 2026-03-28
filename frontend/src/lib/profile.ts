@@ -36,3 +36,23 @@ export function clearProfile(): void {
   if (typeof window === 'undefined') return
   localStorage.removeItem(profileKey())
 }
+
+/**
+ * Called after Clerk sign-in to migrate anonymous profile data to the authenticated account.
+ * Clears the old UUID-keyed profile from localStorage and records the new Clerk user_id.
+ */
+export async function migrateProfileOnLogin(oldUUID: string, newUserId: string): Promise<void> {
+  const res = await fetch('/api/users/migrate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ old_uuid: oldUUID }),
+  })
+
+  if (!res.ok) {
+    throw new Error('Migration failed')
+  }
+
+  // Clear old anonymous profile, store new authenticated user_id
+  localStorage.removeItem(`pickleiq:profile:${oldUUID}`)
+  localStorage.setItem('pickleiq:user_id', newUserId)
+}
