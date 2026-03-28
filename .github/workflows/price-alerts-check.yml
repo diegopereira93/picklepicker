@@ -1,0 +1,28 @@
+name: Price Alerts Check
+
+on:
+  schedule:
+    - cron: '0 6 * * *'  # 6h UTC = 3h BRT
+  workflow_dispatch:       # Allow manual runs for testing
+
+jobs:
+  check-prices:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install "psycopg[binary,pool]" httpx
+
+      - name: Run price alert worker
+        run: python backend/workers/price_alert_check.py
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          FASTAPI_URL: ${{ secrets.FASTAPI_URL }}
