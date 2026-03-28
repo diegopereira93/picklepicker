@@ -1,0 +1,50 @@
+name: NPS Survey Distribution (Day 30)
+
+on:
+  schedule:
+    # Run daily at 9 AM UTC
+    # Script checks if user.created_at > 30 days ago AND hasn't received NPS yet
+    - cron: "0 9 * * *"
+  workflow_dispatch:
+
+jobs:
+  send_nps_surveys:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -e ./backend
+          pip install aiohttp
+
+      - name: Send NPS surveys to eligible users
+        run: |
+          python -m scripts.send_nps_surveys
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          TYPEFORM_API_KEY: ${{ secrets.TYPEFORM_API_KEY }}
+          TYPEFORM_FORM_ID: ${{ secrets.TYPEFORM_FORM_ID }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+      - name: Log completion
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            console.log("✅ NPS survey distribution completed");
+
+      - name: Alert on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            console.log("❌ NPS survey distribution failed - check logs");

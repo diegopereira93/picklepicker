@@ -84,54 +84,51 @@ O mercado de pickleball cresceu no Brasil e os compradores enfrentam dois proble
 
 Receita via comissões de afiliados (10-40% por venda). Distribuição primária via parceiro treinador → alunos (WhatsApp groups). SEO como canal secundário (maturação 6-12 meses, começa Phase 5). URLs de afiliado geradas server-side — LLM nunca constrói URLs diretamente.
 
-## Current Milestone: v1.0 — MVP → Beta Launch
+## Milestone Atual: v1.0 — Milestone 2 (Fases 2-3-5)
 
-**Goal:** Plataforma completa em produção com crawlers BR ativos, agente de IA funcional e links de afiliado gerando cliques.
+**Objetivo:** Completar MVP executando Full Data Pipeline, RAG Agent e Features de SEO & Crescimento.
 
-**Target features:**
-- Foundation: monorepo + PostgreSQL/pgvector + Supabase + crawler BR + Mercado Livre Afiliados
-- Full data pipeline: todos os varejistas BR, dedup, embeddings, GitHub Actions schedule, Railway
-- RAG agent: eval gate OSS + streaming SSE + prompt engineering + Redis + Langfuse
-- Frontend: Next.js 14 anônimo-first + quiz + Route Handler proxy + Admin Panel
-- SEO + Clerk auth + alertas de preço (Resend) + histórico de preços
-- Deploy prod + CI/CD + 50-user beta
+**Features Alvo:**
+- Fase 2: Pipeline de dados completo — todos varejistas BR, dedup, embeddings, GitHub Actions, Railway
+- Fase 3: Agente RAG — chat com streaming, cache Redis, Langfuse, eval gate OSS
+- Fase 5: SEO & Crescimento — páginas otimizadas, alertas de preço, histórico de preços
 
-## Current State
+## Estado Atual
 
-**Phase 04 complete — 2026-03-28**
+**Fase 04 concluída — 2026-03-28**
 
-- **Phase 01:** Foundation & Data Infrastructure (monorepo, PostgreSQL, crawlers, Mercado Livre afiliados)
-- **Phase 02:** Full Data Pipeline (all BR retailers, dedup, embeddings, GitHub Actions, Railway)
-- **Phase 03:** RAG Agent (eval gate OSS, streaming SSE, prompt engineering, Redis, Langfuse)
-- **Phase 04:** Frontend Chat Product UI (Next.js 14 scaffold, quiz onboarding, chat widget with SSE, paddle comparison, affiliate tracking, admin panel)
-  - Quiz: 3-step flow (level → style → budget) with sessionStorage profile
-  - Chat: SSE-streaming widget with Route Handler proxy, Vercel AI SDK integration
-  - Comparison: Paddle search, side-by-side specs table, radar chart visualization
-  - Affiliate: Keepalive fetch tracking, UTM parameter preservation, AffiliateLink component
-  - Admin Panel: Queue review (/admin/queue), catalog CRUD (/admin/catalog), ADMIN_SECRET protection
-  - Build: 61 integration tests passing, production clean, 6/6 plans executed
+- **Fase 01:** Foundation & Data Infrastructure (monorepo, PostgreSQL, crawlers, Mercado Livre afiliados) ✓
+- **Fase 02:** Full Data Pipeline (todos varejistas BR, dedup, embeddings, GitHub Actions, Railway) → Em progresso
+- **Fase 03:** RAG Agent (eval gate OSS, streaming SSE, prompt engineering, Redis, Langfuse) → Em progresso
+- **Fase 04:** Frontend Chat Product UI (Next.js 14 scaffold, quiz onboarding, chat com SSE, comparador, tracking afiliado, admin panel) ✓
+  - Quiz: fluxo 3 passos (nível → estilo → orçamento) com perfil em sessionStorage
+  - Chat: widget com streaming SSE, Route Handler proxy, integração Vercel AI SDK
+  - Comparação: busca de raquete, tabela side-by-side, visualização radar chart
+  - Afiliado: tracking com keepalive fetch, preservação de parâmetros UTM, componente AffiliateLink
+  - Admin Panel: fila de review (/admin/queue), CRUD catálogo (/admin/catalog), proteção ADMIN_SECRET
+  - Build: 61 testes integração passando, produção limpa, 6/6 plans executados
 
-**Next:** Phase 05 — SEO & Growth Features
+**Próximo:** Fases 2-3-5 para v1.0 Milestone 2
 
-## Evolution
+## Evolução
 
-This document evolves at phase transitions and milestone boundaries.
+Este documento evolui nas transições de fase e limites de milestone.
 
-*Last updated: 2026-03-28 — Phase 04: Frontend Chat Product UI complete*
+*Última atualização: 2026-03-28 — Iniciando Milestone 2 (Fases 2-3-5)*
 
-**After each phase transition** (via `/gsd:transition`):
-1. Requirements invalidated? → Move to Out of Scope with reason
-2. Requirements validated? → Move to Validated with phase reference
-3. New requirements emerged? → Add to Active
-4. Decisions to log? → Add to Key Decisions
-5. "What This Is" still accurate? → Update if drifted
+**Após cada transição de fase** (via `/gsd:transition`):
+1. Requisitos invalidados? → Mover para Out of Scope com razão
+2. Requisitos validados? → Mover para Validados com referência de fase
+3. Novos requisitos emergiram? → Adicionar a Ativos
+4. Decisões para registrar? → Adicionar a Decisões Chave
+5. "O que Isso É" ainda preciso? → Atualizar se divergiu
 
-**After each milestone** (via `/gsd:complete-milestone`):
-1. Full review of all sections
-2. Core Value check — still the right priority?
-3. Audit Out of Scope — reasons still valid?
-4. Update Context with current state
+**Após cada milestone** (via `/gsd:complete-milestone`):
+1. Revisão completa de todas as seções
+2. Verificação de Valor Central — ainda a prioridade certa?
+3. Auditoria Out of Scope — razões ainda válidas?
+4. Atualizar Context com estado atual
 
 ---
 
-*Last updated: 2026-03-28 — Phase 04 (Frontend Chat Product UI) validated and complete*
+*Last updated: 2026-03-28
