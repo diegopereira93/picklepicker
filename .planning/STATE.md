@@ -3,30 +3,30 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-03-28T20:46:38.333Z"
+last_updated: "2026-03-28T21:00:00Z"
 progress:
   total_phases: 6
   completed_phases: 4
   total_plans: 17
-  completed_plans: 25
+  completed_plans: 26
 ---
 
 # PickleIQ — Project State
 
-**Última atualização:** 2026-03-28T18:45:00Z
+**Última atualização:** 2026-03-28T21:00:00Z
 **Status:** Executing Phase 02
-**Última sessão:** 2026-03-28T18:45:00Z
+**Última sessão:** 2026-03-28T21:00:00Z
 
 ## Posição Atual
 
-Fase: 06 (launch-deploy) — WAVE 2 COMPLETE
-Plan: Not started
+Fase: 02 (full-data-pipeline) — PLAN 07 COMPLETE
+Plan: 02-07 Complete
 
 - **Milestone:** v1.0 (All infrastructure, observability, beta launch complete)
-- **Fase:** 6 (Launch & Deploy)
-- **Status:** Phase 06 Wave 2 Complete — 06-04 executed with all 4 tasks + checkpoint PASSED
-- **Última atividade:** 2026-03-28T18:45:00Z
-- **Próxima ação:** Phase 07 (Optimization & Growth) based on NPS feedback (day 30+)
+- **Fase:** 2 (Full Data Pipeline)
+- **Status:** Gap closure 02-07 (FastAPI ↔ PostgreSQL wiring) — COMPLETE
+- **Última atividade:** 2026-03-28T21:00:00Z
+- **Próxima ação:** Continue Phase 02 remaining plans or move to Phase 03
 
 ## Completed
 
@@ -72,6 +72,7 @@ Plan: Not started
 - [Phase 05-02]: Canonical URL stored in alternates.canonical (Next.js 14 Metadata API)
 - [Phase 05-02]: revalidateTag/revalidatePath imported dynamically to gracefully no-op in test environment
 - [Phase 05]: Clerk installed with --legacy-peer-deps; Resend client made lazy for vitest testability; vi.hoisted() pattern established for class-based SDK mocks
+- [Phase 02-07]: Backend AsyncConnectionPool singleton (min=2, max=10) initialized in FastAPI lifespan; all paddles endpoints wire real psycopg queries with dict_row factory
 
 ## Performance Metrics
 
@@ -88,6 +89,7 @@ Plan: Not started
 | Phase 05 P01 | 25 min | 3 tasks | 10 files | 28 |
 | Phase 05 P03 | 8 min | 4 micro-tasks | 11 files | 57 |
 | Phase 05 P04 | 6 min | 3 micro-tasks | 7 files | 25 |
+| Phase 02 P07 | 15 min | 2 tasks | 4 files | 0 |
 
 ## Open Questions (não bloqueantes para Phase 1)
 
