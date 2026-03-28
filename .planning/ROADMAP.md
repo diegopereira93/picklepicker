@@ -47,7 +47,7 @@ Plans:
   3. pgvector embeddings populados (text-embedding-3-small, índice HNSW) com re-embedding assíncrono
   4. FastAPI com todos os 5 endpoints GET /paddles funcionando + GET /health
   5. Railway provisionado para API staging
-**Plans**: 5 plans
+**Plans**: 8 plans (5 original + 3 gap-closure)
 
 Plans:
 - [ ] 02-01: Crawlers Drop Shot Brasil + Mercado Livre expansão via Firecrawl /extract
@@ -55,6 +55,9 @@ Plans:
 - [ ] 02-03: GitHub Actions schedule (cron 24h) — orquestração crawlers, retry exponential backoff, alerta Telegram + provisionar Railway
 - [ ] 02-04: pgvector embeddings — extensão vector Supabase, text-embedding-3-small, índice HNSW, re-embedding assíncrono via needs_reembed flag
 - [ ] 02-05: FastAPI endpoints — GET /paddles, GET /paddles/{id}, GET /paddles/{id}/prices, GET /paddles/{id}/latest-prices, GET /health
+- [ ] 02-06: [GAP] Fix crawler module naming — GH Actions references mercadolivre_expansion but file is mercado_livre.py (R2.1)
+- [ ] 02-07: [GAP] Wire API endpoints to real DB — replace mock db_fetch with psycopg async pool (R2.4)
+- [ ] 02-08: [GAP] Create backend/Dockerfile for Railway deployment (R2.5)
 
 ### Phase 3: RAG Agent & AI Core
 **Goal**: Agente conversacional recomendando raquetes com latência < 3s, com observabilidade via Langfuse.
@@ -136,7 +139,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Data Infrastructure | 3/4 | Complete    | 2026-03-26 |
-| 2. Full Data Pipeline | 0/5 | Not started | - |
+| 2. Full Data Pipeline | 0/8 | Gap closure planned | - |
 | 3. RAG Agent & AI Core | 0/5 | Not started | - |
 | 4. Frontend Chat & Product UI | 6/6 | Complete   | 2026-03-28 |
 | 5. SEO & Growth Features | 4/4 | Complete    | 2026-03-28 |
