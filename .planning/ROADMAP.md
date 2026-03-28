@@ -15,7 +15,7 @@ Plataforma de inteligência de dados e IA para o mercado brasileiro de picklebal
 - [ ] **Phase 3: RAG Agent & AI Core** - Agente conversacional PT-BR com eval gate de modelo, streaming SSE, latência P95 < 3s
 - [x] **Phase 4: Frontend Chat & Product UI** - Next.js 14 com quiz onboarding, chat widget, comparador de raquetes e admin panel (completed 2026-03-28)
 - [x] **Phase 5: SEO & Growth Features** - Páginas SSR indexáveis, price alerts com Clerk + Resend, histórico de preços (completed 2026-03-28)
-- [ ] **Phase 6: Launch & Deploy** - Produção estável, CI/CD, observabilidade, beta 50 usuários
+- [x] **Phase 6: Launch & Deploy** - Produção estável, CI/CD, observabilidade, beta 50 usuários (completed 2026-03-28)
 
 ## Phase Details
 
@@ -140,7 +140,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 3. RAG Agent & AI Core | 0/5 | Not started | - |
 | 4. Frontend Chat & Product UI | 6/6 | Complete   | 2026-03-28 |
 | 5. SEO & Growth Features | 4/4 | Complete    | 2026-03-28 |
-| 6. Launch & Deploy | 0/4 | Not started | - |
+| 6. Launch & Deploy | 0/4 | Complete    | 2026-03-28 |
 
 ---
 
