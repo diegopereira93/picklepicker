@@ -1,6 +1,7 @@
 """Chat endpoint with SSE streaming for paddle recommendations."""
 
 import asyncio
+import json
 import time
 from typing import Optional
 from fastapi import APIRouter
@@ -88,7 +89,7 @@ async def chat_stream(request: ChatRequest) -> StreamingResponse:
                     for r in recommendations
                 ]
             }
-            yield f"event: recommendations\ndata: {rec_data}\n\n"
+            yield f"event: recommendations\ndata: {json.dumps(rec_data)}\n\n"
 
             # Try LLM reasoning with timeout
             try:
@@ -98,7 +99,7 @@ async def chat_stream(request: ChatRequest) -> StreamingResponse:
                 # Simulate timeout check (production: asyncio.wait_for(..., timeout=8.0))
                 await asyncio.sleep(0.1)
 
-                yield f"event: reasoning\ndata: {{'text': '{reasoning}'}}\n\n"
+                yield f"event: reasoning\ndata: {json.dumps({'text': reasoning})}\n\n"
 
             except asyncio.TimeoutError:
                 # Degraded mode: use fallback rankings
@@ -115,7 +116,7 @@ async def chat_stream(request: ChatRequest) -> StreamingResponse:
                         for r in fallback
                     ]
                 }
-                yield f"event: degraded\ndata: {fallback_data}\n\n"
+                yield f"event: degraded\ndata: {json.dumps(fallback_data)}\n\n"
 
             # Send done event with metadata
             latency_ms = (time.time() - start_time) * 1000
@@ -125,11 +126,11 @@ async def chat_stream(request: ChatRequest) -> StreamingResponse:
                 "model": "groq",
                 "cache_hit": False
             }
-            yield f"event: done\ndata: {done_data}\n\n"
+            yield f"event: done\ndata: {json.dumps(done_data)}\n\n"
 
         except Exception as e:
             error_event = {"error": str(e)}
-            yield f"event: error\ndata: {error_event}\n\n"
+            yield f"event: error\ndata: {json.dumps(error_event)}\n\n"
 
     return StreamingResponse(
         event_generator(),
