@@ -3,30 +3,30 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-03-27T19:27:21.092Z"
-last_activity: 2026-03-27
+last_updated: "2026-03-28T02:58:03.097Z"
+last_activity: 2026-03-28
 progress:
   total_phases: 6
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 9
-  completed_plans: 12
+  completed_plans: 14
 ---
 
 # PickleIQ — Project State
 
 **Última atualização:** 2026-03-27
 **Status:** Ready to execute
-**Last session:** 2026-03-27T19:27:21.087Z
+**Last session:** 2026-03-28T02:58:03.079Z
 
 ## Current Position
 
 Phase: 04 (frontend-chat-product-ui) — EXECUTING
-Plan: 4 of 6
+Plan: 2 of 6
 
 - **Milestone:** v1.0 (MVP → Beta Launch)
 - **Phase:** 4
 - **Status:** Executing Phase 4
-- **Last activity:** 2026-03-27
+- **Last activity:** 2026-03-28
 - **Next action:** Execute 04-02
 
 ## Completed
@@ -69,6 +69,7 @@ Plan: 4 of 6
 - [04-01]: API client uses NEXT_PUBLIC_FASTAPI_URL env var; graceful fallback returns empty list on network error
 - [Phase 04]: AdminAuthContext provides logout() to all /admin/* children via React context, avoiding prop drilling
 - [Phase 04]: Route Handlers validate Authorization header server-side against ADMIN_SECRET env var; client never compares secrets directly
+- [Phase 04-root]: UIMessage from ai SDK uses parts array only — msg.content property does not exist; textContent must be extracted from parts
 
 ## Performance Metrics
 
@@ -80,6 +81,7 @@ Plan: 4 of 6
 | Phase 01 P04 | 7 min | 1 tasks | 4 files |
 | 04    | 01   | 14 min   | 2/2   | 29    |
 | Phase 04 P05 | 25 min | 2 tasks | 15 files |
+| Phase 04 Proot | 15 min | 1 tasks | 3 files |
 
 ## Open Questions (não bloqueantes para Phase 1)
 
