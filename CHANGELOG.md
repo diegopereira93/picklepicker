@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.2.0] - 2026-03-28
+
+### Added
+- **Phase 5: SEO & Growth Features** — Complete product discovery & monetization platform
+- Clerk v5 authentication: Protected endpoints, anon→registered migration, profile upgrade flow
+- Product pages with SEO: Server Components, dynamic metadata, Schema.org JSON-LD, ISR (3600s) + on-demand revalidation
+- Price history & alerts: Percentile tracking (P20 daily), email notifications via Resend, price trend visualization with Recharts
+- Blog system: Pillar pages, FTC affiliate disclosure, automated metadata generation, SEO-optimized content
+- Admin panel: Review queue (duplicates, spec mismatches), inline catalog editing, FastAPI integration
+- Frontend test suite: Vitest with 152 tests covering auth, API, components, integration flows
+- E2E verification: 4/4 phase plans executed, comprehensive test coverage
+
+### Changed
+- Implemented Session Upgrade pattern (anon → registered user profile)
+- Extended Paddle type with metadata, ratings, review counts
+- Added product revalidation webhook for instant ISR updates
+- Expanded admin API routes (proxy to FastAPI backend)
+- Updated .planning/STATE.md and ROADMAP.md with Phase 5 completion
+
+### Test Coverage
+- Phase 5 total: 127 new tests across authentication, SEO, price tracking, and admin features
+- All phases: 152 frontend tests passing, no regressions from Phase 2
+- Coverage includes: Unit tests (45%), Integration tests (35%), End-to-end verification (20%)
+
 ## [0.2.1.0] - 2026-03-27
 
 ### Added
