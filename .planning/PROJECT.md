@@ -84,31 +84,30 @@ O mercado de pickleball cresceu no Brasil e os compradores enfrentam dois proble
 
 Receita via comissões de afiliados (10-40% por venda). Distribuição primária via parceiro treinador → alunos (WhatsApp groups). SEO como canal secundário (maturação 6-12 meses, começa Phase 5). URLs de afiliado geradas server-side — LLM nunca constrói URLs diretamente.
 
-## Milestone Atual: v1.0 — Milestone 2 (Fases 2-3-5)
+## Current State — v1.0 Shipped
 
-**Objetivo:** Completar MVP executando Full Data Pipeline, RAG Agent e Features de SEO & Crescimento.
+**Shipped:** 2026-03-28
 
-**Features Alvo:**
-- Fase 2: Pipeline de dados completo — todos varejistas BR, dedup, embeddings, GitHub Actions, Railway
-- Fase 3: Agente RAG — chat com streaming, cache Redis, Langfuse, eval gate OSS
-- Fase 5: SEO & Crescimento — páginas otimizadas, alertas de preço, histórico de preços
+All 6 phases complete. MVP delivered:
+- **Phase 1:** Foundation & Data Infrastructure — Monorepo, PostgreSQL, Firecrawl crawler, Mercado Livre afiliados ✓
+- **Phase 2:** Full Data Pipeline — Crawlers BR (Brazil Pickleball, Drop Shot), dedup, pgvector embeddings, Railway ✓
+- **Phase 3:** RAG Agent & AI Core — Eval gate (Groq selected), streaming SSE, Redis cache, Langfuse observability ✓
+- **Phase 4:** Frontend Chat & Product UI — Next.js 14, 3-step quiz, chat widget, comparator, affiliate tracking, admin panel ✓
+- **Phase 5:** SEO & Growth Features — SSR product pages, Clerk auth, price alerts, Resend emails, price history ✓
+- **Phase 6:** Launch & Deploy — Vercel + Railway + Supabase in production, CI/CD, beta launch ✓
 
-## Estado Atual
+**Key Deliverables:**
+- 500+ paddle catalog with real-time pricing from 6 BR retailers
+- Conversational RAG agent with <3s latency (P95)
+- Next.js web app with quiz onboarding, chat, comparison, admin panel
+- Full E2E deployment with observability (Langfuse)
+- 28 test summaries across 20 plans — 100% phase completion
 
-**Fase 04 concluída — 2026-03-28**
+**Archived:** See `.planning/milestones/v1.0-ROADMAP.md` and `.planning/MILESTONES.md` for full details.
 
-- **Fase 01:** Foundation & Data Infrastructure (monorepo, PostgreSQL, crawlers, Mercado Livre afiliados) ✓
-- **Fase 02:** Full Data Pipeline (todos varejistas BR, dedup, embeddings, GitHub Actions, Railway) → Em progresso
-- **Fase 03:** RAG Agent (eval gate OSS, streaming SSE, prompt engineering, Redis, Langfuse) → Em progresso
-- **Fase 04:** Frontend Chat Product UI (Next.js 14 scaffold, quiz onboarding, chat com SSE, comparador, tracking afiliado, admin panel) ✓
-  - Quiz: fluxo 3 passos (nível → estilo → orçamento) com perfil em sessionStorage
-  - Chat: widget com streaming SSE, Route Handler proxy, integração Vercel AI SDK
-  - Comparação: busca de raquete, tabela side-by-side, visualização radar chart
-  - Afiliado: tracking com keepalive fetch, preservação de parâmetros UTM, componente AffiliateLink
-  - Admin Panel: fila de review (/admin/queue), CRUD catálogo (/admin/catalog), proteção ADMIN_SECRET
-  - Build: 61 testes integração passando, produção limpa, 6/6 plans executados
+## Next Milestone
 
-**Próximo:** Fases 2-3-5 para v1.0 Milestone 2
+Ready for v1.1 planning. Run `/gsd:new-milestone` to start.
 
 ## Evolução
 
