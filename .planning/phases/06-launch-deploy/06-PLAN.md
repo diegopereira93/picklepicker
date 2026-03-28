@@ -1571,6 +1571,8 @@ depends_on: [06-01, 06-02, 06-03]
 files_modified:
   - backend/app/routers/paddles.py
   - backend/app/routers/chat.py
+  - backend/app/routers/affiliate.py
+  - backend/app/models.py
   - frontend/app/page.tsx
   - frontend/app/api/onboarding/route.ts
   - .github/workflows/scraper.yml
@@ -1611,6 +1613,9 @@ must_haves:
     - path: "backend/app/routers/chat.py"
       provides: "POST /chat streaming recommendation endpoint"
       exports: ["POST /chat"]
+    - path: "backend/app/routers/affiliate.py"
+      provides: "Affiliate click tracking and redirect"
+      exports: ["GET /api/track-affiliate"]
     - path: "frontend/app/page.tsx"
       provides: "Landing page with onboarding flow"
       contains: "quiz|chat widget|affiliate disclosure"
@@ -1631,8 +1636,8 @@ must_haves:
       pattern: "email|api_key"
     - from: "Product pages"
       to: "Affiliate links"
-      via: "UTM params + FTC disclosure"
-      pattern: "utm_source=pickleiq|FTC disclosure"
+      via: "GET /api/track-affiliate endpoint with UTM params"
+      pattern: "utm_source=pickleiq|track-affiliate|FTC disclosure"
     - from: "Day 30"
       to: "NPS survey"
       via: "Scheduled email job"
@@ -1740,6 +1745,122 @@ Perform manual end-to-end testing of complete user journey before beta launch:
   </verify>
   <done>
 Full-stack functionality verified, performance baseline confirmed, admin panel accessible, database integrity validated.
+  </done>
+</task>
+
+<task type="auto">
+  <name>Task 1.5: Create affiliate tracking endpoint</name>
+  <files>backend/app/routers/affiliate.py</files>
+  <action>
+Create affiliate link tracking endpoint that logs clicks and redirects to partner sites:
+
+1. **Create affiliate.py router:**
+   ```python
+   # backend/app/routers/affiliate.py
+   from fastapi import APIRouter, HTTPException
+   from fastapi.responses import RedirectResponse
+   from datetime import datetime
+   from sqlalchemy import insert
+   from app.db import get_db
+   from app.models import AffiliateClick
+   import logging
+
+   logger = logging.getLogger(__name__)
+   router = APIRouter()
+
+   @router.get("/api/track-affiliate")
+   async def track_affiliate(
+       utm_source: str = "pickleiq",
+       utm_campaign: str = "search",
+       utm_medium: str = "chat",
+       paddle_id: int = None,
+       redirect_url: str = None
+   ):
+       """Track affiliate click and redirect to partner."""
+       try:
+           async with get_db() as conn:
+               # Log the click
+               stmt = insert(AffiliateClick).values(
+                   utm_source=utm_source,
+                   utm_campaign=utm_campaign,
+                   utm_medium=utm_medium,
+                   paddle_id=paddle_id,
+                   redirect_url=redirect_url,
+                   clicked_at=datetime.utcnow()
+               )
+               await conn.execute(stmt)
+               await conn.commit()
+
+               logger.info(f"Affiliate click tracked: {paddle_id} -> {redirect_url}")
+
+               # Redirect to partner
+               if redirect_url:
+                   return RedirectResponse(url=redirect_url, status_code=302)
+               else:
+                   raise HTTPException(status_code=400, detail="Missing redirect_url")
+       except Exception as e:
+           logger.error(f"Affiliate tracking error: {e}")
+           raise HTTPException(status_code=500, detail="Tracking failed")
+   ```
+
+2. **Create AffiliateClick model in app/models.py:**
+   ```python
+   from sqlalchemy import Column, Integer, String, DateTime
+   from sqlalchemy.ext.declarative import declarative_base
+
+   Base = declarative_base()
+
+   class AffiliateClick(Base):
+       __tablename__ = "affiliate_clicks"
+
+       id = Column(Integer, primary_key=True)
+       utm_source = Column(String(100))
+       utm_campaign = Column(String(100))
+       utm_medium = Column(String(100))
+       paddle_id = Column(Integer, nullable=True)
+       redirect_url = Column(String(500))
+       clicked_at = Column(DateTime, default=datetime.utcnow)
+   ```
+
+3. **Add migration:**
+   ```sql
+   CREATE TABLE affiliate_clicks (
+       id SERIAL PRIMARY KEY,
+       utm_source VARCHAR(100),
+       utm_campaign VARCHAR(100),
+       utm_medium VARCHAR(100),
+       paddle_id INTEGER,
+       redirect_url VARCHAR(500),
+       clicked_at TIMESTAMP DEFAULT NOW()
+   );
+   CREATE INDEX idx_paddle_id ON affiliate_clicks(paddle_id);
+   CREATE INDEX idx_clicked_at ON affiliate_clicks(clicked_at);
+   ```
+
+4. **Register router in main.py:**
+   ```python
+   from app.routers import affiliate
+   app.include_router(affiliate.router, prefix="/api", tags=["affiliate"])
+   ```
+
+5. **Update chat response to include tracking URL:**
+   In chat router, when recommending paddles, build affiliate links:
+   ```python
+   redirect_url = "https://example-affiliate.com/product/123"
+   tracking_url = f"https://api.pickleiq.com/api/track-affiliate?utm_source=pickleiq&utm_campaign=chat&utm_medium=recommendation&paddle_id={paddle_id}&redirect_url={urllib.parse.quote(redirect_url)}"
+   ```
+  </action>
+  <verify>
+    - File backend/app/routers/affiliate.py exists with track_affiliate endpoint
+    - AffiliateClick model in app/models.py
+    - Migration applied: affiliate_clicks table exists
+    - Router registered in main.py
+    - GET /api/track-affiliate?utm_source=pickleiq&utm_campaign=chat&redirect_url=... returns 302 redirect
+    - affiliate_clicks table logs each click with timestamp
+    - Chat response includes tracking URLs in affiliate links
+  </verify>
+  <done>
+Affiliate tracking endpoint created, clicks logged to database, redirects working.
   </done>
 </task>
 
