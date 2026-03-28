@@ -13,7 +13,7 @@ Plataforma de inteligência de dados e IA para o mercado brasileiro de picklebal
 - [x] **Phase 1: Foundation & Data Infrastructure** - Dev environment + schema + primeiro crawler + Mercado Livre integration (completed 2026-03-26)
 - [ ] **Phase 2: Full Data Pipeline** - Crawlers BR completos, deduplicação SKU, embeddings pgvector, FastAPI endpoints
 - [ ] **Phase 3: RAG Agent & AI Core** - Agente conversacional PT-BR com eval gate de modelo, streaming SSE, latência P95 < 3s
-- [ ] **Phase 4: Frontend Chat & Product UI** - Next.js 14 com quiz onboarding, chat widget, comparador de raquetes e admin panel
+- [x] **Phase 4: Frontend Chat & Product UI** - Next.js 14 com quiz onboarding, chat widget, comparador de raquetes e admin panel (completed 2026-03-28)
 - [ ] **Phase 5: SEO & Growth Features** - Páginas SSR indexáveis, price alerts com Clerk + Resend, histórico de preços
 - [ ] **Phase 6: Launch & Deploy** - Produção estável, CI/CD, observabilidade, beta 50 usuários
 
@@ -88,11 +88,11 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-- [ ] 04-01: Next.js 14 scaffolding — App Router + Tailwind + shadcn/ui + layout base (anônimo-first, sem auth)
-- [ ] 04-02: Quiz onboarding (3 steps) + Chat widget (Route Handler proxy → FastAPI, useChat, SSE transform, product cards inline)
-- [ ] 04-03: Página de comparação — search/autocomplete, tabela side-by-side, RadarChart Recharts (ssr: false)
-- [ ] 04-04: Tracking de afiliados — fetch keepalive, Edge Route Handler logging, UTM params preservados
-- [ ] 04-05: Admin Panel — /admin/queue (review queue) + /admin/catalog (CRUD paddles) protegido por ADMIN_SECRET
+- [x] 04-01: Next.js 14 scaffolding — App Router + Tailwind + shadcn/ui + layout base (anônimo-first, sem auth)
+- [x] 04-02: Quiz onboarding (3 steps) + Chat widget (Route Handler proxy → FastAPI, useChat, SSE transform, product cards inline)
+- [x] 04-03: Página de comparação — search/autocomplete, tabela side-by-side, RadarChart Recharts (ssr: false)
+- [x] 04-04: Tracking de afiliados — fetch keepalive, Edge Route Handler logging, UTM params preservados
+- [x] 04-05: Admin Panel — /admin/queue (review queue) + /admin/catalog (CRUD paddles) protegido por ADMIN_SECRET
 
 ### Phase 5: SEO & Growth Features
 **Goal**: Páginas SSR/SEO indexáveis, alertas de preço funcionais e histórico de preços visível.
@@ -106,8 +106,8 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 05-01: Páginas produto SSR — generateMetadata(), Schema.org/Product JSON-LD, slug /paddles/[brand]/[model], ISR listings
-- [ ] 05-02: Auth Clerk v5 + price alerts — clerkMiddleware(), favoritar produto, worker GH Actions 24h, e-mail Resend + React Email
+- [x] 05-01: Páginas produto SSR — generateMetadata(), Schema.org/Product JSON-LD, slug /paddles/[brand]/[model], ISR listings
+- [x] 05-02: Auth Clerk v5 + price alerts — clerkMiddleware(), favoritar produto, worker GH Actions 24h, e-mail Resend + React Email
 - [ ] 05-03: Histórico de preços — gráfico linha 90/180 dias, indicador "Bom momento para comprar" (≤ P20 últimos 90 dias)
 - [ ] 05-04: Pillar page SEO — "Best Pickleball Paddles for Beginners" + FTC disclosure obrigatória em todas as páginas com afiliados
 
@@ -138,8 +138,8 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 1. Foundation & Data Infrastructure | 3/4 | Complete    | 2026-03-26 |
 | 2. Full Data Pipeline | 0/5 | Not started | - |
 | 3. RAG Agent & AI Core | 0/5 | Not started | - |
-| 4. Frontend Chat & Product UI | 0/5 | Not started | - |
-| 5. SEO & Growth Features | 0/4 | Not started | - |
+| 4. Frontend Chat & Product UI | 6/6 | Complete   | 2026-03-28 |
+| 5. SEO & Growth Features | 2/4 | In Progress|  |
 | 6. Launch & Deploy | 0/4 | Not started | - |
 
 ---

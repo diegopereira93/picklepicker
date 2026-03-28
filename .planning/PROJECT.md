@@ -98,22 +98,26 @@ Receita via comissões de afiliados (10-40% por venda). Distribuição primária
 
 ## Current State
 
-**Phase 1 complete — 2026-03-26**
+**Phase 04 complete — 2026-03-28**
 
-- Monorepo skeleton: `backend/`, `frontend/`, `pipeline/` with Docker Compose (`pgvector/pgvector:pg16`)
-- PostgreSQL schema: 8 tables + `latest_prices` materialized view + pgvector extension + retailer seed data
-- Brazil Pickleball Store crawler: Firecrawl `/extract`, Tenacity 3x backoff, Telegram alert, saves to `price_snapshots`
-- Mercado Livre integration: public search API, affiliate URL via `matt_id`, saves to `price_snapshots`
-- 11/11 unit tests passing (pytest-asyncio)
-- Pending (human): Supabase staging provisioning, ML Afiliados tag confirmation, live crawl run
+- **Phase 01:** Foundation & Data Infrastructure (monorepo, PostgreSQL, crawlers, Mercado Livre afiliados)
+- **Phase 02:** Full Data Pipeline (all BR retailers, dedup, embeddings, GitHub Actions, Railway)
+- **Phase 03:** RAG Agent (eval gate OSS, streaming SSE, prompt engineering, Redis, Langfuse)
+- **Phase 04:** Frontend Chat Product UI (Next.js 14 scaffold, quiz onboarding, chat widget with SSE, paddle comparison, affiliate tracking, admin panel)
+  - Quiz: 3-step flow (level → style → budget) with sessionStorage profile
+  - Chat: SSE-streaming widget with Route Handler proxy, Vercel AI SDK integration
+  - Comparison: Paddle search, side-by-side specs table, radar chart visualization
+  - Affiliate: Keepalive fetch tracking, UTM parameter preservation, AffiliateLink component
+  - Admin Panel: Queue review (/admin/queue), catalog CRUD (/admin/catalog), ADMIN_SECRET protection
+  - Build: 61 integration tests passing, production clean, 6/6 plans executed
 
-**Next:** Phase 2 — Full Data Pipeline
+**Next:** Phase 05 — SEO & Growth Features
 
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
 
-*Last updated: 2026-03-26 — Phase 1: Foundation & Data Infrastructure complete*
+*Last updated: 2026-03-28 — Phase 04: Frontend Chat Product UI complete*
 
 **After each phase transition** (via `/gsd:transition`):
 1. Requirements invalidated? → Move to Out of Scope with reason
@@ -130,4 +134,4 @@ This document evolves at phase transitions and milestone boundaries.
 
 ---
 
-*Last updated: 2026-03-26*
+*Last updated: 2026-03-28 — Phase 04 (Frontend Chat Product UI) validated and complete*
