@@ -11,6 +11,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
+import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs"
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -47,6 +48,14 @@ export function Header() {
           <Button asChild size="sm">
             <Link href="/chat">Encontrar raquete</Link>
           </Button>
+          <SignedOut>
+            <SignInButton mode="modal">
+              <Button variant="outline" size="sm">Entrar</Button>
+            </SignInButton>
+          </SignedOut>
+          <SignedIn>
+            <UserButton afterSignOutUrl="/" />
+          </SignedIn>
         </div>
 
         {/* Mobile hamburger */}
@@ -81,6 +90,16 @@ export function Header() {
                     Encontrar raquete
                   </Link>
                 </Button>
+                <SignedOut>
+                  <SignInButton mode="modal">
+                    <Button variant="outline" className="mt-2 w-full">Entrar</Button>
+                  </SignInButton>
+                </SignedOut>
+                <SignedIn>
+                  <div className="mt-2">
+                    <UserButton afterSignOutUrl="/" />
+                  </div>
+                </SignedIn>
               </nav>
             </SheetContent>
           </Sheet>
