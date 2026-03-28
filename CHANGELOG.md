@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 
 ## [0.2.2.0] - 2026-03-28
+## [0.2.3.0] - 2026-03-28
+
+### Added
+- Phase 6 (Launch & Deploy): Production infrastructure, CI/CD pipelines, observability, and beta launch
+- Vercel frontend deployment with Next.js 14, Clerk auth, and security headers
+- Railway backend deployment with FastAPI, Redis cache, and Langfuse tracing
+- GitHub Actions CI/CD workflows: test gate, automatic deployment to Railway and Vercel
+- Comprehensive observability: structured logging, Telegram alerts, health endpoints
+- Admin panel (/admin/queue for review queue, /admin/catalog for paddle CRUD) protected by ADMIN_SECRET
+- 230 files added/modified: 45,716 insertions, full pipeline from phase 1-6
+
+### Changed
+- Frontend builds now require Clerk env vars in Vercel config
+- .npmrc configured with legacy-peer-deps for Clerk+Next.js compatibility
+- Environmental configuration standardized across Railway (backend) and Vercel (frontend)
+
+### Fixed
+- Clerk downgrade from v7 to v6.39.1 for Next.js 14 compatibility
+- ESLint/TypeScript build errors resolved
+- Vercel output configuration for production deployment
+
 
 ### Added
 - **Phase 5: SEO & Growth Features** — Complete product discovery & monetization platform

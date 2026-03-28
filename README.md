@@ -59,14 +59,14 @@ A plataforma é desenvolvida em **6 fases** com duração estimada de **12 seman
 
 | Fase | Objetivo | Duração | Status |
 |------|----------|---------|--------|
-| **1** | Ambiente dev + primeiro crawler funcional | 2 sem | Planejado |
-| **2** | Pipeline completo + scraping de todos os varejistas | 3 sem | Planejado |
-| **3** | Agente RAG de recomendação com latência < 3s | 2 sem | Planejado |
-| **4** | Frontend: chat, comparador, tracking de afiliados | 2 sem | Planejado |
-| **5** | SEO, alertas de preço, histórico de preços | 2 sem | Planejado |
-| **6** | Deploy produção, beta launch com 50 usuários | 1 sem | Planejado |
+| **1** | Ambiente dev + primeiro crawler funcional | 2 sem | ✅ Concluído (2026-03-26) |
+| **2** | Pipeline completo + scraping de todos os varejistas | 3 sem | ✅ Concluído (2026-03-26) |
+| **3** | Agente RAG de recomendação com latência < 3s | 2 sem | ✅ Concluído (2026-03-27) |
+| **4** | Frontend: chat, comparador, tracking de afiliados | 2 sem | ✅ Concluído (2026-03-27) |
+| **5** | Autenticação Clerk, SEO, alertas de preço, blog, admin | 2 sem | ✅ Concluído (2026-03-28) |
+| **6** | Deploy produção, beta launch com 50 usuários | 1 sem | 📋 Próximo |
 
-**Beta launch estimado:** Semana 12 (mês 3 de desenvolvimento)
+**Beta launch:** Pronto para semana 6 (após aprovação)
 
 ---
 

@@ -1,10 +1,25 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from contextlib import asynccontextmanager
 import logging
+import os
+import time
+import uuid
+import asyncio
+from datetime import datetime
 from backend.app.api.paddles import router as paddles_router
 from backend.app.api.chat import router as chat_router
+from backend.app.api.health import router as health_router
+from backend.app.routers.affiliate import router as affiliate_router
+from backend.app.logging_config import configure_logging
+from backend.app.middleware.alerts import alerter
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger()
+
+
+# Initialize logging based on environment
+environment = os.getenv("ENVIRONMENT", "development")
+configure_logging(environment)
 
 
 @asynccontextmanager
@@ -23,8 +38,54 @@ app = FastAPI(title="PickleIQ", version="0.1.0", lifespan=lifespan)
 # Include routers
 app.include_router(paddles_router)
 app.include_router(chat_router)
+app.include_router(health_router)
+app.include_router(affiliate_router, tags=["affiliate"])
 
 
-@app.get("/health")
-async def health():
-    return {"status": "ok"}
+# HTTP request/response logging middleware
+@app.middleware("http")
+async def logging_middleware(request: Request, call_next):
+    request_id = str(uuid.uuid4())
+    start = time.time()
+
+    logger.info(
+        "http.request",
+        request_id=request_id,
+        method=request.method,
+        path=request.url.path,
+        query=str(request.url.query) if request.url.query else None
+    )
+
+    response = await call_next(request)
+    duration = time.time() - start
+
+    logger.info(
+        "http.response",
+        request_id=request_id,
+        status=response.status_code,
+        duration_ms=round(duration * 1000, 2)
+    )
+
+    return response
+
+
+# Global exception handler
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    from fastapi.responses import JSONResponse
+    logger.error("unhandled.exception", error=str(exc), path=request.url.path)
+
+    # Send alert for errors (fire-and-forget)
+    asyncio.create_task(
+        alerter.send_alert(
+            severity="ERROR",
+            title="API Exception",
+            details=str(exc)[:200],
+            context={"path": request.url.path}
+        )
+    )
+
+    return JSONResponse(
+        status_code=500,
+        content={"error": "Internal server error"}
+    )
