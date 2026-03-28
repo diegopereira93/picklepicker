@@ -19,13 +19,13 @@ progress:
 
 ## Posição Atual
 
-Fase: 02 (full-data-pipeline) — PLAN 07 COMPLETE
-Plan: 02-07 Complete
+Fase: 02 (full-data-pipeline) — PLAN 08 COMPLETE
+Plan: 02-08 Complete
 
 - **Milestone:** v1.0 (All infrastructure, observability, beta launch complete)
 - **Fase:** 2 (Full Data Pipeline)
-- **Status:** Gap closure 02-07 (FastAPI ↔ PostgreSQL wiring) — COMPLETE
-- **Última atividade:** 2026-03-28T21:00:00Z
+- **Status:** Gap closure 02-08 (Railway Dockerfile) — COMPLETE
+- **Última atividade:** 2026-03-28T21:30:00Z
 - **Próxima ação:** Continue Phase 02 remaining plans or move to Phase 03
 
 ## Completed
@@ -73,6 +73,7 @@ Plan: 02-07 Complete
 - [Phase 05-02]: revalidateTag/revalidatePath imported dynamically to gracefully no-op in test environment
 - [Phase 05]: Clerk installed with --legacy-peer-deps; Resend client made lazy for vitest testability; vi.hoisted() pattern established for class-based SDK mocks
 - [Phase 02-07]: Backend AsyncConnectionPool singleton (min=2, max=10) initialized in FastAPI lifespan; all paddles endpoints wire real psycopg queries with dict_row factory
+- [Phase 02-08]: Docker image uses python:3.12-slim with WORKDIR=/app/backend to align module path (app.main:app) with railway.toml start command; libpq-dev included for psycopg[binary,pool]
 
 ## Performance Metrics
 
