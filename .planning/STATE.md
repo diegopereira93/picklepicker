@@ -3,31 +3,31 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: planning
-last_updated: "2026-03-27T12:29:16.511Z"
-last_activity: 2026-03-27
+last_updated: "2026-03-28T11:34:41.854Z"
+last_activity: 2026-03-28
 progress:
   total_phases: 6
-  completed_phases: 1
-  total_plans: 4
-  completed_plans: 8
+  completed_phases: 3
+  total_plans: 13
+  completed_plans: 18
 ---
 
 # PickleIQ — Project State
 
-**Última atualização:** 2026-03-26
+**Última atualização:** 2026-03-27
 **Status:** Ready to plan
-**Last session:** 2026-03-26T23:49:08.341Z
+**Last session:** 2026-03-28T04:24:23.049Z
 
 ## Current Position
 
-Phase: 03 (rag-agent-ai-core) — EXECUTING
+Phase: 05 (seo-growth-features) — EXECUTING
 Plan: Not started
 
 - **Milestone:** v1.0 (MVP → Beta Launch)
-- **Phase:** 4
-- **Status:** Defining Phase 1
-- **Last activity:** 2026-03-27
-- **Next action:** `/gsd:plan-phase 1`
+- **Phase:** 6
+- **Status:** Executing Phase 4
+- **Last activity:** 2026-03-28
+- **Next action:** Execute 04-02
 
 ## Completed
 
@@ -64,6 +64,15 @@ Plan: Not started
 - [Phase 01-04]: matt_id used as ML Afiliados affiliate parameter — needs portal confirmation before production
 - [Phase 01-04]: psycopg[binary,pool] required — pool extra must be explicit in pyproject.toml
 - [Phase 01-04]: httpx response.json() is sync — test mocks for httpx responses use MagicMock not AsyncMock
+- [04-01]: shadcn@latest init generates Tailwind v4 / @base-ui/react components — all UI components rewritten with Radix UI + HSL CSS variables for Next.js 14 / Tailwind v3 compatibility
+- [04-01]: Geist font not in next/font/google for Next.js 14.2 — replaced with Inter
+- [04-01]: API client uses NEXT_PUBLIC_FASTAPI_URL env var; graceful fallback returns empty list on network error
+- [Phase 04]: AdminAuthContext provides logout() to all /admin/* children via React context, avoiding prop drilling
+- [Phase 04]: Route Handlers validate Authorization header server-side against ADMIN_SECRET env var; client never compares secrets directly
+- [Phase 04-root]: UIMessage from ai SDK uses parts array only — msg.content property does not exist; textContent must be extracted from parts
+- [Phase 05-02]: Canonical URL stored in alternates.canonical (Next.js 14 Metadata API)
+- [Phase 05-02]: revalidateTag/revalidatePath imported dynamically to gracefully no-op in test environment
+- [Phase 05]: Clerk installed with --legacy-peer-deps; Resend client made lazy for vitest testability; vi.hoisted() pattern established for class-based SDK mocks
 
 ## Performance Metrics
 
@@ -73,6 +82,11 @@ Plan: Not started
 | Phase 01 P02 | 1 min | 2 tasks | 1 files |
 | Phase 01 P03 | 6 min | 1 tasks | 5 files |
 | Phase 01 P04 | 7 min | 1 tasks | 4 files |
+| 04    | 01   | 14 min   | 2/2   | 29    |
+| Phase 04 P05 | 25 min | 2 tasks | 15 files |
+| Phase 04 Proot | 15 min | 1 tasks | 3 files |
+| Phase 05 P02 | 4 min | 2 tasks | 9 files |
+| Phase 05 P01 | 25min | 3 tasks | 10 files |
 
 ## Open Questions (não bloqueantes para Phase 1)
 
