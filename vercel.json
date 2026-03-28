@@ -11,13 +11,13 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://api.pickleiq.com/api/:path*"
+      "destination": "https://api.railway.app/api/:path*"
     }
   ],
   "redirects": [
     {
       "source": "/admin/(.*)",
-      "destination": "https://pickleiq.com/admin/$1",
+      "destination": "https://picklepicker.vercel.app/admin/$1",
       "permanent": true
     }
   ],
