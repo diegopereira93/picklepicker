@@ -106,7 +106,7 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 05-01: Páginas produto SSR — generateMetadata(), Schema.org/Product JSON-LD, slug /paddles/[brand]/[model], ISR listings
+- [x] 05-01: Páginas produto SSR — generateMetadata(), Schema.org/Product JSON-LD, slug /paddles/[brand]/[model], ISR listings
 - [x] 05-02: Auth Clerk v5 + price alerts — clerkMiddleware(), favoritar produto, worker GH Actions 24h, e-mail Resend + React Email
 - [ ] 05-03: Histórico de preços — gráfico linha 90/180 dias, indicador "Bom momento para comprar" (≤ P20 últimos 90 dias)
 - [ ] 05-04: Pillar page SEO — "Best Pickleball Paddles for Beginners" + FTC disclosure obrigatória em todas as páginas com afiliados
@@ -139,7 +139,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Full Data Pipeline | 0/5 | Not started | - |
 | 3. RAG Agent & AI Core | 0/5 | Not started | - |
 | 4. Frontend Chat & Product UI | 6/6 | Complete   | 2026-03-28 |
-| 5. SEO & Growth Features | 1/4 | In Progress|  |
+| 5. SEO & Growth Features | 2/4 | In Progress|  |
 | 6. Launch & Deploy | 0/4 | Not started | - |
 
 ---
