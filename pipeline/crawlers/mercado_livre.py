@@ -177,3 +177,10 @@ async def run_mercado_livre_crawler() -> int:
 
     logger.info("Saved %d ML items to price_snapshots", saved)
     return saved
+
+
+if __name__ == "__main__":
+    import asyncio
+
+    logging.basicConfig(level=logging.INFO)
+    asyncio.run(run_mercado_livre_crawler())

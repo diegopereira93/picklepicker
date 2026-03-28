@@ -49,7 +49,7 @@ asyncio.run(send_telegram_alert('Drop Shot Brasil crawler FAILED. Check logs.'))
           cd pipeline && pip install -e .
       - name: Scrape Mercado Livre
         run: |
-          cd pipeline && python -m pipeline.crawlers.mercadolivre_expansion 2>&1 | tee /tmp/ml.log
+          cd pipeline && python -m pipeline.crawlers.mercado_livre 2>&1 | tee /tmp/ml.log
       - name: Alert on failure
         if: failure()
         run: |
