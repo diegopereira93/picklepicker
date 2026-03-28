@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import dynamic from 'next/dynamic'
 import { generateProductMetadata, fetchProductData } from '@/lib/seo'
 import { ProductSchema } from '@/components/schema/product-schema'
+import { FTCDisclosure } from '@/components/ftc-disclosure'
 
 // Price chart imported with ssr:false to prevent Recharts hydration mismatch
 const PriceHistoryChart = dynamic(
@@ -57,6 +58,7 @@ export default async function ProductPage({ params }: { params: PageParams }) {
         {paddle.description && (
           <p className="text-gray-600 mb-4">{paddle.description}</p>
         )}
+        <FTCDisclosure />
         {(paddle.price_brl != null || paddle.price_min_brl != null) && (
           <div className="text-2xl font-semibold text-green-700 mb-4">
             R${' '}
