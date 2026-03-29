@@ -15,8 +15,7 @@ import { SignInButton, UserButton, useAuth } from "@clerk/nextjs"
 
 const navLinks = [
   { href: "/", label: "Home" },
-  { href: "/compare", label: "Comparar" },
-  { href: "/chat", label: "Chat IA" },
+  { href: "/paddles", label: "Catalogo" },
 ]
 
 export function Header() {
