@@ -2,31 +2,31 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: completed
-last_updated: "2026-03-28T22:04:19.526Z"
+status: executing
+last_updated: "2026-03-29T14:00:00Z"
 progress:
-  total_phases: 6
-  completed_phases: 5
-  total_plans: 17
-  completed_plans: 28
+  total_phases: 7
+  completed_phases: 6
+  total_plans: 18
+  completed_plans: 29
 ---
 
 # PickleIQ — Project State
 
-**Última atualização:** 2026-03-28T22:30:00Z
-**Status:** v1.0 milestone complete
-**Última sessão:** 2026-03-28T22:30:00Z
+**Última atualização:** 2026-03-29T00:00:00Z
+**Status:** Executing Phase 07
+**Última sessão:** 2026-03-29T00:00:00Z
 
 ## Posição Atual
 
-Fase: 03 (rag-agent-ai-core) — ALL WAVES COMPLETE
-Plan: Ready for Phase 04 planning
+Fase: 07 (e2e-testing-scraper-validation) — COMPLETE
+Plan: 07-01 COMPLETE
 
-- **Milestone:** v1.0 (All infrastructure, observability, beta launch complete)
-- **Fase:** 3 (RAG Agent & AI Core)
-- **Status:** All 5 waves complete — 103/103 tests passing
-- **Última atividade:** 2026-03-28T22:30:00Z
-- **Próxima ação:** Move to Phase 04 (Frontend Chat Product UI)
+- **Milestone:** v1.1 (E2E Testing & Scraper Validation)
+- **Fase:** 07 (E2E Testing & Scraper Validation)
+- **Status:** Phase 07 complete — 101 tests, 90% combined coverage, all scrapers validated
+- **Última atividade:** 2026-03-29T14:00:00Z
+- **Próxima ação:** v1.1 Phase 2 planning (production cron schedule, monitoring)
 
 ## Completed
 
@@ -75,6 +75,29 @@ Plan: Ready for Phase 04 planning
 - [Phase 02-07]: Backend AsyncConnectionPool singleton (min=2, max=10) initialized in FastAPI lifespan; all paddles endpoints wire real psycopg queries with dict_row factory
 - [Phase 02-08]: Docker image uses python:3.12-slim with WORKDIR=/app/backend to align module path (app.main:app) with railway.toml start command; libpq-dev included for psycopg[binary,pool]
 
+## Phase 07 Completion Summary (E2E Testing & Scraper Validation)
+
+**Execution Date:** 2026-03-29T14:00:00Z
+**Duration:** ~30 minutes
+**Final Commit:** 72661ae
+**Tests:** 101 new tests, 90% combined coverage across all 3 scrapers
+
+**Deliverables:**
+
+- ✅ Brazil Store: 18 tests, 80% coverage, schema + retry + DB persistence
+- ✅ Drop Shot Brasil: 19 tests, 93% coverage, full crawler E2E
+- ✅ Mercado Livre: 24 tests, 94% coverage, affiliate URLs + pagination + fuzzy dedup
+- ✅ Firecrawl integration: 17 tests, all error modes + concurrent execution
+- ✅ Data integrity: 23 tests, cross-scraper schema, dedup, performance benchmarks
+- ✅ Documentation: FIRECRAWL_ERROR_HANDLING.md + E2E_TEST_README.md
+
+**Key Decisions (Phase 07):**
+
+- [07-01] None-guard `(result.get("data") or {})` applied to both Firecrawl scrapers (prevents AttributeError on parse failure)
+- [07-01] scraper_db_connection fixture added to pipeline conftest (backend conftest not inherited by pipeline tests)
+- [07-01] RapidFuzz threshold 85 validated as correct for same-product variant dedup vs different-paddle false positives
+- [07-01] test_firecrawl_integration.py takes ~3min due to tenacity real sleep during retry backoff
+
 ## Performance Metrics
 
 | Phase | Plan | Duration | Tasks | Files | Tests |
@@ -94,6 +117,7 @@ Plan: Ready for Phase 04 planning
 | Phase 03 W1 | 15 min | 2 tasks | 6 files | 17 ✅ |
 | Phase 03 W2-5 | 45 min | 6 tasks | 13 files | 86 ✅ |
 | Phase 03 Total | 60 min | 8 tasks | 13 new + 6 modified | 103 ✅ |
+| Phase 07 | 01   | 30 min   | 18/18 | 12 new + 4 modified | 101 ✅ |
 
 ## Phase 03 Completion Summary (RAG Agent & AI Core)
 
