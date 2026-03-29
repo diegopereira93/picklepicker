@@ -36,3 +36,18 @@
 - Staging domains configured for beta launch: picklepicker.vercel.app (frontend) + api.railway.app (backend)
 
 ---
+
+## v1.1 — Scraper Validation & E2E Testing (Planning)
+
+**Status:** Planning phase initiated 2026-03-29
+
+**Objective:** Validate production-readiness of scraper suite (Brazil Pickleball Store, Drop Shot Brasil, Mercado Livre) through comprehensive end-to-end testing. De-risk Firecrawl integration before production cron scaling.
+
+**Phase 1 Scope:**
+- E2E test suite for all 3 scrapers with ≥80% code coverage
+- Real retailer connectivity validation (staging mode)
+- Firecrawl `/extract` error handling and performance
+- Data integrity: schema compliance, deduplication, affiliate formatting
+- Performance baseline: <30s per retailer crawl
+
+---

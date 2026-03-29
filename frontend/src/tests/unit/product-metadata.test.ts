@@ -102,9 +102,10 @@ describe('fetchProductData', () => {
     expect(paddle).toBeNull()
   })
 
-  it('throws error when response is not ok', async () => {
+  it('returns null when response is not ok', async () => {
     mockFetch.mockResolvedValueOnce({ ok: false })
     const { fetchProductData } = await importSeo()
-    await expect(fetchProductData('selkirk', 'missing')).rejects.toThrow()
+    const result = await fetchProductData('selkirk', 'missing')
+    expect(result).toBeNull()
   })
 })

@@ -1,6 +1,12 @@
 """Tests for Langfuse observability integration."""
 
 import pytest
+import sys
+from pathlib import Path
+
+# Add backend to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
 from backend.app.langfuse_handler import LangfuseHandler
 
 
