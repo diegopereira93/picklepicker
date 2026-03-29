@@ -1,5 +1,9 @@
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
+import os
+
+# Ensure DATABASE_URL is set so pipeline.db.connection doesn't raise at import
+os.environ.setdefault("DATABASE_URL", "postgresql://test:test@localhost/test")
 
 
 @pytest.fixture
@@ -82,3 +86,23 @@ def mock_ml_search_response():
         ],
         "paging": {"total": 120, "offset": 0, "limit": 50}
     }
+
+
+@pytest.fixture
+def scraper_db_connection():
+    """Async DB connection mock with fetchone returning (1,) for paddle upserts."""
+    conn = AsyncMock()
+    execute_result = AsyncMock()
+    execute_result.fetchone = AsyncMock(return_value=(1,))
+    conn.execute = AsyncMock(return_value=execute_result)
+    conn.commit = AsyncMock()
+    conn.__aenter__ = AsyncMock(return_value=conn)
+    conn.__aexit__ = AsyncMock(return_value=None)
+    return conn
+
+
+@pytest.fixture
+def staging_config():
+    """Load staging configuration for retailer URLs and test settings."""
+    from pipeline.tests.test_utils import load_staging_config
+    return load_staging_config()
