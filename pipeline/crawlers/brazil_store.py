@@ -41,14 +41,12 @@ FIRECRAWL_SCHEMA = {
 def extract_products(app: FirecrawlApp, url: str) -> dict:
     """Extract paddle products from URL using Firecrawl /extract endpoint."""
     return app.extract(
-        [url],
-        {
-            "prompt": (
-                "Extract all pickleball paddle products with name, price in BRL, "
-                "availability, image URL, product URL, brand, and technical specs"
-            ),
-            "schema": FIRECRAWL_SCHEMA,
-        },
+        urls=[url],
+        prompt=(
+            "Extract all pickleball paddle products with name, price in BRL, "
+            "availability, image URL, product URL, brand, and technical specs"
+        ),
+        schema=FIRECRAWL_SCHEMA,
     )
 
 
@@ -105,7 +103,13 @@ async def run_brazil_store_crawler(app: FirecrawlApp | None = None) -> int:
         )
         raise
 
-    products = result.get("data", {}).get("products", [])
+    # Convert ExtractResponse to dict if needed
+    if hasattr(result, 'model_dump'):
+        result = result.model_dump()
+    elif hasattr(result, 'dict'):
+        result = result.dict()
+
+    products = (result.get("data") or {}).get("products", [])
     logger.info("Extracted %d products from Brazil Pickleball Store", len(products))
 
     if not products:
