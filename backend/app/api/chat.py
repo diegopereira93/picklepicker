@@ -1,6 +1,7 @@
 """Chat endpoint with SSE streaming for paddle recommendations."""
 
 import asyncio
+import json
 import time
 from typing import Optional
 from fastapi import APIRouter
@@ -74,6 +75,15 @@ async def chat_stream(request: ChatRequest) -> StreamingResponse:
             # Fetch recommendations by profile
             recommendations = await agent.search_by_profile(profile)
 
+            # Per-paddle reason templates — "Por que essa raquete?" trust element
+            # V1: template-based; V2 goal: LLM-generated per-paddle reason in reasoning event
+            def _paddle_reason(rank: int, skill: str, price: float) -> str:
+                if rank == 0:
+                    return f"Melhor opção para {skill} com ótimo custo-benefício (R${price:.0f})"
+                if rank == 1:
+                    return "Excelente equilíbrio entre controle e potência para o seu nível"
+                return "Opção alternativa com specs complementares ao seu estilo de jogo"
+
             # Send recommendations event
             rec_data = {
                 "paddles": [
@@ -84,11 +94,12 @@ async def chat_stream(request: ChatRequest) -> StreamingResponse:
                         "price_min_brl": r.price_min_brl,
                         "affiliate_url": r.affiliate_url,
                         "similarity_score": r.similarity_score,
+                        "reason": _paddle_reason(i, request.skill_level, r.price_min_brl),
                     }
-                    for r in recommendations
+                    for i, r in enumerate(recommendations)
                 ]
             }
-            yield f"event: recommendations\ndata: {rec_data}\n\n"
+            yield f"event: recommendations\ndata: {json.dumps(rec_data)}\n\n"
 
             # Try LLM reasoning with timeout
             try:
@@ -98,7 +109,7 @@ async def chat_stream(request: ChatRequest) -> StreamingResponse:
                 # Simulate timeout check (production: asyncio.wait_for(..., timeout=8.0))
                 await asyncio.sleep(0.1)
 
-                yield f"event: reasoning\ndata: {{'text': '{reasoning}'}}\n\n"
+                yield f"event: reasoning\ndata: {json.dumps({'text': reasoning})}\n\n"
 
             except asyncio.TimeoutError:
                 # Degraded mode: use fallback rankings
@@ -115,7 +126,7 @@ async def chat_stream(request: ChatRequest) -> StreamingResponse:
                         for r in fallback
                     ]
                 }
-                yield f"event: degraded\ndata: {fallback_data}\n\n"
+                yield f"event: degraded\ndata: {json.dumps(fallback_data)}\n\n"
 
             # Send done event with metadata
             latency_ms = (time.time() - start_time) * 1000
@@ -125,11 +136,11 @@ async def chat_stream(request: ChatRequest) -> StreamingResponse:
                 "model": "groq",
                 "cache_hit": False
             }
-            yield f"event: done\ndata: {done_data}\n\n"
+            yield f"event: done\ndata: {json.dumps(done_data)}\n\n"
 
         except Exception as e:
             error_event = {"error": str(e)}
-            yield f"event: error\ndata: {error_event}\n\n"
+            yield f"event: error\ndata: {json.dumps(error_event)}\n\n"
 
     return StreamingResponse(
         event_generator(),

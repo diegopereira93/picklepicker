@@ -3,6 +3,7 @@
 import logging
 from typing import Optional
 from fastapi import APIRouter, Query, HTTPException, status
+from psycopg.rows import dict_row
 from backend.app.schemas import (
     PaddleResponse,
     PaddleListResponse,
@@ -12,21 +13,10 @@ from backend.app.schemas import (
     SpecsResponse,
     PriceSnapshot,
 )
+from backend.app.db import get_connection
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/paddles", tags=["paddles"])
-
-# Mock database functions (will be replaced with real DB calls)
-async def db_fetch_all(query: str, params: list):
-    """Fetch all rows (mock implementation)."""
-    # This will be implemented when DB connection is available
-    return []
-
-
-async def db_fetch_one(query: str, params: list):
-    """Fetch single row (mock implementation)."""
-    # This will be implemented when DB connection is available
-    return None
 
 
 @router.get("", response_model=PaddleListResponse, status_code=status.HTTP_200_OK)
@@ -44,28 +34,32 @@ async def list_paddles(
     params = []
 
     if brand:
-        where_clauses.append(f"brand = ${len(params)+1}")
+        where_clauses.append("brand = %s")
         params.append(brand)
     if price_min:
-        where_clauses.append(f"price_min_brl >= ${len(params)+1}")
+        where_clauses.append("price_min_brl >= %s")
         params.append(price_min)
     if price_max:
-        where_clauses.append(f"price_min_brl <= ${len(params)+1}")
+        where_clauses.append("price_min_brl <= %s")
         params.append(price_max)
     if in_stock is not None:
-        where_clauses.append(f"in_stock = ${len(params)+1}")
+        where_clauses.append("in_stock = %s")
         params.append(in_stock)
 
     where = " AND ".join(where_clauses)
 
-    # Count query
-    count_query = f"SELECT COUNT(*) as total FROM paddles WHERE {where}"
-    count_result = await db_fetch_one(count_query, params)
-    total = count_result["total"] if count_result else 0
+    async with get_connection() as conn:
+        async with conn.cursor(row_factory=dict_row) as cur:
+            # Count query
+            count_query = f"SELECT COUNT(*) as total FROM paddles WHERE {where}"
+            await cur.execute(count_query, params)
+            count_result = await cur.fetchone()
+            total = count_result["total"] if count_result else 0
 
-    # Data query with pagination
-    data_query = f"SELECT id, name, brand, sku, image_url, price_min_brl, created_at FROM paddles WHERE {where} ORDER BY created_at DESC LIMIT ${len(params)+1} OFFSET ${len(params)+2}"
-    paddles = await db_fetch_all(data_query, params + [limit, offset])
+            # Data query with pagination
+            data_query = f"SELECT id, name, brand, sku, image_url, price_min_brl, created_at FROM paddles WHERE {where} ORDER BY created_at DESC LIMIT %s OFFSET %s"
+            await cur.execute(data_query, params + [limit, offset])
+            paddles = await cur.fetchall()
 
     items = [
         PaddleResponse(
@@ -90,9 +84,13 @@ async def get_paddle(paddle_id: int):
            ps.swingweight, ps.twistweight, ps.weight_oz, ps.core_thickness_mm, ps.face_material
     FROM paddles p
     LEFT JOIN paddle_specs ps ON p.id = ps.paddle_id
-    WHERE p.id = $1 AND p.dedup_status IN ('pending', 'merged')
+    WHERE p.id = %s AND p.dedup_status IN ('pending', 'merged')
     """
-    paddle = await db_fetch_one(query, [paddle_id])
+    async with get_connection() as conn:
+        async with conn.cursor(row_factory=dict_row) as cur:
+            await cur.execute(query, [paddle_id])
+            paddle = await cur.fetchone()
+
     if not paddle:
         raise HTTPException(status_code=404, detail="Paddle not found")
 
@@ -107,35 +105,39 @@ async def get_paddle(paddle_id: int):
     specs = SpecsResponse(**specs_data) if any(specs_data.values()) else None
 
     return PaddleResponse(
-        id=paddle["id"],
-        name=paddle["name"],
-        brand=paddle["brand"],
+        id=paddle.get("id", 0),
+        name=paddle.get("name", ""),
+        brand=paddle.get("brand", ""),
         sku=paddle.get("sku"),
         image_url=paddle.get("image_url"),
         specs=specs,
         price_min_brl=paddle.get("price_min_brl"),
-        created_at=paddle["created_at"],
+        created_at=paddle.get("created_at"),
     )
 
 
 @router.get("/{paddle_id}/prices", response_model=PriceHistoryResponse, status_code=status.HTTP_200_OK)
 async def get_paddle_prices(paddle_id: int):
     """Get price history for a paddle across all retailers."""
-    # Verify paddle exists
-    query = "SELECT id, name FROM paddles WHERE id = $1"
-    paddle = await db_fetch_one(query, [paddle_id])
-    if not paddle:
-        raise HTTPException(status_code=404, detail="Paddle not found")
+    async with get_connection() as conn:
+        async with conn.cursor(row_factory=dict_row) as cur:
+            # Verify paddle exists
+            query = "SELECT id, name FROM paddles WHERE id = %s"
+            await cur.execute(query, [paddle_id])
+            paddle = await cur.fetchone()
+            if not paddle:
+                raise HTTPException(status_code=404, detail="Paddle not found")
 
-    # Get prices
-    prices_query = """
-    SELECT r.name AS retailer_name, ps.price_brl, ps.currency, ps.in_stock, ps.scraped_at
-    FROM price_snapshots ps
-    JOIN retailers r ON ps.retailer_id = r.id
-    WHERE ps.paddle_id = $1
-    ORDER BY ps.scraped_at DESC
-    """
-    prices = await db_fetch_all(prices_query, [paddle_id])
+            # Get prices
+            prices_query = """
+            SELECT r.name AS retailer_name, ps.price_brl, ps.currency, ps.in_stock, ps.scraped_at
+            FROM price_snapshots ps
+            JOIN retailers r ON ps.retailer_id = r.id
+            WHERE ps.paddle_id = %s
+            ORDER BY ps.scraped_at DESC
+            """
+            await cur.execute(prices_query, [paddle_id])
+            prices = await cur.fetchall()
 
     price_items = [
         PriceSnapshot(
@@ -150,7 +152,7 @@ async def get_paddle_prices(paddle_id: int):
 
     return PriceHistoryResponse(
         paddle_id=paddle_id,
-        paddle_name=paddle["name"],
+        paddle_name=paddle.get("name", ""),
         prices=price_items,
     )
 
@@ -158,20 +160,24 @@ async def get_paddle_prices(paddle_id: int):
 @router.get("/{paddle_id}/latest-prices", response_model=LatestPriceResponse, status_code=status.HTTP_200_OK)
 async def get_paddle_latest_prices(paddle_id: int):
     """Get latest price from each retailer for a paddle."""
-    # Verify paddle exists
-    query = "SELECT id, name FROM paddles WHERE id = $1"
-    paddle = await db_fetch_one(query, [paddle_id])
-    if not paddle:
-        raise HTTPException(status_code=404, detail="Paddle not found")
+    async with get_connection() as conn:
+        async with conn.cursor(row_factory=dict_row) as cur:
+            # Verify paddle exists
+            query = "SELECT id, name FROM paddles WHERE id = %s"
+            await cur.execute(query, [paddle_id])
+            paddle = await cur.fetchone()
+            if not paddle:
+                raise HTTPException(status_code=404, detail="Paddle not found")
 
-    # Get latest prices (from materialized view)
-    prices_query = """
-    SELECT r.name AS retailer_name, lp.price_brl, lp.currency, lp.in_stock, lp.scraped_at
-    FROM latest_prices lp
-    JOIN retailers r ON lp.retailer_id = r.id
-    WHERE lp.paddle_id = $1
-    """
-    prices = await db_fetch_all(prices_query, [paddle_id])
+            # Get latest prices (from materialized view)
+            prices_query = """
+            SELECT r.name AS retailer_name, lp.price_brl, lp.currency, lp.in_stock, lp.scraped_at
+            FROM latest_prices lp
+            JOIN retailers r ON lp.retailer_id = r.id
+            WHERE lp.paddle_id = %s
+            """
+            await cur.execute(prices_query, [paddle_id])
+            prices = await cur.fetchall()
 
     price_items = [
         PriceSnapshot(
@@ -186,7 +192,7 @@ async def get_paddle_latest_prices(paddle_id: int):
 
     return LatestPriceResponse(
         paddle_id=paddle_id,
-        paddle_name=paddle["name"],
+        paddle_name=paddle.get("name", ""),
         latest_prices=price_items,
     )
 

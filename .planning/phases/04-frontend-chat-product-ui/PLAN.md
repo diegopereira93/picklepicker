@@ -326,6 +326,212 @@ frontend/
 
 </context>
 
+<design>
+
+## Screen Hierarchy — Information Architecture
+
+### Landing Page
+**Goal:** Sport-first. Get users to start the quiz.
+```
+H1 (72px bold): "Encontre a raquete ideal para o seu jogo"
+H2 (20px regular): "IA que analisa specs, preços e avaliações para recomendar a raquete certa para você."
+Primary CTA: [ COMEÇAR QUIZ → ] (full-width on mobile, centered on desktop)
+Secondary: Link to /compare (below the fold)
+```
+Single column layout. No hero image required — headline IS the hero.
+Background: white or very light neutral gray.
+
+### Quiz Steps (pattern applies to all 3 steps)
+**Pattern:** Large selection cards — full-width on mobile, 2-col on tablet+
+```
+Step indicator: "1 de 3" (top, small, secondary text color)
+H2 (28px bold): Question (e.g., "Qual é seu nível de jogo?")
+Cards: [emoji icon + label + 1-line description] — 3-4 options max
+Progress: Dot indicator below cards
+Back link: text link (not a button), secondary placement
+```
+**Card selection auto-advances** to next step — no explicit "Próximo" button.
+PT-BR truncation: card labels max 24 chars, descriptions max 48 chars.
+
+### Quiz → Chat Bridge (quiz completion)
+Before launching chat, show a 1-second summary screen:
+```
+"Seu perfil: [Nível] · [Estilo] · [Orçamento]"
+Subtext: "Encontrando as melhores raquetes para você..."
+Animated: spinner or subtle progress bar
+```
+This bridge confirms the user's input mattered before entering the AI experience.
+
+### Chat Widget
+**Message alignment:** AI responses left (PickleIQ avatar icon), user messages right.
+```
+Empty state: centered + "Analisando seu perfil..." spinner (before first AI message)
+Streaming: tokens render inline as they arrive (no flash/flicker)
+Product cards: appear BELOW the AI text block (never inline mid-sentence)
+Product card limit: 3 cards per response maximum
+Input: bottom-pinned, full-width
+Placeholder: "Faça uma pergunta sobre raquetes..."
+```
+
+### Comparison Page
+**Priority order:**
+1. Search/autocomplete input (top, full-width)
+2. Selected paddle chips/tags (below input — max 3 paddles, disabled state at 3)
+3. Side-by-side spec table (primary content)
+4. RadarChart (below table, collapsible on mobile)
+
+**RadarChart axes** (6 attributes, hardcoded): Potência, Controle, Toque, Swing Weight, Peso, Equilíbrio
+
+### Product Detail Page
+**Priority order:**
+```
+H1: "[Marca] [Modelo]" (large, 40px+)
+Price block: R$ price (large, accent color) + retailer name
+Primary CTA: [ VER NO SITE → ] (affiliate link, opens new tab)
+Secondary CTA: [ + COMPARAR ]
+Specs: accordion/tabs below the fold
+Price history chart: last section, 90-day default
+```
+
+## Responsive & Accessibility
+
+### Breakpoints
+| Viewport | Class | Key Layout Changes |
+|----------|-------|-------------------|
+| Mobile | < 640px (sm) | Single column, full-width cards, bottom-pinned chat input, stacked product cards |
+| Tablet | 640–1024px (md) | Quiz cards 2-col grid, comparison table scrollable horizontally |
+| Desktop | > 1024px (lg) | Landing: max-w-2xl centered, quiz: 2-col cards, chat: max-w-2xl centered |
+
+### Mobile-Critical Specs
+**Quiz (mobile):**
+- Cards: full-width, min-height 72px, tap target ≥ 44px
+- Step indicator + question + cards + back link all visible without scroll on iPhone SE (375px)
+- Budget step (step 3): large tappable cards — NOT a slider (sliders are hard to control on mobile)
+
+**Chat widget (mobile):**
+- Input pinned to bottom with `position: fixed` or `sticky`
+- Message list: `overflow-y: auto` with padding-bottom = input height + 16px
+- Product cards: full-width, stacked vertically (no horizontal scroll)
+
+**Comparison page (mobile):**
+- RadarChart: hidden by default behind "Ver gráfico radar ▼" accordion toggle
+- Table: horizontal scroll with sticky first column (paddle name)
+
+### Accessibility Minimums
+- All interactive elements: keyboard navigable (tab order follows visual order)
+- Quiz cards: `role="radio"` with `aria-checked`, `aria-label` includes full option text
+- Chat messages: `role="log"` on message list, `aria-live="polite"` for streaming
+- Buttons: contrast ratio ≥ 4.5:1 (lime-500 on white = 2.7 — use text-primary-foreground on dark bg instead)
+- Product card CTA: `aria-label="Ver Selkirk Luxx Control no site Brazil Store"` (not just "VER NO SITE →")
+- Touch targets: minimum 44×44px for all tappable elements
+
+**Contrast fix:** `--primary: #84CC16` (lime-500) on white fails 4.5:1 contrast. Apply lime-500 only to large text (H1, H2) or on dark backgrounds. Use `--primary-foreground: #0F172A` (near-black) for button text on lime background.
+
+## Resolved Design Decisions
+
+| Decision | Choice | Rationale |
+|----------|--------|-----------|
+| Quiz persistence | URL params (`?skill=&style=&budget=`) | Shareable, survives refresh, no storage API needed |
+| Comparison max paddles | 3 | RadarChart readable; 4th add button disabled with "Máximo 3 raquetes" tooltip |
+| Affiliate link behavior | `target="_blank" rel="noopener"` | User keeps chat open; standard for comparison/recommendation tools |
+| Quiz UI pattern | Large selection cards, auto-advance | Mobile-friendly, 44px+ tap targets, no explicit "Próximo" button |
+| Landing page H1 direction | Sport-first: "Encontre a raquete ideal para o seu jogo" | Benefits-forward, works for all skill levels |
+| Product card trust element | "Por que essa raquete?" + 1-line AI reason | Makes recommendations feel earned, not ad-like |
+| Chat streaming error | Inline retry below partial response | User keeps context, retry is actionable |
+| RadarChart axes | Potência, Controle, Toque, Swing Weight, Peso, Equilíbrio (6, hardcoded) | Avoids open-ended product decision at component level |
+
+## Design System & Brand Tokens
+
+**Type:** APP UI (task-focused, data-dense, utility language — not marketing)
+
+**Color system** — override shadcn defaults in `globals.css`:
+```css
+/* Sport-appropriate palette for Brazilian pickleball */
+--primary: #84CC16;           /* lime-500: pickleball yellow-green */
+--primary-foreground: #0F172A;
+--accent: #FCD34D;            /* amber-300: paddle face/ball color */
+--accent-foreground: #0F172A;
+/* Background, foreground, border, card: keep shadcn neutral defaults */
+```
+
+**Typography:**
+- Font: Inter (already installed — Geist unavailable in Next.js 14.2)
+- H1: 64px (desktop) / 40px (mobile), font-bold
+- H2: 28px, font-semibold
+- Body: 16px, font-normal
+- Small/label: 14px, font-medium
+
+**AI Slop avoidance checklist** (verify before ship):
+- [ ] No 3-column feature grid on landing page
+- [ ] No icons in colored circles as decoration
+- [ ] No centered-everything layout (left-align body copy)
+- [ ] No generic hero copy ("Welcome to...", "Your all-in-one solution for...")
+- [ ] No decorative blobs or wavy SVG dividers
+- [ ] Cards in comparison table earn existence (they ARE the interaction)
+
+## User Journey & Emotional Arc
+
+| Step | User Does | User Feels | Design Supports It |
+|------|-----------|------------|-------------------|
+| 1 | Lands on homepage | Curious — "will this help me?" | Sport-first H1 names their goal directly |
+| 2 | Reads H1 + H2 | Oriented — understands what the product does | Clear value prop, single CTA |
+| 3 | Clicks "COMEÇAR QUIZ →" | Committed | Button is prominent, no friction |
+| 4 | Answers 3 quiz steps | Engaged — "this is getting to know me" | Large cards with descriptions feel personalized |
+| 5 | Completes step 3 | Anticipatory | Bridge screen: shows their profile summary + loading spinner |
+| 6 | Chat loads | Curious — "what will it recommend?" | "Analisando seu perfil..." spinner maintains anticipation |
+| 7 | AI response streams | Excited — watching live AI reasoning | Streaming text renders as tokens arrive |
+| 8 | Product cards appear | Trust: "this feels like a real recommendation" | "Por que essa raquete?" 1-line explanation per card |
+| 9 | Clicks "VER NO SITE →" | Decisive | Button is clear, opens new tab (doesn't abandon chat) |
+| 10 | Returns to chat | Satisfied or wanting more | Chat input remains active for follow-up questions |
+
+**Product Card Anatomy** (trust-first design):
+```
++-------------------------------+
+| [paddle image]  Brand + Model |
+|                 R$ price · store |
+|                               |
+| Por que essa raquete?         |
+| [1-line AI reason from SSE    |
+|  metadata field]              |
+|                               |
+| [     VER NO SITE →     ]    |
++-------------------------------+
+```
+The `reason` field must be included in the SSE metadata response from Phase 3 backend.
+If absent: fall back to "Recomendada para o seu perfil de jogo."
+
+## Interaction States
+
+| Feature | LOADING | EMPTY | ERROR | SUCCESS | PARTIAL |
+|---------|---------|-------|-------|---------|---------|
+| Landing page | — | — | — | Static render | — |
+| Quiz step | Skeleton cards (rare — static) | — | "Erro ao carregar. Recarregue a página." | Auto-advance to next step | — |
+| Quiz→Chat bridge | Spinner + "Encontrando as melhores raquetes..." | — | — | Auto-redirect to chat | — |
+| Chat (initial) | "Analisando seu perfil..." centered spinner | — | — | First AI token renders | — |
+| Chat (streaming) | Typing indicator (3 dots) | — | Inline: "⚠️ Erro ao carregar resposta. [Tentar novamente]" — keeps partial text | All tokens received + product cards render below | Product cards not yet rendered — show skeleton below text |
+| Product cards | Skeleton card (image + 2 lines) | — | Card hidden, no broken state visible | Price + name + CTA rendered | Price shown, image failed → paddle icon placeholder |
+| Comparison search | Spinner in input field | Inline: 🏓 "Nenhuma raquete encontrada para '[query]'" + search tips | Toast: "Erro ao buscar. Tente novamente." | Results dropdown appears | — |
+| Comparison (3 paddles selected) | — | "Selecione raquetes para comparar" placeholder | — | Table + RadarChart render | RadarChart loading: table visible, chart skeleton |
+| Comparison max (3/3) | — | — | — | — | 4th paddle search result: disabled + "Máximo 3 raquetes" tooltip |
+| Admin queue | Table skeleton | "Nenhum item na fila de revisão" + 🎉 | "Erro ao carregar fila." + [Recarregar] | Table rendered | — |
+| Admin catalog | Table skeleton | "Catálogo vazio. [+ Adicionar raquete]" | "Erro ao carregar catálogo." | Table rendered | — |
+| Admin CRUD save | Button: spinner + disabled | — | Inline field error OR toast "Erro ao salvar" | Toast "Raquete salva ✓" (2s) | — |
+| Affiliate link click | Cursor wait (brief) | — | Silent fail (log error, don't interrupt UX) | New tab opens | — |
+
+## GSTACK REVIEW REPORT
+
+| Review | Trigger | Why | Runs | Status | Findings |
+|--------|---------|-----|------|--------|----------|
+| CEO Review | `/plan-ceo-review` | Scope & strategy | 0 | — | — |
+| Codex Review | `/codex review` | Independent 2nd opinion | 0 | — | — |
+| Eng Review | `/plan-eng-review` | Architecture & tests (required) | 0 | — | — |
+| Design Review | `/plan-design-review` | UI/UX gaps | 1 | CLEAR | score: 2/10 → 8/10, 8 decisions made |
+
+**UNRESOLVED:** 0
+**VERDICT:** Design review CLEAR — eng review required before ship.
+
+</design>
+
 <tasks>
 
 <task type="auto">
