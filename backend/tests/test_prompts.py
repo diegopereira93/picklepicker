@@ -1,6 +1,12 @@
 """Tests for prompt engineering and metric translation."""
 
 import pytest
+import sys
+from pathlib import Path
+
+# Add backend to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
 from backend.app.prompts import SYSTEM_PROMPT, translate_metrics
 from backend.app.schemas import SpecsResponse
 

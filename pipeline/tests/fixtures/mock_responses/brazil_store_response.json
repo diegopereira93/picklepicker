@@ -1,0 +1,33 @@
+{
+  "data": {
+    "products": [
+      {
+        "name": "Selkirk Vanguard Power Air",
+        "price_brl": 1299.90,
+        "in_stock": true,
+        "image_url": "https://brazilpickleballstore.com.br/img/selkirk-vanguard.jpg",
+        "product_url": "https://brazilpickleballstore.com.br/produto/selkirk-vanguard-power-air",
+        "brand": "Selkirk",
+        "specs": {"weight_oz": 8.4, "core_thickness_mm": 16, "face_material": "carbon_fiber"}
+      },
+      {
+        "name": "JOOLA Ben Johns Hyperion CFS 16",
+        "price_brl": 899.90,
+        "in_stock": true,
+        "image_url": "https://brazilpickleballstore.com.br/img/joola-hyperion.jpg",
+        "product_url": "https://brazilpickleballstore.com.br/produto/joola-ben-johns-hyperion",
+        "brand": "JOOLA",
+        "specs": {"weight_oz": 8.2, "core_thickness_mm": 14, "face_material": "fiberglass"}
+      },
+      {
+        "name": "Paddletek Tempest Wave Pro",
+        "price_brl": 750.00,
+        "in_stock": false,
+        "image_url": "https://brazilpickleballstore.com.br/img/paddletek-tempest.jpg",
+        "product_url": "https://brazilpickleballstore.com.br/produto/paddletek-tempest-wave-pro",
+        "brand": "Paddletek",
+        "specs": {"weight_oz": 7.8, "core_thickness_mm": 13, "face_material": "graphite"}
+      }
+    ]
+  }
+}

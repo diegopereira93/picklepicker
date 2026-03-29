@@ -9,9 +9,11 @@ from datetime import datetime
 from backend.app.api.paddles import router as paddles_router
 from backend.app.api.chat import router as chat_router
 from backend.app.api.health import router as health_router
+from backend.app.api.price_history import router as price_history_router
 from backend.app.routers.affiliate import router as affiliate_router
 from backend.app.logging_config import configure_logging
 from backend.app.middleware.alerts import alerter
+from backend.app.db import get_pool, close_pool
 import structlog
 
 logger = structlog.get_logger()
@@ -26,11 +28,11 @@ configure_logging(environment)
 async def lifespan(app: FastAPI):
     # Startup
     logger.info("FastAPI startup — initializing...")
-    # Could initialize DB pool, cache, etc. here
+    await get_pool()  # Initialize DB connection pool
     yield
     # Shutdown
     logger.info("FastAPI shutdown — cleaning up...")
-    # Close DB pool, cache, etc. here
+    await close_pool()  # Close DB connection pool
 
 
 app = FastAPI(title="PickleIQ", version="0.1.0", lifespan=lifespan)
@@ -39,6 +41,7 @@ app = FastAPI(title="PickleIQ", version="0.1.0", lifespan=lifespan)
 app.include_router(paddles_router)
 app.include_router(chat_router)
 app.include_router(health_router)
+app.include_router(price_history_router)
 app.include_router(affiliate_router, tags=["affiliate"])
 
 

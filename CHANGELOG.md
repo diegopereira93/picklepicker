@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.4.0] - 2026-03-29
+
+### Fixed
+- Navigation: removed dead `/compare` links from header, footer, and blog — all point to `/paddles`
+- Navigation: removed "Chat IA" as a standalone header nav item (was bypassing quiz gate)
+- Catalog cards: `fetchProductData` returns `null` on error instead of throwing; numeric ID fallback prevents 404 when `model_slug` is null
+- Backend: registered `price_history` router in `main.py` (endpoint was implemented but not mounted)
+- Backend: defensive `.get()` access on paddle dicts prevents 500 errors in test/mock environments
+- Backend: `PaddleResponse.created_at` made Optional to match real DB nullability
+
+### Added
+- Catalog cards: skill level badge, SW/Core specs row, and in-stock indicator on `/paddles` page
+
+### Changed
+- Home page hero CTA now links to `/paddles` ("Ver catalogo") instead of dead `/compare`
+- Test: `fetchProductData` test updated to expect `null` on error (not throw)
+- Tests: price alert worker mock fixed to provide correct number of `side_effect` values
+
 ## [0.2.2.0] - 2026-03-28
 ## [0.2.3.0] - 2026-03-28
 

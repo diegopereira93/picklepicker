@@ -26,7 +26,7 @@ class PaddleResponse(BaseModel):
     image_url: Optional[str] = None
     specs: Optional[SpecsResponse] = None
     price_min_brl: Optional[float] = None
-    created_at: datetime
+    created_at: Optional[datetime] = None
 
     model_config = {"from_attributes": True}
 

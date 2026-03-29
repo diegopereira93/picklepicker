@@ -1,0 +1,42 @@
+{
+  "results": [
+    {
+      "id": "MLB12345",
+      "title": "Raquete Pickleball Selkirk Vanguard Power Air",
+      "price": 1199.90,
+      "currency_id": "BRL",
+      "available_quantity": 5,
+      "thumbnail": "https://http2.mlstatic.com/D_NQ_NP_selkirk.jpg",
+      "permalink": "https://www.mercadolivre.com.br/raquete-pickleball-selkirk-vanguard-MLB12345",
+      "condition": "new",
+      "seller": {"id": 100001, "nickname": "SELKIRK_BR"}
+    },
+    {
+      "id": "MLB67890",
+      "title": "Raquete Pickleball JOOLA Ben Johns Hyperion",
+      "price": 849.90,
+      "currency_id": "BRL",
+      "available_quantity": 3,
+      "thumbnail": "https://http2.mlstatic.com/D_NQ_NP_joola.jpg",
+      "permalink": "https://www.mercadolivre.com.br/raquete-pickleball-joola-MLB67890",
+      "condition": "new",
+      "seller": {"id": 100002, "nickname": "JOOLA_BR"}
+    },
+    {
+      "id": "MLB11111",
+      "title": "Raquete Pickleball Paddletek Tempest Wave",
+      "price": 720.00,
+      "currency_id": "BRL",
+      "available_quantity": 0,
+      "thumbnail": "https://http2.mlstatic.com/D_NQ_NP_paddletek.jpg",
+      "permalink": "https://www.mercadolivre.com.br/raquete-pickleball-paddletek-MLB11111",
+      "condition": "new",
+      "seller": {"id": 100003, "nickname": "PADDLETEK_BR"}
+    }
+  ],
+  "paging": {
+    "total": 3,
+    "offset": 0,
+    "limit": 50
+  }
+}

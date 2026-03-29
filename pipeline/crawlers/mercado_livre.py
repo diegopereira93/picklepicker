@@ -37,7 +37,14 @@ async def search_pickleball_paddles(
     all_results = []
     current_offset = offset
 
-    async with httpx.AsyncClient(timeout=30.0) as client:
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+        "Accept": "application/json",
+        "Accept-Language": "pt-BR,pt;q=0.9",
+        "Referer": "https://www.mercadolivre.com.br/",
+    }
+
+    async with httpx.AsyncClient(timeout=30.0, headers=headers) as client:
         while True:
             params = {
                 "q": ML_DEFAULT_QUERY,
@@ -177,3 +184,10 @@ async def run_mercado_livre_crawler() -> int:
 
     logger.info("Saved %d ML items to price_snapshots", saved)
     return saved
+
+
+if __name__ == "__main__":
+    import asyncio
+
+    logging.basicConfig(level=logging.INFO)
+    asyncio.run(run_mercado_livre_crawler())

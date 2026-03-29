@@ -4,18 +4,50 @@
 
 Plataforma de inteligência de dados e IA para o mercado brasileiro de pickleball. Pipeline de scraping de preços BR → catálogo com pgvector embeddings → agente RAG conversacional → frontend Next.js com quiz de onboarding, comparador e links de afiliado ativos. Beta com 50 usuários em 12 semanas.
 
+## Milestones
+
+- ✅ **v1.0 MVP** — Phases 1-6 (shipped 2026-03-28)
+- 📋 **v1.1+** — Planning phase
+
+---
+
 ## Phases
 
-**Phase Numbering:**
-- Integer phases (1, 2, 3): Planned milestone work
-- Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
+<details>
+<summary>✅ v1.0 MVP (Phases 1-6) — SHIPPED 2026-03-28</summary>
 
 - [x] **Phase 1: Foundation & Data Infrastructure** - Dev environment + schema + primeiro crawler + Mercado Livre integration (completed 2026-03-26)
-- [ ] **Phase 2: Full Data Pipeline** - Crawlers BR completos, deduplicação SKU, embeddings pgvector, FastAPI endpoints
-- [ ] **Phase 3: RAG Agent & AI Core** - Agente conversacional PT-BR com eval gate de modelo, streaming SSE, latência P95 < 3s
+- [x] **Phase 2: Full Data Pipeline** - Crawlers BR completos, deduplicação SKU, embeddings pgvector, FastAPI endpoints (completed 2026-03-28)
+- [x] **Phase 3: RAG Agent & AI Core** - Agente conversacional PT-BR com eval gate de modelo, streaming SSE, latência P95 < 3s (completed 2026-03-28)
 - [x] **Phase 4: Frontend Chat & Product UI** - Next.js 14 com quiz onboarding, chat widget, comparador de raquetes e admin panel (completed 2026-03-28)
 - [x] **Phase 5: SEO & Growth Features** - Páginas SSR indexáveis, price alerts com Clerk + Resend, histórico de preços (completed 2026-03-28)
 - [x] **Phase 6: Launch & Deploy** - Produção estável, CI/CD, observabilidade, beta 50 usuários (completed 2026-03-28)
+
+See `.planning/milestones/v1.0-ROADMAP.md` for archived phase details.
+
+### ✅ Phase 07: E2E Testing & Scraper Validation (v1.1) — COMPLETE 2026-03-29
+**Goal:** Validate all 3 scrapers (Brazil Pickleball Store, Drop Shot Brasil, Mercado Livre) + Firecrawl integration work correctly locally with staging/test data.
+**Depends on:** v1.0 complete (Phase 1-6)
+**Success Criteria** (ALL TRUE):
+  1. ✅ E2E test suite covers all 3 scrapers with ≥ 80% code path coverage (Brazil 80%, Drop Shot 93%, ML 94%)
+  2. ✅ Each scraper tested against staging mock with schema validation passing
+  3. ✅ Firecrawl `/extract` error modes documented and handled (timeout, rate limit, parse failure)
+  4. ✅ Data integrity verified: schema compliance, dedup matching, affiliate URL formatting
+  5. ✅ Performance validated: crawl times < 30s per retailer, no memory leaks
+**Plans**: 1/1 complete (07-01)
+**Tests**: 101 new tests, 90% combined coverage
+
+</details>
+
+<details>
+<summary>📋 v1.1 — Scraper Validation & E2E Testing (Planning)</summary>
+
+- [ ] **Phase 07: E2E Testing & Scraper Validation** — Validate all 3 scrapers + Firecrawl integration locally with ≥80% coverage, data integrity verified
+- [ ] **Phase 08: Navigation UX Fixes** — Fix broken /compare link (404) and remove Chat IA standalone nav item
+
+See `.planning/v1.1-CONTEXT.md` for scope details.
+
+</details>
 
 ## Phase Details
 
@@ -47,7 +79,7 @@ Plans:
   3. pgvector embeddings populados (text-embedding-3-small, índice HNSW) com re-embedding assíncrono
   4. FastAPI com todos os 5 endpoints GET /paddles funcionando + GET /health
   5. Railway provisionado para API staging
-**Plans**: 5 plans
+**Plans**: 8 plans (5 original + 3 gap-closure)
 
 Plans:
 - [ ] 02-01: Crawlers Drop Shot Brasil + Mercado Livre expansão via Firecrawl /extract
@@ -55,6 +87,9 @@ Plans:
 - [ ] 02-03: GitHub Actions schedule (cron 24h) — orquestração crawlers, retry exponential backoff, alerta Telegram + provisionar Railway
 - [ ] 02-04: pgvector embeddings — extensão vector Supabase, text-embedding-3-small, índice HNSW, re-embedding assíncrono via needs_reembed flag
 - [ ] 02-05: FastAPI endpoints — GET /paddles, GET /paddles/{id}, GET /paddles/{id}/prices, GET /paddles/{id}/latest-prices, GET /health
+- [ ] 02-06: [GAP] Fix crawler module naming — GH Actions references mercadolivre_expansion but file is mercado_livre.py (R2.1)
+- [ ] 02-07: [GAP] Wire API endpoints to real DB — replace mock db_fetch with psycopg async pool (R2.4)
+- [ ] 02-08: [GAP] Create backend/Dockerfile for Railway deployment (R2.5)
 
 ### Phase 3: RAG Agent & AI Core
 **Goal**: Agente conversacional recomendando raquetes com latência < 3s, com observabilidade via Langfuse.
@@ -128,6 +163,20 @@ Plans:
 - [ ] 06-03: Observabilidade produção — logs estruturados, alertas Telegram scraping, Langfuse produção, health checks
 - [ ] 06-04: Beta launch — deploy dados reais, onboarding 50 usuários beta, coleta NPS após 30 dias
 
+### Phase 8: Navigation UX Fixes
+**Goal**: Fix broken navigation — /compare route 404 and Chat IA standalone nav link bypassing quiz gate.
+**Depends on**: Phase 4 (frontend exists)
+**Requirements**: None (UX bug fix)
+**Success Criteria** (what must be TRUE):
+  1. No link in the app points to /compare (all redirected to /paddles)
+  2. Header nav shows only [Home, Catalogo] text links plus "Encontrar raquete" CTA
+  3. No "Chat IA" standalone nav item in header (desktop or mobile)
+  4. Home page secondary CTA says "Ver catalogo" linking to /paddles
+**Plans**: 1 plan
+
+Plans:
+- [ ] 08-01: Fix header navLinks and home page CTA — remove Chat IA, /compare to /paddles, label updates
+
 ## Progress
 
 **Execution Order:**
@@ -136,11 +185,12 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Data Infrastructure | 3/4 | Complete    | 2026-03-26 |
-| 2. Full Data Pipeline | 0/5 | Not started | - |
+| 2. Full Data Pipeline | 0/8 | Gap closure planned | - |
 | 3. RAG Agent & AI Core | 0/5 | Not started | - |
 | 4. Frontend Chat & Product UI | 6/6 | Complete   | 2026-03-28 |
 | 5. SEO & Growth Features | 4/4 | Complete    | 2026-03-28 |
 | 6. Launch & Deploy | 0/4 | Complete    | 2026-03-28 |
+| 8. Navigation UX Fixes | 0/1 | Planned    | - |
 
 ---
 
