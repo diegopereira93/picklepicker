@@ -6,11 +6,21 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pickleiq.com'
 
 export async function fetchProductData(brand: string, modelSlug: string): Promise<Paddle | null> {
   const res = await fetch(
-    `${FASTAPI_URL}/paddles?brand=${encodeURIComponent(brand)}&model_slug=${encodeURIComponent(modelSlug)}`
+    `${FASTAPI_URL}/api/v1/paddles?brand=${encodeURIComponent(brand)}&model_slug=${encodeURIComponent(modelSlug)}`
   )
-  if (!res.ok) throw new Error(`Product not found: ${brand}/${modelSlug}`)
+  if (!res.ok) return null
   const data = await res.json()
-  return data.paddles?.[0] ?? null
+  const paddle = data.data?.[0] ?? data.paddles?.[0] ?? null
+
+  if (!paddle && /^\d+$/.test(modelSlug)) {
+    const idRes = await fetch(`${FASTAPI_URL}/api/v1/paddles/${modelSlug}`)
+    if (idRes.ok) {
+      const idData = await idRes.json()
+      return idData.data ?? idData ?? null
+    }
+  }
+
+  return paddle
 }
 
 export async function fetchPaddlesList(params: {
