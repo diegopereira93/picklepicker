@@ -75,6 +75,15 @@ async def chat_stream(request: ChatRequest) -> StreamingResponse:
             # Fetch recommendations by profile
             recommendations = await agent.search_by_profile(profile)
 
+            # Per-paddle reason templates — "Por que essa raquete?" trust element
+            # V1: template-based; V2 goal: LLM-generated per-paddle reason in reasoning event
+            def _paddle_reason(rank: int, skill: str, price: float) -> str:
+                if rank == 0:
+                    return f"Melhor opção para {skill} com ótimo custo-benefício (R${price:.0f})"
+                if rank == 1:
+                    return "Excelente equilíbrio entre controle e potência para o seu nível"
+                return "Opção alternativa com specs complementares ao seu estilo de jogo"
+
             # Send recommendations event
             rec_data = {
                 "paddles": [
@@ -85,8 +94,9 @@ async def chat_stream(request: ChatRequest) -> StreamingResponse:
                         "price_min_brl": r.price_min_brl,
                         "affiliate_url": r.affiliate_url,
                         "similarity_score": r.similarity_score,
+                        "reason": _paddle_reason(i, request.skill_level, r.price_min_brl),
                     }
-                    for r in recommendations
+                    for i, r in enumerate(recommendations)
                 ]
             }
             yield f"event: recommendations\ndata: {json.dumps(rec_data)}\n\n"

@@ -1,7 +1,13 @@
 """End-to-end tests for the complete chat pipeline."""
 
 import pytest
+import sys
+from pathlib import Path
 from fastapi.testclient import TestClient
+
+# Add backend to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+
 from backend.app.main import app
 
 
