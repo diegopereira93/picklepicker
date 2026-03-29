@@ -43,6 +43,7 @@ See `.planning/milestones/v1.0-ROADMAP.md` for archived phase details.
 <summary>📋 v1.1 — Scraper Validation & E2E Testing (Planning)</summary>
 
 - [ ] **Phase 07: E2E Testing & Scraper Validation** — Validate all 3 scrapers + Firecrawl integration locally with ≥80% coverage, data integrity verified
+- [ ] **Phase 08: Navigation UX Fixes** — Fix broken /compare link (404) and remove Chat IA standalone nav item
 
 See `.planning/v1.1-CONTEXT.md` for scope details.
 
@@ -162,6 +163,20 @@ Plans:
 - [ ] 06-03: Observabilidade produção — logs estruturados, alertas Telegram scraping, Langfuse produção, health checks
 - [ ] 06-04: Beta launch — deploy dados reais, onboarding 50 usuários beta, coleta NPS após 30 dias
 
+### Phase 8: Navigation UX Fixes
+**Goal**: Fix broken navigation — /compare route 404 and Chat IA standalone nav link bypassing quiz gate.
+**Depends on**: Phase 4 (frontend exists)
+**Requirements**: None (UX bug fix)
+**Success Criteria** (what must be TRUE):
+  1. No link in the app points to /compare (all redirected to /paddles)
+  2. Header nav shows only [Home, Catalogo] text links plus "Encontrar raquete" CTA
+  3. No "Chat IA" standalone nav item in header (desktop or mobile)
+  4. Home page secondary CTA says "Ver catalogo" linking to /paddles
+**Plans**: 1 plan
+
+Plans:
+- [ ] 08-01: Fix header navLinks and home page CTA — remove Chat IA, /compare to /paddles, label updates
+
 ## Progress
 
 **Execution Order:**
@@ -175,6 +190,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 4. Frontend Chat & Product UI | 6/6 | Complete   | 2026-03-28 |
 | 5. SEO & Growth Features | 4/4 | Complete    | 2026-03-28 |
 | 6. Launch & Deploy | 0/4 | Complete    | 2026-03-28 |
+| 8. Navigation UX Fixes | 0/1 | Planned    | - |
 
 ---
 
