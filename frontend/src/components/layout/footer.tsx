@@ -32,7 +32,7 @@ export function Footer() {
             <Link href="/chat" className="hover:text-foreground transition-colors">
               Chat IA
             </Link>
-            <Link href="/compare" className="hover:text-foreground transition-colors">
+            <Link href="/paddles" className="hover:text-foreground transition-colors">
               Comparar
             </Link>
           </nav>

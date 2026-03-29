@@ -198,7 +198,7 @@ export default function PillarPage() {
 
       <p>
         Para comparações mais detalhadas entre modelos específicos, visite nosso{' '}
-        <Link href="/compare" className="text-blue-600 hover:underline">
+        <Link href="/paddles" className="text-blue-600 hover:underline">
           Comparador de Raquetes
         </Link>
         .
