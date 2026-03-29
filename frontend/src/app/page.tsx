@@ -44,7 +44,7 @@ export default function Home() {
               <Link href="/chat">Comecar agora — e gratis</Link>
             </Button>
             <Button asChild variant="outline" size="lg">
-              <Link href="/compare">Ver comparador</Link>
+              <Link href="/paddles">Ver catalogo</Link>
             </Button>
           </div>
         </div>
