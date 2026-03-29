@@ -20,7 +20,6 @@ All notable changes to this project will be documented in this file.
 - Test: `fetchProductData` test updated to expect `null` on error (not throw)
 - Tests: price alert worker mock fixed to provide correct number of `side_effect` values
 
-## [0.2.2.0] - 2026-03-28
 ## [0.2.3.0] - 2026-03-28
 
 ### Added
