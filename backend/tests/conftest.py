@@ -46,3 +46,104 @@ def mock_db_pool():
                 mock_close.return_value = None
                 mock_get_conn.return_value = mock_conn
                 yield mock_pool
+
+
+# ---------------------------------------------------------------------------
+# Firecrawl & scraper fixtures (used by pipeline E2E tests)
+# ---------------------------------------------------------------------------
+
+@pytest.fixture
+def mock_firecrawl_app():
+    """Mock FirecrawlApp instance with extract() and crawl() methods.
+
+    Supports configuring error scenarios via side_effect.
+    Scope: function (fresh mock per test).
+    """
+    app = MagicMock()
+    app.extract = MagicMock(return_value={
+        "data": {
+            "products": [
+                {
+                    "name": "Selkirk Vanguard Power Air",
+                    "price_brl": 1299.90,
+                    "in_stock": True,
+                    "image_url": "https://example.com/img.jpg",
+                    "product_url": "https://brazilpickleballstore.com.br/product/1",
+                    "brand": "Selkirk",
+                    "specs": {"weight_oz": 8.4, "core_thickness_mm": 16},
+                }
+            ]
+        }
+    })
+    app.crawl = MagicMock(return_value={"status": "completed", "data": []})
+    return app
+
+
+@pytest.fixture
+def mock_firecrawl_timeout():
+    """Mock FirecrawlApp that raises TimeoutError on first 2 calls, succeeds on 3rd."""
+    app = MagicMock()
+    app.extract = MagicMock(side_effect=[
+        TimeoutError("Request timed out"),
+        TimeoutError("Request timed out"),
+        {
+            "data": {
+                "products": [
+                    {
+                        "name": "Test Paddle",
+                        "price_brl": 500.0,
+                        "in_stock": True,
+                        "image_url": "https://example.com/img.jpg",
+                        "product_url": "https://example.com/product/1",
+                        "brand": "TestBrand",
+                        "specs": {},
+                    }
+                ]
+            }
+        },
+    ])
+    return app
+
+
+@pytest.fixture
+def mock_firecrawl_rate_limit():
+    """Mock FirecrawlApp that simulates 429 rate limit errors."""
+
+    class RateLimitError(Exception):
+        status_code = 429
+
+    app = MagicMock()
+    app.extract = MagicMock(side_effect=RateLimitError("Rate limit exceeded (429)"))
+    return app
+
+
+@pytest.fixture
+def mock_firecrawl_parse_error():
+    """Mock FirecrawlApp that returns unparseable / empty data."""
+    app = MagicMock()
+    app.extract = MagicMock(return_value={"data": None})
+    return app
+
+
+@pytest.fixture
+def scraper_db_connection():
+    """Async DB connection mock for scraper persistence tests.
+
+    Provides execute() that returns an object with fetchone() returning (1,)
+    so paddle upsert logic works correctly.
+    """
+    conn = AsyncMock()
+    execute_result = AsyncMock()
+    execute_result.fetchone = AsyncMock(return_value=(1,))
+    conn.execute = AsyncMock(return_value=execute_result)
+    conn.commit = AsyncMock()
+    conn.__aenter__ = AsyncMock(return_value=conn)
+    conn.__aexit__ = AsyncMock(return_value=None)
+    return conn
+
+
+@pytest.fixture
+def staging_config():
+    """Load staging configuration for retailer URLs and test settings."""
+    from pipeline.tests.test_utils import load_staging_config
+    return load_staging_config()
