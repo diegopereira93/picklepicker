@@ -57,6 +57,30 @@ export default async function PaddlesPage() {
                   {paddle.name}
                 </h2>
                 <p className="text-sm text-gray-500">{paddle.brand}</p>
+
+                {/* Skill level badge */}
+                {paddle.skill_level && (
+                  <span className="inline-block text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 mt-1">
+                    {paddle.skill_level === 'beginner' ? 'Iniciante' : paddle.skill_level === 'intermediate' ? 'Intermediário' : paddle.skill_level === 'advanced' ? 'Avançado' : paddle.skill_level}
+                  </span>
+                )}
+
+                {/* Specs row */}
+                {(paddle.specs?.swingweight || paddle.specs?.core_thickness_mm) && (
+                  <p className="text-xs text-gray-400 mt-1">
+                    {paddle.specs?.swingweight && <span>SW: {paddle.specs.swingweight}</span>}
+                    {paddle.specs?.swingweight && paddle.specs?.core_thickness_mm && <span> · </span>}
+                    {paddle.specs?.core_thickness_mm && <span>Core: {paddle.specs.core_thickness_mm}mm</span>}
+                  </p>
+                )}
+
+                {/* Stock badge */}
+                {paddle.in_stock != null && (
+                  <span className={`inline-block text-xs mt-1 ${paddle.in_stock ? 'text-green-600' : 'text-gray-400'}`}>
+                    {paddle.in_stock ? 'Em estoque' : 'Fora de estoque'}
+                  </span>
+                )}
+
                 {(paddle.price_brl != null || paddle.price_min_brl != null) && (
                   <p className="text-green-700 font-bold mt-1">
                     R${' '}

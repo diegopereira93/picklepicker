@@ -3,30 +3,31 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-03-29T14:00:00Z"
+last_updated: "2026-03-29T00:00:00.000Z"
+last_activity: 2026-03-29
 progress:
-  total_phases: 7
-  completed_phases: 6
-  total_plans: 18
-  completed_plans: 29
+  total_phases: 6
+  completed_phases: 3
+  total_plans: 13
+  completed_plans: 18
 ---
 
 # PickleIQ — Project State
 
-**Última atualização:** 2026-03-29T00:00:00Z
-**Status:** Executing Phase 07
-**Última sessão:** 2026-03-29T00:00:00Z
+**Última atualização:** 2026-03-27
+**Status:** Ready to plan
+**Last session:** 2026-03-28T04:24:23.049Z
 
-## Posição Atual
+## Current Position
 
-Fase: 07 (e2e-testing-scraper-validation) — COMPLETE
-Plan: 07-01 COMPLETE
+Phase: 05 (seo-growth-features) — EXECUTING
+Plan: Not started
 
-- **Milestone:** v1.1 (E2E Testing & Scraper Validation)
-- **Fase:** 07 (E2E Testing & Scraper Validation)
-- **Status:** Phase 07 complete — 101 tests, 90% combined coverage, all scrapers validated
-- **Última atividade:** 2026-03-29T14:00:00Z
-- **Próxima ação:** v1.1 Phase 2 planning (production cron schedule, monitoring)
+- **Milestone:** v1.0 (MVP → Beta Launch)
+- **Phase:** 6
+- **Status:** Executing Phase 4
+- **Last activity:** 2026-03-28
+- **Next action:** Execute 04-02
 
 ## Completed
 
@@ -72,76 +73,20 @@ Plan: 07-01 COMPLETE
 - [Phase 05-02]: Canonical URL stored in alternates.canonical (Next.js 14 Metadata API)
 - [Phase 05-02]: revalidateTag/revalidatePath imported dynamically to gracefully no-op in test environment
 - [Phase 05]: Clerk installed with --legacy-peer-deps; Resend client made lazy for vitest testability; vi.hoisted() pattern established for class-based SDK mocks
-- [Phase 02-07]: Backend AsyncConnectionPool singleton (min=2, max=10) initialized in FastAPI lifespan; all paddles endpoints wire real psycopg queries with dict_row factory
-- [Phase 02-08]: Docker image uses python:3.12-slim with WORKDIR=/app/backend to align module path (app.main:app) with railway.toml start command; libpq-dev included for psycopg[binary,pool]
-
-## Phase 07 Completion Summary (E2E Testing & Scraper Validation)
-
-**Execution Date:** 2026-03-29T14:00:00Z
-**Duration:** ~30 minutes
-**Final Commit:** 72661ae
-**Tests:** 101 new tests, 90% combined coverage across all 3 scrapers
-
-**Deliverables:**
-
-- ✅ Brazil Store: 18 tests, 80% coverage, schema + retry + DB persistence
-- ✅ Drop Shot Brasil: 19 tests, 93% coverage, full crawler E2E
-- ✅ Mercado Livre: 24 tests, 94% coverage, affiliate URLs + pagination + fuzzy dedup
-- ✅ Firecrawl integration: 17 tests, all error modes + concurrent execution
-- ✅ Data integrity: 23 tests, cross-scraper schema, dedup, performance benchmarks
-- ✅ Documentation: FIRECRAWL_ERROR_HANDLING.md + E2E_TEST_README.md
-
-**Key Decisions (Phase 07):**
-
-- [07-01] None-guard `(result.get("data") or {})` applied to both Firecrawl scrapers (prevents AttributeError on parse failure)
-- [07-01] scraper_db_connection fixture added to pipeline conftest (backend conftest not inherited by pipeline tests)
-- [07-01] RapidFuzz threshold 85 validated as correct for same-product variant dedup vs different-paddle false positives
-- [07-01] test_firecrawl_integration.py takes ~3min due to tenacity real sleep during retry backoff
 
 ## Performance Metrics
 
-| Phase | Plan | Duration | Tasks | Files | Tests |
-|-------|------|----------|-------|-------|-------|
-| 01    | 01   | 4 min    | 2/2   | 14    | 22 |
-| Phase 01 P02 | 1 min | 2 tasks | 1 files | 8 |
-| Phase 01 P03 | 6 min | 1 tasks | 5 files | 12 |
-| Phase 01 P04 | 7 min | 1 tasks | 4 files | 10 |
-| 04    | 01   | 14 min   | 2/2   | 29    | 38 |
-| Phase 04 P05 | 25 min | 2 tasks | 15 files | 35 |
-| Phase 04 Proot | 15 min | 1 tasks | 3 files | 12 |
-| Phase 05 P02 | 4 min | 2 tasks | 9 files | 18 |
-| Phase 05 P01 | 25 min | 3 tasks | 10 files | 28 |
-| Phase 05 P03 | 8 min | 4 micro-tasks | 11 files | 57 |
-| Phase 05 P04 | 6 min | 3 micro-tasks | 7 files | 25 |
-| Phase 02 P07 | 15 min | 2 tasks | 4 files | 0 |
-| Phase 03 W1 | 15 min | 2 tasks | 6 files | 17 ✅ |
-| Phase 03 W2-5 | 45 min | 6 tasks | 13 files | 86 ✅ |
-| Phase 03 Total | 60 min | 8 tasks | 13 new + 6 modified | 103 ✅ |
-| Phase 07 | 01   | 30 min   | 18/18 | 12 new + 4 modified | 101 ✅ |
-
-## Phase 03 Completion Summary (RAG Agent & AI Core)
-
-**Execution Date:** 2026-03-28T22:30:00Z
-**Duration:** ~60 minutes
-**Final Commit:** a6c5cca
-**Tests:** 103/103 passing ✅
-
-**Deliverables:**
-
-- ✅ Eval gate: 10 Portuguese queries scored, Groq selected (4.25 avg)
-- ✅ RAG agent: pgvector search, top-3 filtering, degraded mode
-- ✅ POST /chat SSE endpoint: streaming recommendations, <3s P95 latency
-- ✅ Redis cache: 3600s TTL, deterministic keys, graceful degradation
-- ✅ Langfuse observability: traces, cost tracking, latency monitoring
-- ✅ E2E tests: full pipeline, timeout handling, regression checks
-
-**Key Decisions (Phase 03):**
-
-- [03-01] Groq selected as primary LLM (4.25 avg score >= 4.0 threshold, cost-effective)
-- [03-02] Portuguese metric translation handles NULL specs gracefully
-- [03-03] SSE events properly JSON-serialized (fixed in commit e805611)
-- [03-04] Redis cache compatible with any async-capable library (no hard redis dependency)
-- [03-05] Langfuse v3 API used for production-ready observability
+| Phase | Plan | Duration | Tasks | Files |
+|-------|------|----------|-------|-------|
+| 01    | 01   | 4 min    | 2/2   | 14    |
+| Phase 01 P02 | 1 min | 2 tasks | 1 files |
+| Phase 01 P03 | 6 min | 1 tasks | 5 files |
+| Phase 01 P04 | 7 min | 1 tasks | 4 files |
+| 04    | 01   | 14 min   | 2/2   | 29    |
+| Phase 04 P05 | 25 min | 2 tasks | 15 files |
+| Phase 04 Proot | 15 min | 1 tasks | 3 files |
+| Phase 05 P02 | 4 min | 2 tasks | 9 files |
+| Phase 05 P01 | 25min | 3 tasks | 10 files |
 
 ## Open Questions (não bloqueantes para Phase 1)
 
