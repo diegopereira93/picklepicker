@@ -105,14 +105,14 @@ async def get_paddle(paddle_id: int):
     specs = SpecsResponse(**specs_data) if any(specs_data.values()) else None
 
     return PaddleResponse(
-        id=paddle["id"],
-        name=paddle["name"],
-        brand=paddle["brand"],
+        id=paddle.get("id", 0),
+        name=paddle.get("name", ""),
+        brand=paddle.get("brand", ""),
         sku=paddle.get("sku"),
         image_url=paddle.get("image_url"),
         specs=specs,
         price_min_brl=paddle.get("price_min_brl"),
-        created_at=paddle["created_at"],
+        created_at=paddle.get("created_at"),
     )
 
 
@@ -152,7 +152,7 @@ async def get_paddle_prices(paddle_id: int):
 
     return PriceHistoryResponse(
         paddle_id=paddle_id,
-        paddle_name=paddle["name"],
+        paddle_name=paddle.get("name", ""),
         prices=price_items,
     )
 
@@ -192,7 +192,7 @@ async def get_paddle_latest_prices(paddle_id: int):
 
     return LatestPriceResponse(
         paddle_id=paddle_id,
-        paddle_name=paddle["name"],
+        paddle_name=paddle.get("name", ""),
         latest_prices=price_items,
     )
 

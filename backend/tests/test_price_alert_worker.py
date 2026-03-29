@@ -119,8 +119,10 @@ def _build_mock_conn(alert_rows, price_value):
     price_cursor = AsyncMock()
     price_cursor.fetchone = AsyncMock(return_value=_make_price_row(price_value) if price_value is not None else None)
 
+    update_cursor = AsyncMock()
+
     conn = AsyncMock()
-    conn.execute = AsyncMock(side_effect=[alerts_cursor, price_cursor])
+    conn.execute = AsyncMock(side_effect=[alerts_cursor, price_cursor, update_cursor])
     conn.commit = AsyncMock()
 
     # Support async context manager
@@ -258,8 +260,10 @@ async def test_multiple_alerts_independent():
     alerts_cursor = AsyncMock()
     alerts_cursor.fetchall = AsyncMock(return_value=alerts)
 
+    update_cursor = AsyncMock()
+
     conn = AsyncMock()
-    conn.execute = AsyncMock(side_effect=[alerts_cursor, price_cursor_1, price_cursor_2])
+    conn.execute = AsyncMock(side_effect=[alerts_cursor, price_cursor_1, update_cursor, price_cursor_2])
     conn.commit = AsyncMock()
     conn.__aenter__ = AsyncMock(return_value=conn)
     conn.__aexit__ = AsyncMock(return_value=False)
