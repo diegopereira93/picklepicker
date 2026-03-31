@@ -1,6 +1,9 @@
 import os
 import json
 import logging
+import re
+import time
+from typing import Optional
 from firecrawl import FirecrawlApp
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 from pipeline.db.connection import get_connection
@@ -48,6 +51,41 @@ def extract_products(app: FirecrawlApp, url: str) -> dict:
         ),
         schema=FIRECRAWL_SCHEMA,
     )
+
+
+def extract_image_from_markdown(markdown: str) -> Optional[str]:
+    """Extract image URL from markdown content using regex.
+
+    Looks for mitiendanube.com CDN URLs and transforms them to smaller size.
+    """
+    pattern = r'!\[.*?\]\((https?://[^)]+\.(?:jpg|jpeg|png|webp))\)'
+    matches = re.findall(pattern, markdown, re.IGNORECASE)
+    for match in matches:
+        if 'mitiendanube.com' in match:
+            return match.replace('-1024-1024', '-480-0')
+    return None
+
+
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=1, min=5, max=60),
+    retry=retry_if_exception_type(Exception),
+    reraise=True,
+)
+def scrape_product_page(app: FirecrawlApp, url: str) -> Optional[str]:
+    """Scrape individual product page and extract image URL."""
+    try:
+        result = app.scrape(url)
+        if hasattr(result, 'markdown'):
+            markdown = result.markdown
+        elif isinstance(result, dict):
+            markdown = result.get('markdown', '')
+        else:
+            return None
+        return extract_image_from_markdown(markdown)
+    except Exception as e:
+        logger.warning(f"Failed to scrape product page {url}: {e}")
+        return None
 
 
 async def save_products_to_db(products: list[dict], retailer_id: int, conn) -> int:
@@ -111,6 +149,27 @@ async def run_brazil_store_crawler(app: FirecrawlApp | None = None) -> int:
 
     products = (result.get("data") or {}).get("products", [])
     logger.info("Extracted %d products from Brazil Pickleball Store", len(products))
+
+    # Phase 2: Scrape individual product pages for images
+    logger.info("Starting Phase 2: Scraping individual product pages for images...")
+    for i, product in enumerate(products):
+        product_url = product.get("product_url") or product.get("url")
+        current_image = product.get("image_url", "")
+
+        # Only scrape if we have a product URL and no/placeholder image
+        if product_url and (not current_image or "placeholder" in current_image.lower()):
+            logger.debug(f"Scraping product page {i+1}/{len(products)}: {product_url}")
+            image_url = scrape_product_page(app, product_url)
+            if image_url:
+                product["image_url"] = image_url
+                logger.info(f"Found image for '{product.get('name', 'Unknown')[:40]}...': {image_url[:60]}...")
+            # Rate limiting: sleep between scrapes
+            if i < len(products) - 1:
+                time.sleep(1)
+
+    # Count products with images
+    products_with_images = [p for p in products if p.get("image_url")]
+    logger.info(f"Phase 2 complete: {len(products_with_images)}/{len(products)} products have images")
 
     if not products:
         logger.warning("No products extracted from Brazil Pickleball Store")
