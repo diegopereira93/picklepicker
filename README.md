@@ -55,7 +55,7 @@ PickleIQ resolve ambos os problemas:
 
 ## Roadmap de Desenvolvimento
 
-A plataforma é desenvolvida em **6 fases** com duração estimada de **12 semanas** até o lançamento beta:
+A plataforma é desenvolvida em **8 fases** com duração estimada de **14 semanas** até o lançamento beta:
 
 | Fase | Objetivo | Duração | Status |
 |------|----------|---------|--------|
@@ -64,9 +64,11 @@ A plataforma é desenvolvida em **6 fases** com duração estimada de **12 seman
 | **3** | Agente RAG de recomendação com latência < 3s | 2 sem | ✅ Concluído (2026-03-27) |
 | **4** | Frontend: chat, comparador, tracking de afiliados | 2 sem | ✅ Concluído (2026-03-27) |
 | **5** | Autenticação Clerk, SEO, alertas de preço, blog, admin | 2 sem | ✅ Concluído (2026-03-28) |
-| **6** | Deploy produção, beta launch com 50 usuários | 1 sem | 📋 Próximo |
+| **6** | Deploy produção, beta launch com 50 usuários | 1 sem | ✅ Concluído (2026-03-29) |
+| **7** | E2E testing & validação dos scrapers — 101 testes, 90% cobertura | 1 sem | ✅ Concluído (2026-03-29) |
+| **8** | Navigation UX fixes — catalog cards, hero CTA, header nav | 1 sem | ✅ Concluído (2026-03-29) |
 
-**Beta launch:** Pronto para semana 6 (após aprovação)
+**Beta launch:** Fases 1-8 concluídas — pronto para Milestone 2
 
 ---
 
@@ -84,11 +86,13 @@ A plataforma é desenvolvida em **6 fases** com duração estimada de **12 seman
 
 - **[PickleIQ_PRD_v1.0.md](./PickleIQ_PRD_v1.0.md)** — Produto completo: problema, solução, personas, user stories, requisitos técnicos, roadmap
 - **[.planning/PROJECT.md](./.planning/PROJECT.md)** — Resumo executivo: o que estamos construindo, por que, para quem, decisões
-- **[.planning/REQUIREMENTS.md](./.planning/REQUIREMENTS.md)** — Requisitos técnicos detalhados por fase (6 fases, 24 plans)
+- **[.planning/milestones/v1.0-REQUIREMENTS.md](./.planning/milestones/v1.0-REQUIREMENTS.md)** — Requisitos técnicos detalhados por fase (v1.0, 8 fases)
 - **[.planning/ROADMAP.md](./.planning/ROADMAP.md)** — Roadmap executivo com timeline, KPIs e backlog
 - **[.planning/STATE.md](./.planning/STATE.md)** — Estado atual do projeto, decisões de pesquisa, questões abertas
 - **[TODOS.md](./TODOS.md)** — 7 itens deferred do eng review (T1-T7): infraestrutura, monitoring, legal, testes
 - **[CLAUDE.md](./CLAUDE.md)** — Configuração Claude Code: skills gstack disponíveis
+- **[CONTRIBUTING.md](./CONTRIBUTING.md)** — Setup de desenvolvimento, CI/CD, workflow de contribuição
+- **[DESIGN.md](./DESIGN.md)** — Design system e diretrizes visuais do projeto
 
 ---
 
@@ -165,27 +169,21 @@ picklepicker/
 │   └── STATE.md
 ├── docker-compose.yml
 ├── .gitignore
+├── CHANGELOG.md
 ├── CLAUDE.md
+├── CONTRIBUTING.md
+├── DESIGN.md
 ├── PickleIQ_PRD_v1.0.md
-└── TODOS.md
+├── TODOS.md
+└── VERSION
 ```
 
 ---
 
 ## Próximas Ações
 
-1. **Phase 1 — Foundation** (próximas 2 semanas)
-   - [ ] Setup monorepo + Docker Compose
-   - [ ] Schema PostgreSQL criado
-   - [ ] Primeiro crawler (Brazil Pickleball Store) funcional
-   - [ ] Mercado Livre Afiliados integration
-
-2. **Phase 2 — Full Pipeline** (semanas 3-5)
-   - [ ] Crawlers para Drop Shot Brasil
-   - [ ] Deduplicação 3-tier + fila de revisão manual
-   - [ ] GitHub Actions schedule 24h
-
-Veja [.planning/ROADMAP.md](./.planning/ROADMAP.md) para detalhes completos.
+Fases 1-8 concluídas — projeto em Milestone 2 (v1.1).
+Veja [.planning/ROADMAP.md](./.planning/ROADMAP.md) para o roadmap completo.
 
 ---
 
@@ -196,5 +194,5 @@ Veja [.planning/ROADMAP.md](./.planning/ROADMAP.md) para detalhes completos.
 
 ---
 
-**Status do Projeto:** Initialized — Ready for Phase 1
-**Última atualização:** 2026-03-26
+**Status do Projeto:** v0.2.4.0 — Fases 1-8 concluídas, Milestone 2 em progresso
+**Última atualização:** 2026-03-29
