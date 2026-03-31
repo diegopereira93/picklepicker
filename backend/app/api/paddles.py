@@ -59,7 +59,7 @@ async def list_paddles(
 
             # Data query with pagination - include specs, skill_level, in_stock, model_slug
             data_query = f"""
-                SELECT p.id, p.name, p.brand, p.sku, p.image_url, p.price_min_brl, p.created_at,
+                SELECT p.id, p.name, p.brand, p.manufacturer_sku as sku, p.image_url, p.price_min_brl, p.created_at,
                        p.model_slug, p.skill_level, p.in_stock,
                        ps.swingweight, ps.twistweight, ps.weight_oz, ps.core_thickness_mm, ps.face_material
                 FROM paddles p
@@ -100,11 +100,11 @@ async def list_paddles(
 async def get_paddle(paddle_id: int):
     """Get single paddle with full details."""
     query = """
-    SELECT p.id, p.name, p.brand, p.sku, p.image_url, p.price_min_brl, p.created_at,
+    SELECT p.id, p.name, p.brand, p.manufacturer_sku as sku, p.image_url, p.price_min_brl, p.created_at,
            ps.swingweight, ps.twistweight, ps.weight_oz, ps.core_thickness_mm, ps.face_material
     FROM paddles p
     LEFT JOIN paddle_specs ps ON p.id = ps.paddle_id
-    WHERE p.id = %s AND p.dedup_status IN ('pending', 'merged')
+    WHERE p.id = %s
     """
     async with get_connection() as conn:
         async with conn.cursor(row_factory=dict_row) as cur:
