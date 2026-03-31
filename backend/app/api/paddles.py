@@ -4,7 +4,7 @@ import logging
 from typing import Optional
 from fastapi import APIRouter, Query, HTTPException, status
 from psycopg.rows import dict_row
-from backend.app.schemas import (
+from app.schemas import (
     PaddleResponse,
     PaddleListResponse,
     PriceHistoryResponse,
@@ -13,7 +13,7 @@ from backend.app.schemas import (
     SpecsResponse,
     PriceSnapshot,
 )
-from backend.app.db import get_connection
+from app.db import get_connection
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/paddles", tags=["paddles"])
@@ -30,7 +30,8 @@ async def list_paddles(
 ):
     """List all paddles with optional filters."""
     # Build SQL with WHERE clauses based on filters
-    where_clauses = ["dedup_status IN ('pending', 'merged')"]
+    # Note: dedup_status column may not exist in all schemas, so we omit it
+    where_clauses = ["1=1"]  # Always true placeholder
     params = []
 
     if brand:
@@ -56,8 +57,17 @@ async def list_paddles(
             count_result = await cur.fetchone()
             total = count_result["total"] if count_result else 0
 
-            # Data query with pagination
-            data_query = f"SELECT id, name, brand, sku, image_url, price_min_brl, created_at FROM paddles WHERE {where} ORDER BY created_at DESC LIMIT %s OFFSET %s"
+            # Data query with pagination - include specs, skill_level, in_stock, model_slug
+            data_query = f"""
+                SELECT p.id, p.name, p.brand, p.sku, p.image_url, p.price_min_brl, p.created_at,
+                       p.model_slug, p.skill_level, p.in_stock,
+                       ps.swingweight, ps.twistweight, ps.weight_oz, ps.core_thickness_mm, ps.face_material
+                FROM paddles p
+                LEFT JOIN paddle_specs ps ON p.id = ps.paddle_id
+                WHERE {where}
+                ORDER BY p.created_at DESC
+                LIMIT %s OFFSET %s
+            """
             await cur.execute(data_query, params + [limit, offset])
             paddles = await cur.fetchall()
 
@@ -70,6 +80,16 @@ async def list_paddles(
             image_url=p.get("image_url"),
             price_min_brl=p.get("price_min_brl"),
             created_at=p.get("created_at"),
+            model_slug=p.get("model_slug"),
+            skill_level=p.get("skill_level"),
+            in_stock=p.get("in_stock"),
+            specs=SpecsResponse(
+                swingweight=p.get("swingweight"),
+                twistweight=p.get("twistweight"),
+                weight_oz=p.get("weight_oz"),
+                core_thickness_mm=p.get("core_thickness_mm"),
+                face_material=p.get("face_material"),
+            ) if any([p.get("swingweight"), p.get("twistweight"), p.get("weight_oz"), p.get("core_thickness_mm"), p.get("face_material")]) else None,
         )
         for p in paddles
     ]
