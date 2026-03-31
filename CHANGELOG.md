@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0.0] - 2026-03-31
+
+### Added
+- **MVP v1.0 Complete** — Full PickleIQ platform with 6 phases delivered
+- **Phase 1: Foundation** — PostgreSQL + pgvector schema, Docker Compose, Supabase staging
+- **Phase 2: Data Pipeline** — Firecrawl scrapers for Brazil Pickleball Store, Drop Shot, Mercado Livre; deduplication, embeddings
+- **Phase 3: RAG Agent** — Claude Sonnet via Groq eval gate, streaming SSE chat, <3s P95 latency, Redis cache
+- **Phase 4: Frontend** — Next.js 14, quiz onboarding, chat widget, paddle comparator, admin panel
+- **Phase 5: SEO & Growth** — SSR product pages, Clerk auth, price alerts, Resend emails, price history graphs
+- **Phase 6: Launch** — Vercel + Railway + Supabase production, CI/CD, Langfuse observability
+- **Phase 7: E2E Testing** — 101 tests across 3 scrapers with ≥80% coverage
+- **Phase 8: Navigation UX** — Fixed /compare 404s, enriched catalog cards with skill_level/specs/in_stock
+
+### Changed
+- Navigation: Header shows only Home + Catalogo + "Encontrar raquete" CTA; mobile matches desktop
+- Catalog: Cards display skill level badges, swingweight/core specs, stock indicators
+- Database: Enriched paddle data with 10+ paddles including specs
+
 ## [0.2.4.0] - 2026-03-29
 
 ### Fixed
@@ -20,7 +38,6 @@ All notable changes to this project will be documented in this file.
 - Test: `fetchProductData` test updated to expect `null` on error (not throw)
 - Tests: price alert worker mock fixed to provide correct number of `side_effect` values
 
-## [0.2.2.0] - 2026-03-28
 ## [0.2.3.0] - 2026-03-28
 
 ### Added

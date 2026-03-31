@@ -4,7 +4,7 @@
 
 1. Clone and install:
    ```bash
-   git clone https://github.com/pickleiq/pickleiq.git
+   git clone https://github.com/diegopereira93/picklepicker.git
    cd picklepicker
    pip install -e ./backend[dev]
    npm install
@@ -24,7 +24,7 @@ Every PR triggers automated checks:
 - **Coverage gate** (orgoro): Minimum 80% code coverage required
 - **Preview deploy** (Vercel): Staging environment for QA
 
-Merging to `main` triggers production deployment:
+Merging to `master` triggers production deployment:
 - **Backend** (Railway): FastAPI service + PostgreSQL
 - **Frontend** (Vercel): Next.js app
 - **Smoke tests**: Health checks on both services
@@ -51,7 +51,7 @@ The following secrets must be configured in GitHub repo settings:
 
 ## Branch Protection Rules
 
-The `main` branch requires:
+The `master` branch requires:
 - All status checks passing (test.yml, deploy.yml)
 - 1 code review approval (or 0 for solo development)
 - Branches up to date before merging
@@ -59,9 +59,9 @@ The `main` branch requires:
 
 ## Development Workflow
 
-1. Create feature branch from `main`:
+1. Create feature branch from `master`:
    ```bash
-   git checkout -b feature/your-feature
+   git checkout -b feature/your-feature master
    ```
 
 2. Make changes and commit:

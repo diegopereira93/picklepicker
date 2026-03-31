@@ -25,18 +25,6 @@ Plataforma de inteligência de dados e IA para o mercado brasileiro de picklebal
 
 See `.planning/milestones/v1.0-ROADMAP.md` for archived phase details.
 
-### ✅ Phase 07: E2E Testing & Scraper Validation (v1.1) — COMPLETE 2026-03-29
-**Goal:** Validate all 3 scrapers (Brazil Pickleball Store, Drop Shot Brasil, Mercado Livre) + Firecrawl integration work correctly locally with staging/test data.
-**Depends on:** v1.0 complete (Phase 1-6)
-**Success Criteria** (ALL TRUE):
-  1. ✅ E2E test suite covers all 3 scrapers with ≥ 80% code path coverage (Brazil 80%, Drop Shot 93%, ML 94%)
-  2. ✅ Each scraper tested against staging mock with schema validation passing
-  3. ✅ Firecrawl `/extract` error modes documented and handled (timeout, rate limit, parse failure)
-  4. ✅ Data integrity verified: schema compliance, dedup matching, affiliate URL formatting
-  5. ✅ Performance validated: crawl times < 30s per retailer, no memory leaks
-**Plans**: 1/1 complete (07-01)
-**Tests**: 101 new tests, 90% combined coverage
-
 </details>
 
 <details>
@@ -160,7 +148,7 @@ Plans:
 Plans:
 - [ ] 06-01: Infraestrutura produção — Supabase + Railway pro, variáveis env via painéis, domínio configurado
 - [ ] 06-02: CI/CD GitHub Actions — lint + testes PR, cobertura ≥ 80% Python, deploy automático main → Vercel + preview PRs
-- [ ] 06-03: Observabilidade produção — logs estruturados, alertas Telegram scraping, Langfuse produção, health checks
+- [ ] 06-03: Observabilidade produção — logs estruturados, alertas Telegram, Langfuse produção, health checks
 - [ ] 06-04: Beta launch — deploy dados reais, onboarding 50 usuários beta, coleta NPS após 30 dias
 
 ### Phase 8: Navigation UX Fixes
@@ -172,10 +160,13 @@ Plans:
   2. Header nav shows only [Home, Catalogo] text links plus "Encontrar raquete" CTA
   3. No "Chat IA" standalone nav item in header (desktop or mobile)
   4. Home page secondary CTA says "Ver catalogo" linking to /paddles
-**Plans**: 1 plan
+**Plans**: 4 plans
 
 Plans:
-- [ ] 08-01: Fix header navLinks and home page CTA — remove Chat IA, /compare to /paddles, label updates
+- [x] 08-01: Fix header navLinks and home page CTA — remove Chat IA, /compare to /paddles, label updates
+- [x] 08-02: [GAP] Enriched data pipeline — schemas + prompts + E2E test for skill_level/specs/stock extraction
+- [ ] 08-03: [GAP] Fix catalog card link structure — `<article><a href>` instead of `<Link><article>`
+- [ ] 08-04: [GAP] Run scraper to populate database with enriched data
 
 ## Progress
 
@@ -190,7 +181,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 4. Frontend Chat & Product UI | 6/6 | Complete   | 2026-03-28 |
 | 5. SEO & Growth Features | 4/4 | Complete    | 2026-03-28 |
 | 6. Launch & Deploy | 0/4 | Complete    | 2026-03-28 |
-| 8. Navigation UX Fixes | 0/1 | Planned    | - |
+| 8. Navigation UX Fixes | 3/5 | In Progress|  |
 
 ---
 
@@ -202,7 +193,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Freshness de preços | Atualização a cada 24h | Fim Phase 2 |
 | Latência agente IA (P95) | < 3s | Fim Phase 3 |
 | Usuários beta | 50 | Fim Phase 6 |
-| NPS | ≥ 50 | 90 dias após Phase 6 |
+| NPS | ≥ 50 | 90 dias pós-launch |
 | Taxa conversão afiliado | ≥ 3% clique→compra | 60 dias pós-launch |
 
 ## Backlog (Milestone 2+)
