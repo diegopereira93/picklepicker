@@ -85,11 +85,6 @@ export function Header() {
                     {link.label}
                   </Link>
                 ))}
-                <Button asChild className="mt-4">
-                  <Link href="/chat" onClick={() => setOpen(false)}>
-                    Encontrar raquete
-                  </Link>
-                </Button>
                 {!isSignedIn && (
                   <SignInButton mode="modal">
                     <Button variant="outline" className="mt-2 w-full">Entrar</Button>
