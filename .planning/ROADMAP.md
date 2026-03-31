@@ -181,7 +181,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 4. Frontend Chat & Product UI | 6/6 | Complete   | 2026-03-28 |
 | 5. SEO & Growth Features | 4/4 | Complete    | 2026-03-28 |
 | 6. Launch & Deploy | 0/4 | Complete    | 2026-03-28 |
-| 8. Navigation UX Fixes | 2/4 | Gap closure planned | - |
+| 8. Navigation UX Fixes | 3/5 | In Progress|  |
 
 ---
 
