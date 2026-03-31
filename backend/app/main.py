@@ -6,14 +6,14 @@ import time
 import uuid
 import asyncio
 from datetime import datetime
-from backend.app.api.paddles import router as paddles_router
-from backend.app.api.chat import router as chat_router
-from backend.app.api.health import router as health_router
-from backend.app.api.price_history import router as price_history_router
-from backend.app.routers.affiliate import router as affiliate_router
-from backend.app.logging_config import configure_logging
-from backend.app.middleware.alerts import alerter
-from backend.app.db import get_pool, close_pool
+from app.api.paddles import router as paddles_router
+from app.api.chat import router as chat_router
+from app.api.health import router as health_router
+from app.api.price_history import router as price_history_router
+from app.routers.affiliate import router as affiliate_router
+from app.logging_config import configure_logging
+from app.middleware.alerts import alerter
+from app.db import get_pool, close_pool
 import structlog
 
 logger = structlog.get_logger()
@@ -38,7 +38,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="PickleIQ", version="0.1.0", lifespan=lifespan)
 
 # Include routers
-app.include_router(paddles_router)
+app.include_router(paddles_router, prefix="/api/v1")
 app.include_router(chat_router)
 app.include_router(health_router)
 app.include_router(price_history_router)
