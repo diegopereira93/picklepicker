@@ -160,11 +160,13 @@ Plans:
   2. Header nav shows only [Home, Catalogo] text links plus "Encontrar raquete" CTA
   3. No "Chat IA" standalone nav item in header (desktop or mobile)
   4. Home page secondary CTA says "Ver catalogo" linking to /paddles
-**Plans**: 2 plans
+**Plans**: 4 plans
 
 Plans:
-- [ ] 08-01: Fix header navLinks and home page CTA — remove Chat IA, /compare to /paddles, label updates
-- [ ] 08-02: [GAP] Populate database with enriched paddle data (skill_level, specs, in_stock) for catalog cards
+- [x] 08-01: Fix header navLinks and home page CTA — remove Chat IA, /compare to /paddles, label updates
+- [x] 08-02: [GAP] Enriched data pipeline — schemas + prompts + E2E test for skill_level/specs/stock extraction
+- [ ] 08-03: [GAP] Fix catalog card link structure — `<article><a href>` instead of `<Link><article>`
+- [ ] 08-04: [GAP] Run scraper to populate database with enriched data
 
 ## Progress
 
@@ -179,7 +181,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 4. Frontend Chat & Product UI | 6/6 | Complete   | 2026-03-28 |
 | 5. SEO & Growth Features | 4/4 | Complete    | 2026-03-28 |
 | 6. Launch & Deploy | 0/4 | Complete    | 2026-03-28 |
-| 8. Navigation UX Fixes | 0/2 | Planned    | - |
+| 8. Navigation UX Fixes | 2/4 | Gap closure planned | - |
 
 ---
 
