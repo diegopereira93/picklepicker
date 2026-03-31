@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { Metadata } from 'next'
 import { fetchPaddlesList } from '@/lib/seo'
 
@@ -24,6 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function PaddlesPage() {
   const { paddles } = await fetchPaddlesList({ page: 1, per_page: 50 })
+  console.log('[PaddlesPage] paddles count:', paddles.length)
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
@@ -40,12 +40,14 @@ export default async function PaddlesPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {paddles.map((paddle) => (
-            <Link
+            <article
               key={paddle.id}
-              href={`/paddles/${encodeURIComponent(paddle.brand?.toLowerCase() ?? '')}/${encodeURIComponent(paddle.model_slug ?? String(paddle.id))}`}
-              className="group"
+              className="border rounded-lg p-4 hover:shadow-md transition-shadow"
             >
-              <article className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+              <a
+                href={`/paddles/${encodeURIComponent(paddle.brand?.toLowerCase() ?? '')}/${encodeURIComponent(paddle.model_slug ?? String(paddle.id))}`}
+                className="block"
+              >
                 {paddle.image_url && (
                   <img
                     src={paddle.image_url}
@@ -53,7 +55,7 @@ export default async function PaddlesPage() {
                     className="w-full h-48 object-contain mb-3"
                   />
                 )}
-                <h2 className="font-semibold text-lg group-hover:text-blue-600">
+                <h2 className="font-semibold text-lg hover:text-blue-600">
                   {paddle.name}
                 </h2>
                 <p className="text-sm text-gray-500">{paddle.brand}</p>
@@ -87,8 +89,8 @@ export default async function PaddlesPage() {
                     {(paddle.price_brl ?? paddle.price_min_brl ?? 0).toFixed(2)}
                   </p>
                 )}
-              </article>
-            </Link>
+              </a>
+            </article>
           ))}
         </div>
       )}
