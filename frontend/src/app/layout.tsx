@@ -23,6 +23,12 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="pt-BR" className={inter.variable} suppressHydrationWarning>
         <body className="min-h-screen bg-background font-sans antialiased flex flex-col">
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md"
+          >
+            Pular para o conteúdo principal
+          </a>
           <ThemeProvider
             attribute="class"
             defaultTheme="system"
@@ -30,7 +36,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <Header />
-            <main className="flex-1">{children}</main>
+            <main id="main-content" className="flex-1">{children}</main>
             <Footer />
           </ThemeProvider>
         </body>
