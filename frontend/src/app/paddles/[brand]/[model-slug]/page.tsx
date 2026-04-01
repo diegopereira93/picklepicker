@@ -36,7 +36,7 @@ export default async function ProductPage({ params }: { params: PageParams }) {
   return (
     <>
       <ProductSchema paddle={paddle} url={canonicalUrl} />
-      <article className="max-w-4xl mx-auto px-4 py-8">
+      <article className="max-w-4xl mx-auto px-4 py-8 min-h-[600px]">
         <nav aria-label="Breadcrumb" className="text-sm text-gray-500 mb-4">
           <ol className="flex gap-1">
             <li><a href="/">Home</a></li>
@@ -49,10 +49,14 @@ export default async function ProductPage({ params }: { params: PageParams }) {
           </ol>
         </nav>
         {paddle.image_url && (
-          <img
+          <Image
             src={paddle.image_url}
-            alt={paddle.name}
+            alt={`${paddle.brand} ${paddle.name} paddle`}
+            width={600}
+            height={600}
+            priority={true}
             className="w-full max-w-md mx-auto rounded-lg mb-6"
+            sizes="(max-width: 768px) 100vw, 50vw"
           />
         )}
         <h1 className="text-3xl font-bold mb-2">{paddle.name}</h1>
@@ -67,7 +71,7 @@ export default async function ProductPage({ params }: { params: PageParams }) {
           </div>
         )}
         {paddle.specs && (
-          <section className="mb-6">
+          <section className="mb-6 min-h-[200px]">
             <h2 className="text-xl font-semibold mb-2">Especificações</h2>
             <dl className="grid grid-cols-2 gap-2">
               {paddle.specs.swingweight != null && (
