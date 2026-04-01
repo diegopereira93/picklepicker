@@ -8,6 +8,7 @@ from pipeline.alerts.telegram import send_telegram_alert
 logger = logging.getLogger(__name__)
 
 ML_SEARCH_URL = "https://api.mercadolibre.com/sites/MLB/search"
+MAX_ITEMS = 1000  # Prevent unbounded memory growth
 ML_DEFAULT_QUERY = "raquete pickleball"
 ML_CATEGORY = "MLB1276"  # Esportes e Fitness
 
@@ -31,11 +32,12 @@ async def search_pickleball_paddles(
 ) -> dict:
     """Search ML for pickleball paddles. Public API — no auth required.
 
-    If fetch_all=True, paginates through all results.
+    If fetch_all=True, paginates through results up to MAX_ITEMS.
     Returns dict with 'results' list and 'paging' info.
     """
     all_results = []
     current_offset = offset
+    items_fetched = 0
 
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
@@ -58,6 +60,15 @@ async def search_pickleball_paddles(
 
             results = data.get("results", [])
             all_results.extend(results)
+            items_fetched += len(results)
+
+            # Check memory limit
+            if items_fetched >= MAX_ITEMS:
+                logger.warning(
+                    "Reached MAX_ITEMS limit (%d), stopping pagination. "
+                    "Some results may be truncated.", MAX_ITEMS
+                )
+                break
 
             if not fetch_all:
                 return data
@@ -66,7 +77,7 @@ async def search_pickleball_paddles(
             total = paging.get("total", 0)
             current_offset += limit
 
-            if current_offset >= total:
+            if current_offset >= total or len(results) == 0:
                 break
 
     return {
