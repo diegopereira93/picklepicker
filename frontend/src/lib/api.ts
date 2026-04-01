@@ -1,6 +1,6 @@
 import type { Paddle, PaddleListResponse, LatestPriceResponse } from '@/types/paddle'
 
-const API_BASE = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
+const API_BASE = (process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000') + '/api/v1'
 
 const EMPTY_LIST: PaddleListResponse = { items: [], total: 0, limit: 20, offset: 0 }
 

@@ -28,13 +28,19 @@ export async function fetchPaddlesList(params: {
   per_page?: number
 }): Promise<{ paddles: Paddle[]; total: number }> {
   const { page = 1, per_page = 50 } = params
-  const res = await fetch(
-    `${FASTAPI_URL}/paddles?page=${page}&per_page=${per_page}`
-  )
-  if (!res.ok) return { paddles: [], total: 0 }
+  const url = `${FASTAPI_URL}/api/v1/paddles?page=${page}&per_page=${per_page}`
+  console.log('[fetchPaddlesList] Fetching:', url)
+  const res = await fetch(url)
+  console.log('[fetchPaddlesList] Response status:', res.status)
+  if (!res.ok) {
+    console.error('[fetchPaddlesList] Response not OK:', res.status, res.statusText)
+    return { paddles: [], total: 0 }
+  }
   const data = await res.json()
+  console.log('[fetchPaddlesList] Response data keys:', Object.keys(data))
   // Support both {items, total} (existing backend schema) and {paddles, total}
-  const paddles = data.paddles ?? data.items ?? []
+  const paddles = data.paddles ?? data.items ?? data.data ?? []
+  console.log('[fetchPaddlesList] Extracted paddles count:', paddles.length)
   return { paddles, total: data.total ?? paddles.length }
 }
 

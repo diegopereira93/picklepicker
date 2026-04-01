@@ -7,7 +7,7 @@ from typing import Optional
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, field_validator
-from backend.app.agents.rag_agent import RAGAgent, UserProfile
+from app.agents.rag_agent import RAGAgent, UserProfile
 
 
 router = APIRouter()
