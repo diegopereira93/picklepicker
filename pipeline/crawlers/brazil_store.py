@@ -11,7 +11,7 @@ from pipeline.alerts.telegram import send_telegram_alert
 
 logger = logging.getLogger(__name__)
 
-BRAZIL_STORE_URL = "https://brazilpickleballstore.com.br/raquete/"
+BRAZIL_STORE_URL = "https://www.brazilpickleballstore.com.br/raquete/"
 
 FIRECRAWL_SCHEMA = {
     "type": "object",
