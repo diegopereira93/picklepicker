@@ -93,9 +93,16 @@ async def search_pickleball_paddles(
 async def save_ml_items_to_db(items: list[dict], affiliate_tag: str, conn) -> int:
     """Save ML search items to price_snapshots.
 
+    Uses atomic upsert for paddles (INSERT ... ON CONFLICT DO UPDATE)
+    to avoid TOCTOU race conditions. Requires UNIQUE constraint on
+    paddles.name.
+
     Skips items with missing/zero price.
     Returns count of saved snapshots.
     """
+    # NOTE: Requires UNIQUE constraint on paddles.name
+    # If this constraint doesn't exist, the upsert will fail
+    # with a PostgreSQL error, which is safer than silent data loss
     saved = 0
     retailer_id = 2  # Mercado Livre from seed data (id=2)
 
@@ -112,32 +119,29 @@ async def save_ml_items_to_db(items: list[dict], affiliate_tag: str, conn) -> in
         permalink = item.get("permalink", "")
         affiliate_url = build_affiliate_url(permalink, affiliate_tag)
 
-        # Upsert paddle by name (title) — dedup handled in Phase 2
+        # Atomic upsert: insert or update, always return id
         result = await conn.execute(
             """
             INSERT INTO paddles (name, brand, model, images)
             VALUES (%(name)s, %(brand)s, %(model)s, %(images)s)
-            ON CONFLICT DO NOTHING
+            ON CONFLICT (name) DO UPDATE SET
+                brand = EXCLUDED.brand,
+                model = EXCLUDED.model,
+                images = EXCLUDED.images,
+                updated_at = NOW()
             RETURNING id
             """,
             {
                 "name": title,
-                "brand": "",  # ML search doesn't always have a separate brand field
+                "brand": "",  # ML search doesn't always have separate brand
                 "model": title,
                 "images": [item.get("thumbnail", "")],
             },
         )
         row = await result.fetchone()
         if row is None:
-            # Row already existed — fetch its id
-            result = await conn.execute(
-                "SELECT id FROM paddles WHERE name = %(name)s",
-                {"name": title},
-            )
-            row = await result.fetchone()
-            if row is None:
-                logger.error("Could not find or create paddle: %s", title)
-                continue
+            logger.error("Upsert failed for paddle: %s", title)
+            continue
 
         paddle_id = row[0]
 
