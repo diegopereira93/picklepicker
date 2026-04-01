@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import type { ChatRecommendation } from '@/types/paddle'
 import { ProductCard } from './product-card'
 
@@ -26,7 +27,7 @@ function renderText(text: string) {
   ))
 }
 
-export function MessageBubble({ role, content, annotations }: MessageBubbleProps) {
+export const MessageBubble = React.memo(function MessageBubble({ role, content, annotations }: MessageBubbleProps) {
   const isUser = role === 'user'
 
   // Find any paddle recommendation arrays in annotations
