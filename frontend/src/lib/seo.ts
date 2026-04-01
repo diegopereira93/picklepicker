@@ -5,22 +5,27 @@ const FASTAPI_URL = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:800
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pickleiq.com'
 
 export async function fetchProductData(brand: string, modelSlug: string): Promise<Paddle | null> {
-  const res = await fetch(
-    `${FASTAPI_URL}/api/v1/paddles?brand=${encodeURIComponent(brand)}&model_slug=${encodeURIComponent(modelSlug)}`
-  )
-  if (!res.ok) return null
-  const data = await res.json()
-  const paddle = data.data?.[0] ?? data.paddles?.[0] ?? null
+  try {
+    const res = await fetch(
+      `${FASTAPI_URL}/api/v1/paddles?brand=${encodeURIComponent(brand)}&model_slug=${encodeURIComponent(modelSlug)}`
+    )
+    if (!res.ok) return null
+    const data = await res.json()
+    const paddle = data.data?.[0] ?? data.paddles?.[0] ?? null
 
-  if (!paddle && /^\d+$/.test(modelSlug)) {
-    const idRes = await fetch(`${FASTAPI_URL}/api/v1/paddles/${modelSlug}`)
-    if (idRes.ok) {
-      const idData = await idRes.json()
-      return idData.data ?? idData ?? null
+    if (!paddle && /^\d+$/.test(modelSlug)) {
+      const idRes = await fetch(`${FASTAPI_URL}/api/v1/paddles/${modelSlug}`)
+      if (idRes.ok) {
+        const idData = await idRes.json()
+        return idData.data ?? idData ?? null
+      }
     }
-  }
 
-  return paddle
+    return paddle
+  } catch (error) {
+    console.error('[fetchProductData] Fetch failed (backend unavailable):', error)
+    return null
+  }
 }
 
 export async function fetchPaddlesList(params: {
@@ -30,18 +35,23 @@ export async function fetchPaddlesList(params: {
   const { page = 1, per_page = 50 } = params
   const url = `${FASTAPI_URL}/api/v1/paddles?page=${page}&per_page=${per_page}`
   console.log('[fetchPaddlesList] Fetching:', url)
-  const res = await fetch(url)
-  console.log('[fetchPaddlesList] Response status:', res.status)
-  if (!res.ok) {
-    console.error('[fetchPaddlesList] Response not OK:', res.status, res.statusText)
+  try {
+    const res = await fetch(url)
+    console.log('[fetchPaddlesList] Response status:', res.status)
+    if (!res.ok) {
+      console.error('[fetchPaddlesList] Response not OK:', res.status, res.statusText)
+      return { paddles: [], total: 0 }
+    }
+    const data = await res.json()
+    console.log('[fetchPaddlesList] Response data keys:', Object.keys(data))
+    // Support both {items, total} (existing backend schema) and {paddles, total}
+    const paddles = data.paddles ?? data.items ?? data.data ?? []
+    console.log('[fetchPaddlesList] Extracted paddles count:', paddles.length)
+    return { paddles, total: data.total ?? paddles.length }
+  } catch (error) {
+    console.error('[fetchPaddlesList] Fetch failed (backend unavailable):', error)
     return { paddles: [], total: 0 }
   }
-  const data = await res.json()
-  console.log('[fetchPaddlesList] Response data keys:', Object.keys(data))
-  // Support both {items, total} (existing backend schema) and {paddles, total}
-  const paddles = data.paddles ?? data.items ?? data.data ?? []
-  console.log('[fetchPaddlesList] Extracted paddles count:', paddles.length)
-  return { paddles, total: data.total ?? paddles.length }
 }
 
 export async function generateProductMetadata(
