@@ -84,7 +84,24 @@ O mercado de pickleball cresceu no Brasil e os compradores enfrentam dois proble
 
 Receita via comissões de afiliados (10-40% por venda). Distribuição primária via parceiro treinador → alunos (WhatsApp groups). SEO como canal secundário (maturação 6-12 meses, começa Phase 5). URLs de afiliado geradas server-side — LLM nunca constrói URLs diretamente.
 
-## Current State — v1.0 Shipped
+## Current State — v1.1 Shipped
+
+**Shipped:** 2026-04-01
+
+Milestone v1.1 (Scraper Validation & E2E Testing) complete. Added 3 new phases:
+- **Phase 07:** E2E Testing & Scraper Validation — 101 tests added, 94% coverage on Mercado Livre, Firecrawl error handling documented, data integrity verified ✓
+- **Phase 08:** Navigation UX Fixes — Fixed /compare 404, removed Chat IA standalone nav, mobile nav gaps closed, enriched paddle data populated ✓
+- **Phase 09:** Image Extraction — Two-phase Brazil Store crawler extracting real product images from individual pages, 6% → 80% real image coverage ✓
+
+**Key Deliverables:**
+- Comprehensive E2E test suite covering all 3 scrapers with mocked Firecrawl
+- Fixed navigation gaps (broken links, quiz gate enforcement)
+- Real product images replacing Unsplash placeholders
+- 10 additional SUMMARY files, 38 total tasks across v1.1
+
+**Archived:** See `.planning/milestones/v1.1-ROADMAP.md` and `.planning/MILESTONES.md` for full details.
+
+## Previous Milestone — v1.0 MVP
 
 **Shipped:** 2026-03-28
 
@@ -103,11 +120,11 @@ All 6 phases complete. MVP delivered:
 - Full E2E deployment with observability (Langfuse)
 - 28 test summaries across 20 plans — 100% phase completion
 
-**Archived:** See `.planning/milestones/v1.0-ROADMAP.md` and `.planning/MILESTONES.md` for full details.
+**Archived:** See `.planning/milestones/v1.0-ROADMAP.md`
 
 ## Next Milestone
 
-Ready for v1.1 planning. Run `/gsd:new-milestone` to start.
+Ready for v1.2 planning. Run `/gsd:new-milestone` to start.
 
 ## Evolução
 

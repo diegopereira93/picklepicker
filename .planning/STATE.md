@@ -2,32 +2,32 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-last_updated: "2026-03-31T11:19:18.589Z"
-last_activity: 2026-03-31
+status: completed
+last_updated: "2026-04-01T01:43:14.517Z"
+last_activity: 2026-04-01
 progress:
-  total_phases: 7
-  completed_phases: 6
-  total_plans: 22
-  completed_plans: 33
+  total_phases: 8
+  completed_phases: 7
+  total_plans: 26
+  completed_plans: 37
 ---
 
 # PickleIQ — Project State
 
 **Última atualização:** 2026-03-27
-**Status:** Ready to execute
+**Status:** v1.1 milestone complete
 **Last session:** 2026-03-28T04:24:23.049Z
 
 ## Current Position
 
-Phase: 08 (navigation-ux-fixes) — EXECUTING
-Plan: 4 COMPLETED
+Phase: 09 (image-extraction) — EXECUTING
+Plan: 1 COMPLETED
 
 - **Milestone:** v1.0 (MVP → Beta Launch)
-- **Phase:** 8
-- **Status:** Plan 08-04 completed
-- **Last activity:** 2026-03-31
-- **Next action:** Execute next plan in Phase 8
+- **Phase:** 9
+- **Status:** Plan 09-01 completed
+- **Last activity:** 2026-04-01
+- **Next action:** Execute next plan in Phase 9
 
 ## Completed
 
@@ -73,6 +73,8 @@ Plan: 4 COMPLETED
 - [Phase 05-02]: Canonical URL stored in alternates.canonical (Next.js 14 Metadata API)
 - [Phase 05-02]: revalidateTag/revalidatePath imported dynamically to gracefully no-op in test environment
 - [Phase 05]: Clerk installed with --legacy-peer-deps; Resend client made lazy for vitest testability; vi.hoisted() pattern established for class-based SDK mocks
+- [Phase 09-01]: Two-phase extraction (category page + product pages) to capture lazy-loaded images from Brazil Store
+- [Phase 09-01]: Transform mitiendanube URLs from -1024-1024 to -480-0 for optimized image size
 
 ## Performance Metrics
 
@@ -88,6 +90,7 @@ Plan: 4 COMPLETED
 | Phase 05 P02 | 4 min | 2 tasks | 9 files |
 | Phase 05 P01 | 25min | 3 tasks | 10 files |
 | Phase 08 P04 | 45min | 3 tasks | 3 files |
+| Phase 09 P01 | 15min | 4 tasks | 2 files |
 
 ## Open Questions (não bloqueantes para Phase 1)
 

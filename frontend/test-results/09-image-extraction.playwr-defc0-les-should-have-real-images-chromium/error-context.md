@@ -1,0 +1,375 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "PickleIQ" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e5]: PickleIQ
+      - navigation [ref=e6]:
+        - link "Home" [ref=e7] [cursor=pointer]:
+          - /url: /
+        - link "Catalogo" [ref=e8] [cursor=pointer]:
+          - /url: /paddles
+      - generic [ref=e9]:
+        - link "Encontrar raquete" [ref=e10] [cursor=pointer]:
+          - /url: /chat
+        - button "Entrar" [ref=e11] [cursor=pointer]
+  - main [ref=e12]:
+    - generic [ref=e13]:
+      - navigation "Breadcrumb" [ref=e14]:
+        - list [ref=e15]:
+          - listitem [ref=e16]:
+            - link "Home" [ref=e17] [cursor=pointer]:
+              - /url: /
+          - listitem [ref=e18]: /
+          - listitem [ref=e19]: Raquetes
+      - heading "Catálogo de Raquetes" [level=1] [ref=e20]
+      - generic [ref=e21]:
+        - article [ref=e22]:
+          - link "RP790 RP790 Royal Padel Iniciante Em estoque R$ 579.00" [ref=e23] [cursor=pointer]:
+            - /url: /paddles/royal%20padel/rp790
+            - img "RP790" [ref=e24]
+            - heading "RP790" [level=2] [ref=e25]
+            - paragraph [ref=e26]: Royal Padel
+            - generic [ref=e27]: Iniciante
+            - generic [ref=e28]: Em estoque
+            - paragraph [ref=e29]: R$ 579.00
+        - article [ref=e30]:
+          - link "V730 V730 Vulcan Avançado Em estoque R$ 1099.00" [ref=e31] [cursor=pointer]:
+            - /url: /paddles/vulcan/v730
+            - img "V730" [ref=e32]
+            - heading "V730" [level=2] [ref=e33]
+            - paragraph [ref=e34]: Vulcan
+            - generic [ref=e35]: Avançado
+            - generic [ref=e36]: Em estoque
+            - paragraph [ref=e37]: R$ 1099.00
+        - article [ref=e38]:
+          - link "Power Pro Power Pro Dropshot Intermediário Em estoque R$ 749.00" [ref=e39] [cursor=pointer]:
+            - /url: /paddles/dropshot/power-pro
+            - img "Power Pro" [ref=e40]
+            - heading "Power Pro" [level=2] [ref=e41]
+            - paragraph [ref=e42]: Dropshot
+            - generic [ref=e43]: Intermediário
+            - generic [ref=e44]: Em estoque
+            - paragraph [ref=e45]: R$ 749.00
+        - article [ref=e46]:
+          - link "Vanguard Control Vanguard Control Selkirk Intermediário Em estoque R$ 1199.00" [ref=e47] [cursor=pointer]:
+            - /url: /paddles/selkirk/vanguard-control
+            - img "Vanguard Control" [ref=e48]
+            - heading "Vanguard Control" [level=2] [ref=e49]
+            - paragraph [ref=e50]: Selkirk
+            - generic [ref=e51]: Intermediário
+            - generic [ref=e52]: Em estoque
+            - paragraph [ref=e53]: R$ 1199.00
+        - article [ref=e54]:
+          - link "Sports Pro Sports Pro Franklin Iniciante Em estoque R$ 599.00" [ref=e55] [cursor=pointer]:
+            - /url: /paddles/franklin/sports-pro
+            - img "Sports Pro" [ref=e56]
+            - heading "Sports Pro" [level=2] [ref=e57]
+            - paragraph [ref=e58]: Franklin
+            - generic [ref=e59]: Iniciante
+            - generic [ref=e60]: Em estoque
+            - paragraph [ref=e61]: R$ 599.00
+        - article [ref=e62]:
+          - link "Speed Pro Speed Pro Asics Intermediário Em estoque R$ 849.00" [ref=e63] [cursor=pointer]:
+            - /url: /paddles/asics/speed-pro
+            - img "Speed Pro" [ref=e64]
+            - heading "Speed Pro" [level=2] [ref=e65]
+            - paragraph [ref=e66]: Asics
+            - generic [ref=e67]: Intermediário
+            - generic [ref=e68]: Em estoque
+            - paragraph [ref=e69]: R$ 849.00
+        - article [ref=e70]:
+          - link "Drive Pro Drive Pro Adidas Avançado Fora de estoque R$ 1299.00" [ref=e71] [cursor=pointer]:
+            - /url: /paddles/adidas/drive-pro
+            - img "Drive Pro" [ref=e72]
+            - heading "Drive Pro" [level=2] [ref=e73]
+            - paragraph [ref=e74]: Adidas
+            - generic [ref=e75]: Avançado
+            - generic [ref=e76]: Fora de estoque
+            - paragraph [ref=e77]: R$ 1299.00
+        - article [ref=e78]:
+          - link "Vision CGS Vision CGS JOOLA Intermediário Em estoque R$ 999.00" [ref=e79] [cursor=pointer]:
+            - /url: /paddles/joola/vision-cgs
+            - img "Vision CGS" [ref=e80]
+            - heading "Vision CGS" [level=2] [ref=e81]
+            - paragraph [ref=e82]: JOOLA
+            - generic [ref=e83]: Intermediário
+            - generic [ref=e84]: Em estoque
+            - paragraph [ref=e85]: R$ 999.00
+        - article [ref=e86]:
+          - link "AT10 Genius AT10 Genius Nox Avançado Em estoque R$ 1699.00" [ref=e87] [cursor=pointer]:
+            - /url: /paddles/nox/at10-genius
+            - img "AT10 Genius" [ref=e88]
+            - heading "AT10 Genius" [level=2] [ref=e89]
+            - paragraph [ref=e90]: Nox
+            - generic [ref=e91]: Avançado
+            - generic [ref=e92]: Em estoque
+            - paragraph [ref=e93]: R$ 1699.00
+        - article [ref=e94]:
+          - link "Vanguard Power Air Vanguard Power Air Selkirk Avançado Em estoque R$ 1299.00" [ref=e95] [cursor=pointer]:
+            - /url: /paddles/selkirk/vanguard-power-air
+            - img "Vanguard Power Air" [ref=e96]
+            - heading "Vanguard Power Air" [level=2] [ref=e97]
+            - paragraph [ref=e98]: Selkirk
+            - generic [ref=e99]: Avançado
+            - generic [ref=e100]: Em estoque
+            - paragraph [ref=e101]: R$ 1299.00
+        - article [ref=e102]:
+          - link "Tempest Pro Tempest Pro Paddletek Avançado Em estoque R$ 1099.00" [ref=e103] [cursor=pointer]:
+            - /url: /paddles/paddletek/tempest-pro
+            - img "Tempest Pro" [ref=e104]
+            - heading "Tempest Pro" [level=2] [ref=e105]
+            - paragraph [ref=e106]: Paddletek
+            - generic [ref=e107]: Avançado
+            - generic [ref=e108]: Em estoque
+            - paragraph [ref=e109]: R$ 1099.00
+        - article [ref=e110]:
+          - link "S2 S2 Selkirk Intermediário Em estoque R$ 899.00" [ref=e111] [cursor=pointer]:
+            - /url: /paddles/selkirk/s2
+            - img "S2" [ref=e112]
+            - heading "S2" [level=2] [ref=e113]
+            - paragraph [ref=e114]: Selkirk
+            - generic [ref=e115]: Intermediário
+            - generic [ref=e116]: Em estoque
+            - paragraph [ref=e117]: R$ 899.00
+        - article [ref=e118]:
+          - link "EZONE Plus EZONE Plus Yonex Intermediário Em estoque R$ 949.00" [ref=e119] [cursor=pointer]:
+            - /url: /paddles/yonex/ezone-plus
+            - img "EZONE Plus" [ref=e120]
+            - heading "EZONE Plus" [level=2] [ref=e121]
+            - paragraph [ref=e122]: Yonex
+            - generic [ref=e123]: Intermediário
+            - generic [ref=e124]: Em estoque
+            - paragraph [ref=e125]: R$ 949.00
+        - article [ref=e126]:
+          - link "Carbon 1 Carbon 1 Netset Iniciante Em estoque R$ 349.00" [ref=e127] [cursor=pointer]:
+            - /url: /paddles/netset/carbon-1
+            - img "Carbon 1" [ref=e128]
+            - heading "Carbon 1" [level=2] [ref=e129]
+            - paragraph [ref=e130]: Netset
+            - generic [ref=e131]: Iniciante
+            - generic [ref=e132]: Em estoque
+            - paragraph [ref=e133]: R$ 349.00
+        - article [ref=e134]:
+          - link "Ben Johns Hyperion Ben Johns Hyperion JOOLA Avançado Em estoque R$ 1499.00" [ref=e135] [cursor=pointer]:
+            - /url: /paddles/joola/ben-johns-hyperion
+            - img "Ben Johns Hyperion" [ref=e136]
+            - heading "Ben Johns Hyperion" [level=2] [ref=e137]
+            - paragraph [ref=e138]: JOOLA
+            - generic [ref=e139]: Avançado
+            - generic [ref=e140]: Em estoque
+            - paragraph [ref=e141]: R$ 1499.00
+        - article [ref=e142]:
+          - link "Response Pro Response Pro Prince Intermediário Em estoque R$ 649.00" [ref=e143] [cursor=pointer]:
+            - /url: /paddles/prince/response-pro
+            - img "Response Pro" [ref=e144]
+            - heading "Response Pro" [level=2] [ref=e145]
+            - paragraph [ref=e146]: Prince
+            - generic [ref=e147]: Intermediário
+            - generic [ref=e148]: Em estoque
+            - paragraph [ref=e149]: R$ 649.00
+        - article [ref=e150]:
+          - link "Encore Pro Encore Pro Engage Avançado Em estoque R$ 1199.00" [ref=e151] [cursor=pointer]:
+            - /url: /paddles/engage/encore-pro
+            - img "Encore Pro" [ref=e152]
+            - heading "Encore Pro" [level=2] [ref=e153]
+            - paragraph [ref=e154]: Engage
+            - generic [ref=e155]: Avançado
+            - generic [ref=e156]: Em estoque
+            - paragraph [ref=e157]: R$ 1199.00
+        - article [ref=e158]:
+          - link "Outbreak Outbreak Onix Intermediário Em estoque R$ 899.00" [ref=e159] [cursor=pointer]:
+            - /url: /paddles/onix/outbreak
+            - img "Outbreak" [ref=e160]
+            - heading "Outbreak" [level=2] [ref=e161]
+            - paragraph [ref=e162]: Onix
+            - generic [ref=e163]: Intermediário
+            - generic [ref=e164]: Em estoque
+            - paragraph [ref=e165]: R$ 899.00
+        - article [ref=e166]:
+          - link "SLK Evo Soft SLK Evo Soft Selkirk Intermediário Em estoque R$ 799.00" [ref=e167] [cursor=pointer]:
+            - /url: /paddles/selkirk/slk-evo-soft
+            - img "SLK Evo Soft" [ref=e168]
+            - heading "SLK Evo Soft" [level=2] [ref=e169]
+            - paragraph [ref=e170]: Selkirk
+            - generic [ref=e171]: Intermediário
+            - generic [ref=e172]: Em estoque
+            - paragraph [ref=e173]: R$ 799.00
+        - article [ref=e174]:
+          - link "Radical Pro Radical Pro Head Avançado Em estoque R$ 1399.00" [ref=e175] [cursor=pointer]:
+            - /url: /paddles/head/radical-pro
+            - img "Radical Pro" [ref=e176]
+            - heading "Radical Pro" [level=2] [ref=e177]
+            - paragraph [ref=e178]: Head
+            - generic [ref=e179]: Avançado
+            - generic [ref=e180]: Em estoque
+            - paragraph [ref=e181]: R$ 1399.00
+        - article [ref=e182]:
+          - link "Needle Needle Gamma Iniciante Em estoque R$ 499.00" [ref=e183] [cursor=pointer]:
+            - /url: /paddles/gamma/needle
+            - img "Needle" [ref=e184]
+            - heading "Needle" [level=2] [ref=e185]
+            - paragraph [ref=e186]: Gamma
+            - generic [ref=e187]: Iniciante
+            - generic [ref=e188]: Em estoque
+            - paragraph [ref=e189]: R$ 499.00
+        - article [ref=e190]:
+          - link "Pro XR Pro XR Gearbox Avançado Em estoque R$ 1249.00" [ref=e191] [cursor=pointer]:
+            - /url: /paddles/gearbox/pro-xr
+            - img "Pro XR" [ref=e192]
+            - heading "Pro XR" [level=2] [ref=e193]
+            - paragraph [ref=e194]: Gearbox
+            - generic [ref=e195]: Avançado
+            - generic [ref=e196]: Em estoque
+            - paragraph [ref=e197]: R$ 1249.00
+        - article [ref=e198]:
+          - link "MNSTR Power MNSTR Power Babolat Avançado Em estoque R$ 1599.00" [ref=e199] [cursor=pointer]:
+            - /url: /paddles/babolat/mnstr-power
+            - img "MNSTR Power" [ref=e200]
+            - heading "MNSTR Power" [level=2] [ref=e201]
+            - paragraph [ref=e202]: Babolat
+            - generic [ref=e203]: Avançado
+            - generic [ref=e204]: Em estoque
+            - paragraph [ref=e205]: R$ 1599.00
+        - article [ref=e206]:
+          - link "Warrior V2 Warrior V2 Diadem Avançado Em estoque R$ 1349.00" [ref=e207] [cursor=pointer]:
+            - /url: /paddles/diadem/warrior-v2
+            - img "Warrior V2" [ref=e208]
+            - heading "Warrior V2" [level=2] [ref=e209]
+            - paragraph [ref=e210]: Diadem
+            - generic [ref=e211]: Avançado
+            - generic [ref=e212]: Em estoque
+            - paragraph [ref=e213]: R$ 1349.00
+        - article [ref=e214]:
+          - link "Onix Outbreak Intermediate Onix Outbreak Intermediate Onix Intermediário Em estoque R$ 599.90" [ref=e215] [cursor=pointer]:
+            - /url: /paddles/onix/outbreak-intermediate
+            - img "Onix Outbreak Intermediate" [ref=e216]
+            - heading "Onix Outbreak Intermediate" [level=2] [ref=e217]
+            - paragraph [ref=e218]: Onix
+            - generic [ref=e219]: Intermediário
+            - generic [ref=e220]: Em estoque
+            - paragraph [ref=e221]: R$ 599.90
+        - article [ref=e222]:
+          - 'link "JOOLA Ben Johns Hyperion JOOLA Ben Johns Hyperion JOOLA Avançado SW: 110 · Core: 14mm Em estoque R$ 899.90" [ref=e223] [cursor=pointer]':
+            - /url: /paddles/joola/ben-johns-hyperion
+            - img "JOOLA Ben Johns Hyperion" [ref=e224]
+            - heading "JOOLA Ben Johns Hyperion" [level=2] [ref=e225]
+            - paragraph [ref=e226]: JOOLA
+            - generic [ref=e227]: Avançado
+            - paragraph [ref=e228]:
+              - generic [ref=e229]: "SW: 110"
+              - text: ·
+              - generic [ref=e230]: "Core: 14mm"
+            - generic [ref=e231]: Em estoque
+            - paragraph [ref=e232]: R$ 899.90
+        - article [ref=e233]:
+          - 'link "PaddleTech Pro Beginner PaddleTech Pro Beginner PaddleTech Iniciante SW: 95 · Core: 13mm Em estoque R$ 499.90" [ref=e234] [cursor=pointer]':
+            - /url: /paddles/paddletech/pro-beginner
+            - img "PaddleTech Pro Beginner" [ref=e235]
+            - heading "PaddleTech Pro Beginner" [level=2] [ref=e236]
+            - paragraph [ref=e237]: PaddleTech
+            - generic [ref=e238]: Iniciante
+            - paragraph [ref=e239]:
+              - generic [ref=e240]: "SW: 95"
+              - text: ·
+              - generic [ref=e241]: "Core: 13mm"
+            - generic [ref=e242]: Em estoque
+            - paragraph [ref=e243]: R$ 499.90
+        - article [ref=e244]:
+          - 'link "Wilson Camo Intermediate Wilson Camo Intermediate Wilson Intermediário SW: 102 · Core: 16mm Fora de estoque R$ 699.90" [ref=e245] [cursor=pointer]':
+            - /url: /paddles/wilson/camo-intermediate
+            - img "Wilson Camo Intermediate" [ref=e246]
+            - heading "Wilson Camo Intermediate" [level=2] [ref=e247]
+            - paragraph [ref=e248]: Wilson
+            - generic [ref=e249]: Intermediário
+            - paragraph [ref=e250]:
+              - generic [ref=e251]: "SW: 102"
+              - text: ·
+              - generic [ref=e252]: "Core: 16mm"
+            - generic [ref=e253]: Fora de estoque
+            - paragraph [ref=e254]: R$ 699.90
+        - article [ref=e255]:
+          - 'link "Gearbox Advanced Pro Gearbox Advanced Pro Gearbox Avançado SW: 115 · Core: 14mm Em estoque R$ 1199.90" [ref=e256] [cursor=pointer]':
+            - /url: /paddles/gearbox/advanced-pro
+            - img "Gearbox Advanced Pro" [ref=e257]
+            - heading "Gearbox Advanced Pro" [level=2] [ref=e258]
+            - paragraph [ref=e259]: Gearbox
+            - generic [ref=e260]: Avançado
+            - paragraph [ref=e261]:
+              - generic [ref=e262]: "SW: 115"
+              - text: ·
+              - generic [ref=e263]: "Core: 14mm"
+            - generic [ref=e264]: Em estoque
+            - paragraph [ref=e265]: R$ 1199.90
+        - article [ref=e266]:
+          - link "Head Radical Intermediate Head Radical Intermediate Head Intermediário Em estoque R$ 549.90" [ref=e267] [cursor=pointer]:
+            - /url: /paddles/head/radical-intermediate
+            - img "Head Radical Intermediate" [ref=e268]
+            - heading "Head Radical Intermediate" [level=2] [ref=e269]
+            - paragraph [ref=e270]: Head
+            - generic [ref=e271]: Intermediário
+            - generic [ref=e272]: Em estoque
+            - paragraph [ref=e273]: R$ 549.90
+        - article [ref=e274]:
+          - link "Engage Elite Pro Engage Elite Pro Engage Avançado Fora de estoque R$ 849.90" [ref=e275] [cursor=pointer]:
+            - /url: /paddles/engage/elite-pro
+            - img "Engage Elite Pro" [ref=e276]
+            - heading "Engage Elite Pro" [level=2] [ref=e277]
+            - paragraph [ref=e278]: Engage
+            - generic [ref=e279]: Avançado
+            - generic [ref=e280]: Fora de estoque
+            - paragraph [ref=e281]: R$ 849.90
+        - article [ref=e282]:
+          - link "Franklin Sports Starter Franklin Sports Starter Franklin Iniciante Em estoque R$ 349.90" [ref=e283] [cursor=pointer]:
+            - /url: /paddles/franklin/sports-starter
+            - img "Franklin Sports Starter" [ref=e284]
+            - heading "Franklin Sports Starter" [level=2] [ref=e285]
+            - paragraph [ref=e286]: Franklin
+            - generic [ref=e287]: Iniciante
+            - generic [ref=e288]: Em estoque
+            - paragraph [ref=e289]: R$ 349.90
+        - article [ref=e290]:
+          - link "Gamma Photon Beginner Gamma Photon Beginner Gamma Iniciante Em estoque R$ 449.90" [ref=e291] [cursor=pointer]:
+            - /url: /paddles/gamma/photon-beginner
+            - img "Gamma Photon Beginner" [ref=e292]
+            - heading "Gamma Photon Beginner" [level=2] [ref=e293]
+            - paragraph [ref=e294]: Gamma
+            - generic [ref=e295]: Iniciante
+            - generic [ref=e296]: Em estoque
+            - paragraph [ref=e297]: R$ 449.90
+        - article [ref=e298]:
+          - 'link "Selkirk Vanguard Power Air Selkirk Vanguard Power Air Selkirk Intermediário SW: 105 · Core: 16mm Em estoque R$ 1299.90" [ref=e299] [cursor=pointer]':
+            - /url: /paddles/selkirk/vanguard-power-air
+            - img "Selkirk Vanguard Power Air" [ref=e300]
+            - heading "Selkirk Vanguard Power Air" [level=2] [ref=e301]
+            - paragraph [ref=e302]: Selkirk
+            - generic [ref=e303]: Intermediário
+            - paragraph [ref=e304]:
+              - generic [ref=e305]: "SW: 105"
+              - text: ·
+              - generic [ref=e306]: "Core: 16mm"
+            - generic [ref=e307]: Em estoque
+            - paragraph [ref=e308]: R$ 1299.90
+  - contentinfo [ref=e309]:
+    - generic [ref=e310]:
+      - paragraph [ref=e311]:
+        - strong [ref=e312]: "Divulgacao:"
+        - text: PickleIQ pode receber comissoes por compras qualificadas realizadas atraves dos links de afiliados presentes neste site. Isso nao afeta o preco que voce paga nem nossas recomendacoes — so recomendamos produtos em que acreditamos.
+      - generic [ref=e313]:
+        - generic [ref=e314]:
+          - link "PickleIQ" [ref=e315] [cursor=pointer]:
+            - /url: /
+          - paragraph [ref=e316]: Conselheiro de raquetes de pickleball com IA
+        - navigation [ref=e317]:
+          - link "Politica de Privacidade" [ref=e318] [cursor=pointer]:
+            - /url: /privacy
+          - link "Chat IA" [ref=e319] [cursor=pointer]:
+            - /url: /chat
+          - link "Comparar" [ref=e320] [cursor=pointer]:
+            - /url: /paddles
+      - paragraph [ref=e322]: © 2026 PickleIQ. Todos os direitos reservados.
+  - alert [ref=e323]
+```

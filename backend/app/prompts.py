@@ -1,7 +1,7 @@
 """Prompt engineering for paddle recommendation chatbot."""
 
 from typing import Dict, Optional
-from backend.app.schemas import SpecsResponse
+from app.schemas import SpecsResponse
 
 
 SYSTEM_PROMPT = """
@@ -14,6 +14,46 @@ Para cada recomendação:
 - Preço em BRL e onde comprar (link de afiliado)
 
 Seja conciso, conversacional e em português brasileiro.
+"""
+
+PADDLE_ENRICHMENT_PROMPT = """
+Extraia informações estruturadas sobre a raquete de pickleball a partir do texto fornecido.
+
+Retorne um JSON com os seguintes campos:
+
+{
+  "skill_level": "beginner|intermediate|advanced|null",
+  "specs": {
+    "swingweight": 100,
+    "twistweight": 7,
+    "weight_oz": 7.8,
+    "core_thickness_mm": 16,
+    "face_material": "carbon fiber"
+  },
+  "in_stock": true
+}
+
+Instruções de extração:
+
+1. skill_level — Classifique o nível de habilidade:
+   - 'beginner': raquetes para iniciantes, controle, fácil de usar
+   - 'intermediate': raquetes intermediárias, versáteis, equilíbrio
+   - 'advanced': raquetes avançadas, potência, profissionais
+   - null: se não houver indicação clara
+
+2. specs — Extraia especificações técnicas:
+   - swingweight: inteiro (100-120 range)
+   - twistweight: inteiro (6-10 range)
+   - weight_oz: float (7.5-8.5 oz)
+   - core_thickness_mm: float (14mm, 16mm)
+   - face_material: string ("carbon fiber", "fiberglass", "graphite")
+
+3. in_stock — Booleano baseado em indicadores de disponibilidade:
+   - true: "em estoque", "disponível", "pronta entrega"
+   - false: "fora de estoque", "esgotado", "pré-venda"
+   - null: se não houver indicação
+
+Seja conservador — retorne null quando não houver dados claros.
 """
 
 
