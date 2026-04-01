@@ -123,7 +123,8 @@ async def run_dropshot_brasil_crawler(app: FirecrawlApp | None = None) -> int:
         return 0
 
     async with get_connection() as conn:
-        # retailer_id=3 is Drop Shot Brasil (from seed data in schema.sql)
+        # Note: get_connection() context manager automatically rolls back
+        # on exception to prevent pool poisoning. Connection returned clean.
         saved = await save_products_to_db(products, retailer_id=3, conn=conn)
         await conn.execute("REFRESH MATERIALIZED VIEW CONCURRENTLY latest_prices")
         await conn.commit()
