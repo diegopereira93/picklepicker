@@ -40,17 +40,22 @@ export function ProductCard({
     stock_level ?? (in_stock === false ? 'unavailable' : 'available')
 
   return (
-    <div
-      className="border rounded-xl p-4 bg-card shadow-sm flex flex-col gap-3 transition-transform hover:lift cursor-pointer"
+    <article
+      className="border rounded-xl p-4 bg-card shadow-sm flex flex-col gap-3 transition-transform hover:lift"
       data-testid={`product-card-${paddle_id}`}
+      aria-labelledby={`product-title-${paddle_id}`}
     >
-      {/* Placeholder image */}
-      <div className="w-full h-32 bg-muted rounded-lg flex items-center justify-center text-muted-foreground text-sm">
+      {/* Placeholder image with proper accessibility */}
+      <div
+        className="w-full h-32 bg-muted rounded-lg flex items-center justify-center text-muted-foreground text-sm"
+        role="img"
+        aria-label={`Imagem da raquete ${brand} ${name}`}
+      >
         Foto em breve
       </div>
 
       <div className="flex-1 space-y-1">
-        <div className="font-semibold text-base leading-tight">{name}</div>
+        <h3 id={`product-title-${paddle_id}`} className="font-semibold text-base leading-tight">{name}</h3>
         <div className="text-sm text-muted-foreground">{brand}</div>
       </div>
 
@@ -74,6 +79,6 @@ export function ProductCard({
       >
         Comprar
       </a>
-    </div>
+    </article>
   )
 }
