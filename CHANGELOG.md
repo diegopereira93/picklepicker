@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0.0] - 2026-04-01
+
+### Added
+- **Milestone v1.1 Complete** — Scraper Validation, Navigation UX Fixes, and Image Extraction
+- **Phase 07: E2E Testing & Scraper Validation** — 101 tests covering all 3 scrapers (Brazil Pickleball Store, Drop Shot Brasil, Mercado Livre), 94% code coverage on ML scraper, Firecrawl error handling documented
+- **Phase 08: Navigation UX Fixes** — Fixed /compare 404 links, removed Chat IA standalone nav, enforced quiz gate, mobile nav consistency, enriched paddle data with specs/skill_level/in_stock
+- **Phase 09: Image Extraction** — Two-phase Brazil Store crawler extracting real product images from individual pages, URL transformation (1024→480px), 6% → 80% real image coverage
+
+### Changed
+- **Crawler infrastructure** — Added `extract_image_from_markdown()` and `scrape_product_page()` helpers to Brazil Store crawler
+- **Catalog data** — Enriched 10+ paddles with technical specs, skill levels, and real images
+- **Test framework** — Added pytest-asyncio, pytest-cov, RapidFuzz for E2E scraper validation
+
 ## [1.0.0.0] - 2026-03-31
 
 ### Added
