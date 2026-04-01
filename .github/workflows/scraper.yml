@@ -2,7 +2,10 @@ name: Data Crawlers
 
 on:
   schedule:
-    - cron: '0 2 * * *'  # 2 AM UTC = 10 PM BRT (off-peak)
+    # Stagger schedules: 2:00, 2:05, 2:10 UTC to prevent thundering herd
+    - cron: '0 2 * * *'
+    - cron: '5 2 * * *'
+    - cron: '10 2 * * *'
   workflow_dispatch:  # Manual trigger
 
 jobs:
@@ -29,23 +32,26 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e ./backend
 
-      - name: Run Brazil Pickleball Store crawler
+      - name: Add jitter delay
         run: |
-          cd backend
-          python -m pipeline.crawlers.brazil_pickleball_store
-        continue-on-error: true
+          # Random sleep 0-120 seconds to prevent thundering herd
+          echo "Adding jitter delay to prevent resource contention..."
+          sleep $((RANDOM % 120))
 
-      - name: Run Mercado Livre crawler
-        run: |
-          cd backend
-          python -m pipeline.crawlers.mercado_livre
-        continue-on-error: true
-
-      - name: Run Drop Shot Brasil crawler
-        run: |
-          cd backend
-          python -m pipeline.crawlers.drop_shot_brasil
-        continue-on-error: true
+      - name: Run crawlers with retry
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 30
+          max_attempts: 3
+          retry_on: error
+          command: |
+            cd backend
+            echo "Running Brazil Pickleball Store crawler (attempt $GITHUB_RUN_ATTEMPT)..."
+            python -m pipeline.crawlers.brazil_pickleball_store
+            echo "Running Mercado Livre crawler (attempt $GITHUB_RUN_ATTEMPT)..."
+            python -m pipeline.crawlers.mercado_livre
+            echo "Running Drop Shot Brasil crawler (attempt $GITHUB_RUN_ATTEMPT)..."
+            python -m pipeline.crawlers.drop_shot_brasil
 
       - name: Verify crawl results
         run: |
@@ -68,6 +74,28 @@ async def count_paddles():
 
 asyncio.run(count_paddles())
           "
+
+      - name: Check data freshness
+        if: always()
+        run: |
+          cd backend
+          python -c "
+import asyncio
+import sys
+from pipeline.alerts.freshness import check_data_freshness
+
+async def main():
+    results = await check_data_freshness()
+    stale_sources = [s for s, fresh in results.items() if not fresh]
+    if stale_sources:
+        print(f'WARNING: Stale data detected for: {stale_sources}')
+        sys.exit(0)  # Don't fail workflow, just alert
+    else:
+        print('All data sources are fresh')
+
+asyncio.run(main())
+          "
+        continue-on-error: true
 
       - name: Notify on failure
         if: failure()
