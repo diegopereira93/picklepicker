@@ -2,21 +2,29 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: — Next Milestone
-status: executing
-stopped_at: Completed 12-02-p1-transactions-and-retry-PLAN.md
-last_updated: "2026-04-01T16:14:24.254Z"
+status: verifying
+stopped_at: Completed 12-04-p2-observability-infrastructure-PLAN.md
+last_updated: "2026-04-01T17:05:00.000Z"
 last_activity: 2026-04-01
 progress:
   total_phases: 1
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 4
-  completed_plans: 3
+  completed_plans: 4
+
+## Phase 12 Complete
+
+**All 4 plans completed:**
+- [x] 12-01: Data Pipeline Schema Foundation
+- [x] 12-02: Transactions and Retry Logic
+- [x] 12-03: Atomic Upsert and Batch Processing
+- [x] 12-04: Observability Infrastructure (this plan)
 ---
 
 # PickleIQ — Project State
 
 **Última atualização:** 2026-04-01
-**Status:** Ready to execute
+**Status:** Phase complete — ready for verification
 **Last session:** 2026-04-01T16:14:24.251Z
 
 ## Current Position
@@ -92,6 +100,10 @@ See: `.planning/PROJECT.md` (updated 2026-04-01)
 - [Phase 11.2]: Font already optimized with display: 'swap', adjustFontFallback: true, preconnect hints, and system font fallback; SpeedInsights uses dynamic import pattern (ssr: false) which is equivalent to lazyOnload for component-level deferring
 - [Phase 12-03]: MAX_ITEMS=1000 prevents unbounded memory growth from fetch_all=True pagination
 - [Phase 12-03]: Atomic upsert with ON CONFLICT DO UPDATE ... RETURNING eliminates TOCTOU race; requires UNIQUE constraint on paddles.name
+- [Phase 12-04]: Staggered cron schedules (5-min intervals) combined with random sleep jitter for thundering herd prevention
+- [Phase 12-04]: TDD for database modules - write failing tests first, then implementation (17 tests total: 7 quality metrics + 10 DLQ)
+- [Phase 12-04]: Pydantic models for database entities with proper typing and validation
+- [Phase 12-04]: DLQ status management via Enum (pending/processing/resolved/failed) with retry_count tracking
 
 ## Performance Metrics
 
@@ -117,6 +129,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-01)
 | Phase 12 P01 | 18 | 3 tasks | 6 files |
 | Phase 12 P03 | 15 min | 3 tasks | 2 files |
 | Phase 12 P02 | 15 | 3 tasks | 4 files |
+| Phase 12 P04 | 35 min | 4 tasks | 7 files |
 
 ## Open Questions (não bloqueantes para Phase 1)
 
