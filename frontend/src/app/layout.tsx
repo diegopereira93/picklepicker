@@ -5,12 +5,15 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
   preload: true,
   display: "swap",
+  adjustFontFallback: true,
+  fallback: ["system-ui", "sans-serif"],
 });
 
 export const metadata: Metadata = {
@@ -24,6 +27,12 @@ export const metadata: Metadata = {
       as: "style",
     },
   ],
+  other: {
+    preconnect: [
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+    ],
+  },
 };
 
 export default function RootLayout({
@@ -50,6 +59,7 @@ export default function RootLayout({
             <Header />
             <main id="main-content" className="flex-1">{children}</main>
             <Footer />
+            <SpeedInsights sampleRate={1.0} />
           </ThemeProvider>
         </body>
       </html>
