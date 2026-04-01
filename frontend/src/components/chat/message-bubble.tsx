@@ -61,4 +61,5 @@ export const MessageBubble = React.memo(function MessageBubble({ role, content, 
       </div>
     </div>
   )
-}
+})
+
