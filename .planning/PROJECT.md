@@ -122,9 +122,20 @@ All 6 phases complete. MVP delivered:
 
 **Archived:** See `.planning/milestones/v1.0-ROADMAP.md`
 
+## Current Milestone: v1.2 Core Web Vitals Optimization
+
+**Goal:** Optimize Core Web Vitals performance metrics while completing dark mode, motion system, and achieving WCAG 2.1 AA accessibility compliance.
+
+**Target features:**
+- Core Web Vitals optimization (LCP, TBT, CLS improvements)
+- Dark mode completion with brand color preservation
+- Motion system implementation per DESIGN.md v1.1
+- WCAG 2.1 AA accessibility compliance
+- Performance monitoring and measurement
+
 ## Next Milestone
 
-Ready for v1.2 planning. Run `/gsd:new-milestone` to start.
+Ready for v1.3 planning. Run `/gsd:new-milestone` to start.
 
 ## Evolução
 
