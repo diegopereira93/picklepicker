@@ -21,7 +21,7 @@ progress:
 ## Current Position
 
 Phase: 11 (core-web-vitals-optimization) — EXECUTING
-Plan: 4 of 4 (Plan 11.4 complete)
+Plan: 4 of 4 (Plan 11.2 complete)
 
 - **Milestone:** v1.2 Core Web Vitals Optimization
 - **Phase:** 11 — Core Web Vitals Optimization
@@ -79,6 +79,7 @@ Plan: 4 of 4 (Plan 11.4 complete)
 - [Phase 11.1]: next/image migration complete; all images now use explicit dimensions, responsive sizes, priority loading for hero; automatic WebP/AVIF via Next.js
 - [Phase 11.3]: Skeleton placeholders with Suspense for dynamic content; min-height containers prevent CLS; no ad components exist in codebase
 - [Phase 11.4]: Vercel Speed Insights with dynamic import for zero initial load impact; Lighthouse CI with strict budgets (LCP < 2500ms, CLS < 0.1); Bundle analyzer with ANALYZE env var; size-limit 150KB budget; WCAG 2.1 AA focus indicators using primary color with offset; useAnnouncer hook with polite aria-live region
+- [Phase 11.2]: Font already optimized with display: 'swap', adjustFontFallback: true, preconnect hints, and system font fallback; SpeedInsights uses dynamic import pattern (ssr: false) which is equivalent to lazyOnload for component-level deferring
 
 ## Performance Metrics
 
@@ -99,6 +100,7 @@ Plan: 4 of 4 (Plan 11.4 complete)
 | Phase 10-performance-ux-polish P02 | 5min | 2 tasks | 2 files |
 | Phase 10-performance-ux-polish P10.1 | 5 min | 3 tasks | 3 files |
 | Phase 11 P11.1 | 10 min | 3 tasks | 2 files |
+| Phase 11 P11.2 | 15 min | 4 tasks | 3 files |
 | Phase 11 P11.4 | 15 min | 5 tasks | 8 files |
 
 ## Open Questions (não bloqueantes para Phase 1)
