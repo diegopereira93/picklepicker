@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0.0] - 2026-04-01
+
+### Added
+- **Phase 12: Data Pipeline Quality** — Comprehensive data quality infrastructure for the paddle catalog pipeline
+- **Data Quality Metrics Tracking** — Pipeline success rate, extraction coverage, price currency consistency, image availability, and store distribution analytics
+- **Dead Letter Queue (DLQ)** — Failed extraction handling with retry logic, exponential backoff, and comprehensive logging
+- **Data Freshness Monitoring** — Automated freshness checks, configurable TTL per store, alerting for stale data
+- **Pipeline Observability** — Structured logging, performance metrics, and extraction telemetry
+- **CI/CD Improvements** — Lighthouse CI server startup configuration, SSG error handling, Clerk environment setup
+
+### Changed
+- **Lighthouse CI Configuration** — Added `startServerCommand` to properly start Next.js production server before audits
+- **SSG Error Handling** — Added graceful fallbacks when backend is unavailable during static generation
+
+### Fixed
+- Lighthouse CI failing with CHROME_INTERSTITIAL_ERROR due to missing dev server startup
+- SSG build failures when backend services are unavailable
+
 ## [1.1.0.0] - 2026-04-01
 
 ### Added
