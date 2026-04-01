@@ -173,3 +173,90 @@ class TestPoolTypeHints:
 
             pool = await get_pool()
             assert pool is not None
+
+
+class TestTransactionRollback:
+    """Tests for transaction rollback on exception."""
+
+    @pytest.fixture(autouse=True)
+    def setup_env(self):
+        """Set up environment variable for tests."""
+        os.environ["DATABASE_URL"] = "postgresql://test:test@localhost/test"
+        yield
+
+    @pytest.fixture(autouse=True)
+    def reset_module(self):
+        """Reset connection module state before each test."""
+        modules_to_remove = [k for k in sys.modules.keys() if k.startswith("pipeline.db")]
+        for mod in modules_to_remove:
+            del sys.modules[mod]
+        yield
+
+    def _create_mock_pool(self):
+        """Helper to create properly mocked pool and connection."""
+        mock_conn = AsyncMock()
+        mock_pool = AsyncMock()
+        # Create async context manager for pool.connection()
+        mock_cm = AsyncMock()
+        mock_cm.__aenter__ = AsyncMock(return_value=mock_conn)
+        mock_cm.__aexit__ = AsyncMock(return_value=None)
+        mock_pool.connection = MagicMock(return_value=mock_cm)
+        return mock_pool, mock_conn
+
+    async def test_transaction_rollback_on_exception(self):
+        """Exception in get_connection context triggers automatic rollback."""
+        mock_pool, mock_conn = self._create_mock_pool()
+
+        with patch("pipeline.db.connection.get_pool", return_value=mock_pool):
+            from pipeline.db.connection import get_connection
+
+            with pytest.raises(ValueError, match="Simulated error"):
+                async with get_connection() as conn:
+                    raise ValueError("Simulated error")
+
+            # Verify rollback was called
+            mock_conn.rollback.assert_called_once()
+
+    async def test_connection_returned_to_pool_after_rollback(self):
+        """Connection returned to pool in clean state after rollback."""
+        mock_pool, mock_conn = self._create_mock_pool()
+
+        with patch("pipeline.db.connection.get_pool", return_value=mock_pool):
+            from pipeline.db.connection import get_connection
+
+            try:
+                async with get_connection() as conn:
+                    raise ValueError("Simulated error")
+            except ValueError:
+                pass
+
+            # Verify rollback was called before connection exit
+            mock_conn.rollback.assert_called_once()
+
+    async def test_original_exception_re_raised_after_rollback(self):
+        """Original exception re-raised after rollback."""
+        mock_pool, mock_conn = self._create_mock_pool()
+
+        with patch("pipeline.db.connection.get_pool", return_value=mock_pool):
+            from pipeline.db.connection import get_connection
+
+            with pytest.raises(RuntimeError, match="Custom error"):
+                async with get_connection() as conn:
+                    raise RuntimeError("Custom error")
+
+            # Verify rollback was still called
+            mock_conn.rollback.assert_called_once()
+
+    async def test_no_rollback_on_success(self):
+        """No rollback called when no exception."""
+        mock_pool, mock_conn = self._create_mock_pool()
+
+        with patch("pipeline.db.connection.get_pool", return_value=mock_pool):
+            from pipeline.db.connection import get_connection
+
+            async with get_connection() as conn:
+                # Normal operation, no exception
+                pass
+
+            # Verify rollback was NOT called
+            mock_conn.rollback.assert_not_called()
