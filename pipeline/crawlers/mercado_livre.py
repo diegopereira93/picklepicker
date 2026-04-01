@@ -2,10 +2,19 @@ import os
 import json
 import logging
 import httpx
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_exponential,
+    retry_if_exception_type,
+    before_sleep_log,
+)
 from pipeline.db.connection import get_connection
 from pipeline.alerts.telegram import send_telegram_alert
+from pipeline.utils.security import scrub_sensitive_data, SensitiveDataFilter
 
 logger = logging.getLogger(__name__)
+logger.addFilter(SensitiveDataFilter())
 
 ML_SEARCH_URL = "https://api.mercadolibre.com/sites/MLB/search"
 MAX_ITEMS = 1000  # Prevent unbounded memory growth
@@ -25,6 +34,17 @@ def build_affiliate_url(permalink: str, affiliate_tag: str) -> str:
     return f"{permalink}{separator}matt_id={affiliate_tag}"
 
 
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=1, min=1, max=10),
+    retry=retry_if_exception_type((
+        httpx.HTTPStatusError,
+        httpx.ConnectError,
+        httpx.TimeoutException,
+    )),
+    before_sleep=before_sleep_log(logger, logging.WARNING),
+    reraise=True,
+)
 async def search_pickleball_paddles(
     limit: int = 50,
     offset: int = 0,
@@ -34,6 +54,9 @@ async def search_pickleball_paddles(
 
     If fetch_all=True, paginates through results up to MAX_ITEMS.
     Returns dict with 'results' list and 'paging' info.
+
+    Retries on transient failures (5xx, connection errors, timeouts)
+    with exponential backoff (1s, 2s, 4s). Does not retry on 4xx errors.
     """
     all_results = []
     current_offset = offset
@@ -182,7 +205,9 @@ async def run_mercado_livre_crawler() -> int:
     try:
         data = await search_pickleball_paddles(limit=50, offset=0, fetch_all=True)
     except Exception as e:
-        await send_telegram_alert(f"Mercado Livre crawler failed: {e}")
+        # Scrub sensitive data before sending alert
+        safe_message = scrub_sensitive_data(str(e))
+        await send_telegram_alert(f"Mercado Livre crawler failed: {safe_message}")
         raise
 
     items = data.get("results", [])
