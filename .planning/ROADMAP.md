@@ -1,7 +1,7 @@
 # PickleIQ — Roadmap v1.2
 
 **Milestone:** v1.2 — Core Web Vitals Optimization
-**Status:** Planning
+**Status:** In Progress
 **Last updated:** 2026-04-01
 
 ---
@@ -78,24 +78,26 @@
 
 ---
 
-### Plan 11.3: Layout Stability & CLS Fixes
+### Plan 11.3: Layout Stability & CLS Fixes — **COMPLETED**
 
 **Objective:** Eliminate layout shifts and improve CLS scores.
 
 **Requirements addressed:** CLS-01, CLS-02, CLS-03, CLS-04, IMG-01
 
 **Scope:**
-- Identify layout shift sources
-- Add space reservation for dynamic content
-- Fix font loading layout shifts
-- Ensure ad/sponsored containers have fixed dimensions
+- ✅ Identify layout shift sources
+- ✅ Add space reservation for dynamic content
+- ✅ Fix font loading layout shifts
+- ✅ Ensure ad/sponsored containers have fixed dimensions
 
 **Deliverable:** CLS < 0.1 achieved
 
-**Estimates:**
-- Confidence: medium
-- Scoping: 10 min
-- Execution: 40 min
+**Completion:**
+- Skeleton placeholders with Suspense for async paddle grid
+- Min-height containers for paddles page (min-h-[600px], min-h-[800px])
+- Min-height containers for detail page (min-h-[600px], min-h-[200px])
+- No ad components found in codebase (no action needed)
+- Font loading already CLS-safe from Plan 11.2
 
 ---
 

@@ -3,25 +3,25 @@ gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: milestone
 status: executing
-last_updated: "2026-04-01T13:47:09.718Z"
+last_updated: "2026-04-01T16:00:00.000Z"
 last_activity: 2026-04-01
 progress:
   total_phases: 1
   completed_phases: 0
   total_plans: 4
-  completed_plans: 0
+  completed_plans: 1
 ---
 
 # PickleIQ — Project State
 
 **Última atualização:** 2026-04-01
 **Status:** Executing Phase 11
-**Last session:** 2026-04-01T15:00:00.000Z
+**Last session:** 2026-04-01T16:00:00.000Z
 
 ## Current Position
 
 Phase: 11 (core-web-vitals-optimization) — EXECUTING
-Plan: 1 of 4
+Plan: 3 of 4 (Plan 11.3 complete)
 
 - **Milestone:** v1.2 Core Web Vitals Optimization
 - **Phase:** 11 — Core Web Vitals Optimization
@@ -76,6 +76,8 @@ Plan: 1 of 4
 - [Phase 09-01]: Two-phase extraction (category page + product pages) to capture lazy-loaded images from Brazil Store
 - [Phase 09-01]: Transform mitiendanube URLs from -1024-1024 to -480-0 for optimized image size
 - [Phase 10-10]: Custom ThemeProvider instead of next-themes package for zero dependencies; localStorage key pickleiq-theme; motion system uses CSS animations (no JS library); all animations respect prefers-reduced-motion
+- [Phase 11.1]: next/image migration complete; all images now use explicit dimensions, responsive sizes, priority loading for hero; automatic WebP/AVIF via Next.js
+- [Phase 11.3]: Skeleton placeholders with Suspense for dynamic content; min-height containers prevent CLS; no ad components exist in codebase
 
 ## Performance Metrics
 
@@ -95,6 +97,7 @@ Plan: 1 of 4
 | Phase 10 P10 | 15min | 4/4 | 7 files |
 | Phase 10-performance-ux-polish P02 | 5min | 2 tasks | 2 files |
 | Phase 10-performance-ux-polish P10.1 | 5 min | 3 tasks | 3 files |
+| Phase 11 P11.1 | 10 min | 3 tasks | 2 files |
 
 ## Open Questions (não bloqueantes para Phase 1)
 
