@@ -6,12 +6,24 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  preload: true,
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "PickleIQ — AI Pickleball Paddle Advisor",
   description:
     "Encontre a raquete de pickleball perfeita com ajuda de IA. Comparador de precos, especificacoes tecnicas e recomendacoes personalizadas para jogadores brasileiros.",
+  preload: [
+    {
+      rel: "preload",
+      href: "/_next/static/css/app/layout.css",
+      as: "style",
+    },
+  ],
 };
 
 export default function RootLayout({
