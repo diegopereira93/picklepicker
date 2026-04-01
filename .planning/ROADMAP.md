@@ -64,7 +64,7 @@
 | 9 | v1.1 | 1/1 | Complete | 2026-04-01 |
 | 10 | v1.1 | 2/2 | Complete | 2026-04-01 |
 | 11 | v1.2 | 4/4 | Complete | 2026-04-01 |
-| 12 | v1.3 | 3/4 | In Progress|  |
+| 12 | v1.3 | 4/4 | Complete | 2026-04-01 |
 
 ### Phase 12: Data Pipeline Quality & Reliability
 
@@ -73,10 +73,11 @@
 **Requirements:** PIPE-01 through PIPE-12
 
 **Plans:**
-3/4 plans executed
+4/4 plans executed
+- [x] 12-01-P1-schema-foundation-PLAN.md — Schema fixes, NOT NULL constraints
 - [x] 12-02-P1-transactions-and-retry-PLAN.md — Transaction rollback, ML retry logic
 - [x] 12-03-P1-memory-and-concurrency-PLAN.md — Memory limits, atomic upsert
-- [ ] 12-04-P2-observability-infrastructure-PLAN.md — Metrics, DLQ, freshness alerts
+- [x] 12-04-P2-observability-infrastructure-PLAN.md — Metrics, DLQ, freshness alerts
 
 ---
 
