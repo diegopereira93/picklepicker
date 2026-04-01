@@ -1,0 +1,42 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]:
+      - link "PickleIQ" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e5]: PickleIQ
+      - navigation [ref=e6]:
+        - link "Home" [ref=e7] [cursor=pointer]:
+          - /url: /
+        - link "Catalogo" [ref=e8] [cursor=pointer]:
+          - /url: /paddles
+      - generic [ref=e9]:
+        - link "Encontrar raquete" [ref=e10] [cursor=pointer]:
+          - /url: /chat
+        - button "Entrar" [ref=e11] [cursor=pointer]
+  - main [ref=e12]:
+    - generic [ref=e14]:
+      - heading "404" [level=1] [ref=e15]
+      - heading "This page could not be found." [level=2] [ref=e17]
+  - contentinfo [ref=e18]:
+    - generic [ref=e19]:
+      - paragraph [ref=e20]:
+        - strong [ref=e21]: "Divulgacao:"
+        - text: PickleIQ pode receber comissoes por compras qualificadas realizadas atraves dos links de afiliados presentes neste site. Isso nao afeta o preco que voce paga nem nossas recomendacoes — so recomendamos produtos em que acreditamos.
+      - generic [ref=e22]:
+        - generic [ref=e23]:
+          - link "PickleIQ" [ref=e24] [cursor=pointer]:
+            - /url: /
+          - paragraph [ref=e25]: Conselheiro de raquetes de pickleball com IA
+        - navigation [ref=e26]:
+          - link "Politica de Privacidade" [ref=e27] [cursor=pointer]:
+            - /url: /privacy
+          - link "Chat IA" [ref=e28] [cursor=pointer]:
+            - /url: /chat
+          - link "Comparar" [ref=e29] [cursor=pointer]:
+            - /url: /paddles
+      - paragraph [ref=e31]: © 2026 PickleIQ. Todos os direitos reservados.
+  - alert [ref=e32]
+```

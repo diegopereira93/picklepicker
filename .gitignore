@@ -5,3 +5,7 @@
 .claude
 __pycache__
 .gstack/
+.node_modules
+playwright*
+venv
+pytest*

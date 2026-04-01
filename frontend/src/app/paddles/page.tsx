@@ -1,8 +1,8 @@
 import { Metadata } from 'next'
 import { fetchPaddlesList } from '@/lib/seo'
 
-// ISR: regenerate every hour
-export const revalidate = 3600
+// ISR: regenerate every minute during development
+export const revalidate = 60
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -42,11 +42,12 @@ export default async function PaddlesPage() {
           {paddles.map((paddle) => (
             <article
               key={paddle.id}
-              className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+              className="border rounded-lg overflow-hidden hover:shadow-md transition-shadow"
             >
               <a
                 href={`/paddles/${encodeURIComponent(paddle.brand?.toLowerCase() ?? '')}/${encodeURIComponent(paddle.model_slug ?? String(paddle.id))}`}
-                className="block"
+                className="block p-4"
+                data-testid="paddle-card-link"
               >
                 {paddle.image_url && (
                   <img

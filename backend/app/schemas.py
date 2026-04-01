@@ -27,6 +27,9 @@ class PaddleResponse(BaseModel):
     specs: Optional[SpecsResponse] = None
     price_min_brl: Optional[float] = None
     created_at: Optional[datetime] = None
+    model_slug: Optional[str] = None
+    skill_level: Optional[str] = None
+    in_stock: Optional[bool] = None
 
     model_config = {"from_attributes": True}
 
