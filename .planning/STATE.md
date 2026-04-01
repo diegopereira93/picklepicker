@@ -21,7 +21,10 @@ progress:
 ## Current Position
 
 Phase: 12 (data-pipeline-quality) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
+
+- **Last session:** 2026-04-01T16:30:00.000Z
+- **Stopped at:** Completed 12-03-p1-memory-and-concurrency-PLAN.md
 
 - **Milestone:** v1.2 Core Web Vitals Optimization — COMPLETED
 - **Status:** All 4 plans complete (11.1-11.4), milestone archived
@@ -86,6 +89,8 @@ See: `.planning/PROJECT.md` (updated 2026-04-01)
 - [Phase 11.3]: Skeleton placeholders with Suspense for dynamic content; min-height containers prevent CLS; no ad components exist in codebase
 - [Phase 11.4]: Vercel Speed Insights with dynamic import for zero initial load impact; Lighthouse CI with strict budgets (LCP < 2500ms, CLS < 0.1); Bundle analyzer with ANALYZE env var; size-limit 150KB budget; WCAG 2.1 AA focus indicators using primary color with offset; useAnnouncer hook with polite aria-live region
 - [Phase 11.2]: Font already optimized with display: 'swap', adjustFontFallback: true, preconnect hints, and system font fallback; SpeedInsights uses dynamic import pattern (ssr: false) which is equivalent to lazyOnload for component-level deferring
+- [Phase 12-03]: MAX_ITEMS=1000 prevents unbounded memory growth from fetch_all=True pagination
+- [Phase 12-03]: Atomic upsert with ON CONFLICT DO UPDATE ... RETURNING eliminates TOCTOU race; requires UNIQUE constraint on paddles.name
 
 ## Performance Metrics
 
@@ -109,6 +114,7 @@ See: `.planning/PROJECT.md` (updated 2026-04-01)
 | Phase 11 P11.2 | 15 min | 4 tasks | 3 files |
 | Phase 11 P11.4 | 15 min | 5 tasks | 8 files |
 | Phase 12 P01 | 18 | 3 tasks | 6 files |
+| Phase 12 P03 | 15 min | 3 tasks | 2 files |
 
 ## Open Questions (não bloqueantes para Phase 1)
 
