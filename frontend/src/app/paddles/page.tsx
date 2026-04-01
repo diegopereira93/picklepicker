@@ -4,8 +4,9 @@ import Image from 'next/image'
 import { fetchPaddlesList } from '@/lib/seo'
 import { PaddleGridSkeleton } from '@/components/paddle-card-skeleton'
 
-// ISR: regenerate every minute during development
-export const revalidate = 60
+// Force dynamic rendering to avoid build-time data fetching
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
