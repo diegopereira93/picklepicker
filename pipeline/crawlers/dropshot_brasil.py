@@ -5,8 +5,10 @@ from firecrawl import FirecrawlApp
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 from pipeline.db.connection import get_connection
 from pipeline.alerts.telegram import send_telegram_alert
+from pipeline.utils.security import scrub_sensitive_data, SensitiveDataFilter
 
 logger = logging.getLogger(__name__)
+logger.addFilter(SensitiveDataFilter())
 
 DROPSHOT_BRASIL_URL = "https://www.dropshotbrasil.com.br/raquetes"
 
@@ -98,10 +100,14 @@ async def run_dropshot_brasil_crawler(app: FirecrawlApp | None = None) -> int:
     try:
         result = extract_products(app, DROPSHOT_BRASIL_URL)
     except Exception as e:
+        # Scrub any sensitive data from error message before logging/alerting
+        safe_message = scrub_sensitive_data(str(e))
+        logger.error("Drop Shot Brasil crawler failed: %s", safe_message)
         await send_telegram_alert(
-            f"Drop Shot Brasil crawler failed after 3 retries: {e}"
+            f"Drop Shot Brasil crawler failed after 3 retries: {safe_message}"
         )
-        raise
+        # Re-raise sanitized exception
+        raise type(e)(safe_message) from e
 
     # Convert ExtractResponse to dict if needed
     if hasattr(result, 'model_dump'):
