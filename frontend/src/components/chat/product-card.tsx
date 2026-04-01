@@ -41,7 +41,7 @@ export function ProductCard({
 
   return (
     <div
-      className="border rounded-xl p-4 bg-card shadow-sm flex flex-col gap-3"
+      className="border rounded-xl p-4 bg-card shadow-sm flex flex-col gap-3 transition-transform hover:lift cursor-pointer"
       data-testid={`product-card-${paddle_id}`}
     >
       {/* Placeholder image */}

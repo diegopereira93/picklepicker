@@ -35,7 +35,7 @@ export function MessageBubble({ role, content, annotations }: MessageBubbleProps
     | undefined
 
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-3`}>
+    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-3 message-enter`}>
       <div className="max-w-[85%] space-y-3">
         {content && (
           <div
@@ -50,8 +50,10 @@ export function MessageBubble({ role, content, annotations }: MessageBubbleProps
         )}
         {recommendations && recommendations.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
-            {recommendations.map((rec) => (
-              <ProductCard key={rec.paddle_id} {...rec} />
+            {recommendations.map((rec, idx) => (
+              <div key={rec.paddle_id} className="animate-in-slide-up" style={{ animationDelay: `${idx * 50}ms` }}>
+                <ProductCard {...rec} />
+              </div>
             ))}
           </div>
         )}

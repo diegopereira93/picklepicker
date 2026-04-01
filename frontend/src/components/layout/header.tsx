@@ -12,6 +12,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import { SignInButton, UserButton, useAuth } from "@clerk/nextjs"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -45,6 +46,7 @@ export function Header() {
 
         {/* Desktop CTA */}
         <div className="hidden md:flex items-center space-x-2 ml-auto">
+          <ThemeToggle />
           <Button asChild size="sm">
             <Link href="/chat">Encontrar raquete</Link>
           </Button>
