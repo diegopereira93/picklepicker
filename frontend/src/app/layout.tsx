@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import dynamic from "next/dynamic";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import { SpeedInsights } from "@vercel/speed-insights/next";
+
+// Dynamic import for SpeedInsights to defer loading until after interactive
+const SpeedInsights = dynamic(
+  () => import("@vercel/speed-insights/next").then((mod) => mod.SpeedInsights),
+  { ssr: false }
+);
 
 const inter = Inter({
   subsets: ["latin"],
@@ -20,13 +26,6 @@ export const metadata: Metadata = {
   title: "PickleIQ — AI Pickleball Paddle Advisor",
   description:
     "Encontre a raquete de pickleball perfeita com ajuda de IA. Comparador de precos, especificacoes tecnicas e recomendacoes personalizadas para jogadores brasileiros.",
-  preload: [
-    {
-      rel: "preload",
-      href: "/_next/static/css/app/layout.css",
-      as: "style",
-    },
-  ],
   other: {
     preconnect: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
