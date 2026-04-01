@@ -6,6 +6,9 @@ module.exports = {
         'http://localhost:3000/paddles'
       ],
       numberOfRuns: 3,
+      startServerCommand: 'npm start',
+      startServerReadyPattern: 'Ready in',
+      startServerReadyTimeout: 60000,
     },
     assert: {
       assertions: {
