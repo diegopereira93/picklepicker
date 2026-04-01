@@ -82,7 +82,19 @@
 
 ---
 
-## v1.1 — Scraper Validation & E2E Testing (Planning)
+## v1.2 — Polish & Performance (Planning)
+
+**Status:** Planning phase initiated 2026-03-31
+
+**Objective:** Implement DESIGN.md v1.1 motion system, complete dark mode with brand preservation, optimize Core Web Vitals, and achieve WCAG 2.1 AA accessibility compliance.
+
+**Phases:**
+
+- Phase 10: Performance & UX Polish — Core Web Vitals, motion system, dark mode completion, accessibility audit
+
+---
+
+## v1.1 — Scraper Validation & E2E Testing (Shipped: 2026-04-01)
 
 **Status:** Planning phase initiated 2026-03-29
 
