@@ -1,5 +1,17 @@
 # Milestones
 
+## v1.2 Core Web Vitals Optimization (Shipped: 2026-04-01)
+
+**Phases completed:** 1 phases, 4 plans, 12 tasks
+
+**Key accomplishments:**
+
+- Files audited:
+- One-liner:
+- Plan ID:
+
+---
+
 ## v1.1 Scraper Validation & E2E Testing (Shipped: 2026-04-01)
 
 **Phases completed:** 8 phases, 29 plans, 38 tasks
