@@ -70,6 +70,8 @@ export function QuizFlow({ onComplete, onEditCancel, editMode = false }: QuizFlo
         ))}
       </div>
 
+      <div className="animate-in-scale">
+
       {/* Step content */}
       {currentStep === 'level' && (
         <StepLevel value={level} onChange={setLevel} />
@@ -109,6 +111,7 @@ export function QuizFlow({ onComplete, onEditCancel, editMode = false }: QuizFlo
         >
           {isLastStep ? 'Comecar' : 'Proximo'}
         </button>
+      </div>
       </div>
     </div>
   )

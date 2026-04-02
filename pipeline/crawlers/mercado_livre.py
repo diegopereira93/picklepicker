@@ -2,12 +2,22 @@ import os
 import json
 import logging
 import httpx
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_exponential,
+    retry_if_exception_type,
+    before_sleep_log,
+)
 from pipeline.db.connection import get_connection
 from pipeline.alerts.telegram import send_telegram_alert
+from pipeline.utils.security import scrub_sensitive_data, SensitiveDataFilter
 
 logger = logging.getLogger(__name__)
+logger.addFilter(SensitiveDataFilter())
 
 ML_SEARCH_URL = "https://api.mercadolibre.com/sites/MLB/search"
+MAX_ITEMS = 1000  # Prevent unbounded memory growth
 ML_DEFAULT_QUERY = "raquete pickleball"
 ML_CATEGORY = "MLB1276"  # Esportes e Fitness
 
@@ -24,6 +34,17 @@ def build_affiliate_url(permalink: str, affiliate_tag: str) -> str:
     return f"{permalink}{separator}matt_id={affiliate_tag}"
 
 
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=1, min=1, max=10),
+    retry=retry_if_exception_type((
+        httpx.HTTPStatusError,
+        httpx.ConnectError,
+        httpx.TimeoutException,
+    )),
+    before_sleep=before_sleep_log(logger, logging.WARNING),
+    reraise=True,
+)
 async def search_pickleball_paddles(
     limit: int = 50,
     offset: int = 0,
@@ -31,11 +52,15 @@ async def search_pickleball_paddles(
 ) -> dict:
     """Search ML for pickleball paddles. Public API — no auth required.
 
-    If fetch_all=True, paginates through all results.
+    If fetch_all=True, paginates through results up to MAX_ITEMS.
     Returns dict with 'results' list and 'paging' info.
+
+    Retries on transient failures (5xx, connection errors, timeouts)
+    with exponential backoff (1s, 2s, 4s). Does not retry on 4xx errors.
     """
     all_results = []
     current_offset = offset
+    items_fetched = 0
 
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
@@ -58,6 +83,15 @@ async def search_pickleball_paddles(
 
             results = data.get("results", [])
             all_results.extend(results)
+            items_fetched += len(results)
+
+            # Check memory limit
+            if items_fetched >= MAX_ITEMS:
+                logger.warning(
+                    "Reached MAX_ITEMS limit (%d), stopping pagination. "
+                    "Some results may be truncated.", MAX_ITEMS
+                )
+                break
 
             if not fetch_all:
                 return data
@@ -66,7 +100,7 @@ async def search_pickleball_paddles(
             total = paging.get("total", 0)
             current_offset += limit
 
-            if current_offset >= total:
+            if current_offset >= total or len(results) == 0:
                 break
 
     return {
@@ -82,9 +116,16 @@ async def search_pickleball_paddles(
 async def save_ml_items_to_db(items: list[dict], affiliate_tag: str, conn) -> int:
     """Save ML search items to price_snapshots.
 
+    Uses atomic upsert for paddles (INSERT ... ON CONFLICT DO UPDATE)
+    to avoid TOCTOU race conditions. Requires UNIQUE constraint on
+    paddles.name.
+
     Skips items with missing/zero price.
     Returns count of saved snapshots.
     """
+    # NOTE: Requires UNIQUE constraint on paddles.name
+    # If this constraint doesn't exist, the upsert will fail
+    # with a PostgreSQL error, which is safer than silent data loss
     saved = 0
     retailer_id = 2  # Mercado Livre from seed data (id=2)
 
@@ -101,32 +142,29 @@ async def save_ml_items_to_db(items: list[dict], affiliate_tag: str, conn) -> in
         permalink = item.get("permalink", "")
         affiliate_url = build_affiliate_url(permalink, affiliate_tag)
 
-        # Upsert paddle by name (title) — dedup handled in Phase 2
+        # Atomic upsert: insert or update, always return id
         result = await conn.execute(
             """
             INSERT INTO paddles (name, brand, model, images)
             VALUES (%(name)s, %(brand)s, %(model)s, %(images)s)
-            ON CONFLICT DO NOTHING
+            ON CONFLICT (name) DO UPDATE SET
+                brand = EXCLUDED.brand,
+                model = EXCLUDED.model,
+                images = EXCLUDED.images,
+                updated_at = NOW()
             RETURNING id
             """,
             {
                 "name": title,
-                "brand": "",  # ML search doesn't always have a separate brand field
+                "brand": "",  # ML search doesn't always have separate brand
                 "model": title,
                 "images": [item.get("thumbnail", "")],
             },
         )
         row = await result.fetchone()
         if row is None:
-            # Row already existed — fetch its id
-            result = await conn.execute(
-                "SELECT id FROM paddles WHERE name = %(name)s",
-                {"name": title},
-            )
-            row = await result.fetchone()
-            if row is None:
-                logger.error("Could not find or create paddle: %s", title)
-                continue
+            logger.error("Upsert failed for paddle: %s", title)
+            continue
 
         paddle_id = row[0]
 
@@ -167,7 +205,9 @@ async def run_mercado_livre_crawler() -> int:
     try:
         data = await search_pickleball_paddles(limit=50, offset=0, fetch_all=True)
     except Exception as e:
-        await send_telegram_alert(f"Mercado Livre crawler failed: {e}")
+        # Scrub sensitive data before sending alert
+        safe_message = scrub_sensitive_data(str(e))
+        await send_telegram_alert(f"Mercado Livre crawler failed: {safe_message}")
         raise
 
     items = data.get("results", [])

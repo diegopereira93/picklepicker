@@ -84,11 +84,35 @@ O mercado de pickleball cresceu no Brasil e os compradores enfrentam dois proble
 
 Receita via comissões de afiliados (10-40% por venda). Distribuição primária via parceiro treinador → alunos (WhatsApp groups). SEO como canal secundário (maturação 6-12 meses, começa Phase 5). URLs de afiliado geradas server-side — LLM nunca constrói URLs diretamente.
 
-## Current State — v1.1 Shipped
+## Current State — v1.2 Shipped
 
 **Shipped:** 2026-04-01
 
-Milestone v1.1 (Scraper Validation & E2E Testing) complete. Added 3 new phases:
+Milestone v1.2 (Core Web Vitals Optimization) complete. Production performance and accessibility compliance achieved:
+
+**Performance:**
+- **Image Optimization (11.1):** All images migrated to next/Image with responsive sizes, priority loading for hero images, automatic WebP/AVIF via Next.js
+- **Font & Script Optimization (11.2):** Font loading optimized with display swap and adjustFontFallback, third-party scripts audited and documented
+- **Layout Stability (11.3):** Skeleton placeholders with Suspense for async content, min-height containers prevent CLS, no layout shifts during font loading
+
+**Monitoring & Accessibility:**
+- **RUM & A11Y (11.4):** Vercel Speed Insights integrated with dynamic import (zero initial load), Lighthouse CI with strict budgets (LCP < 2500ms, CLS < 0.1), bundle analyzer with 150KB performance budget, WCAG 2.1 AA compliance with focus indicators and useAnnouncer hook
+
+**Key Deliverables:**
+- LCP, INP, CLS, TTFB targets defined and tracked via Vercel Speed Insights
+- Lighthouse CI enforcing performance budgets in build pipeline
+- WCAG 2.1 AA compliance audit passed
+- 4 plans, 12 tasks completed
+
+**Archived:** See `.planning/milestones/v1.2-ROADMAP.md`
+
+## Previous Milestones
+
+### v1.1 — Scraper Validation & E2E Testing
+
+**Shipped:** 2026-04-01
+
+Milestone v1.1 complete. Added 3 new phases:
 - **Phase 07:** E2E Testing & Scraper Validation — 101 tests added, 94% coverage on Mercado Livre, Firecrawl error handling documented, data integrity verified ✓
 - **Phase 08:** Navigation UX Fixes — Fixed /compare 404, removed Chat IA standalone nav, mobile nav gaps closed, enriched paddle data populated ✓
 - **Phase 09:** Image Extraction — Two-phase Brazil Store crawler extracting real product images from individual pages, 6% → 80% real image coverage ✓
@@ -99,9 +123,9 @@ Milestone v1.1 (Scraper Validation & E2E Testing) complete. Added 3 new phases:
 - Real product images replacing Unsplash placeholders
 - 10 additional SUMMARY files, 38 total tasks across v1.1
 
-**Archived:** See `.planning/milestones/v1.1-ROADMAP.md` and `.planning/MILESTONES.md` for full details.
+**Archived:** See `.planning/milestones/v1.1-ROADMAP.md` and `.planning/MILESTONES.md`
 
-## Previous Milestone — v1.0 MVP
+### v1.0 — MVP
 
 **Shipped:** 2026-03-28
 
@@ -122,15 +146,15 @@ All 6 phases complete. MVP delivered:
 
 **Archived:** See `.planning/milestones/v1.0-ROADMAP.md`
 
-## Next Milestone
+## Next Milestone: v1.3
 
-Ready for v1.2 planning. Run `/gsd:new-milestone` to start.
+Ready for v1.3 planning. Run `/gsd:new-milestone` to start.
 
 ## Evolução
 
 Este documento evolui nas transições de fase e limites de milestone.
 
-*Última atualização: 2026-03-28 — Iniciando Milestone 2 (Fases 2-3-5)*
+*Última atualização: 2026-04-01 — v1.2 Core Web Vitals Optimization shipped*
 
 **Após cada transição de fase** (via `/gsd:transition`):
 1. Requisitos invalidados? → Mover para Out of Scope com razão
@@ -147,4 +171,4 @@ Este documento evolui nas transições de fase e limites de milestone.
 
 ---
 
-*Last updated: 2026-03-28
+*Last updated: 2026-04-01
