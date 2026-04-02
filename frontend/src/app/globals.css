@@ -156,6 +156,35 @@ body {
   line-height: var(--line-height-snug);
 }
 
+/* Section Heading (alias for semantic clarity) */
+.hy-section-heading {
+  font-family: var(--font-display);
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-snug);
+}
+
+/* Subheading (body text for descriptions under headings) */
+.hy-subheading {
+  font-family: var(--font-body);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+  color: var(--color-gray-300);
+}
+
+.hy-light-section .hy-subheading {
+  color: var(--color-gray-500);
+}
+
+/* Caption Small (alias for caption) */
+.hy-caption-small {
+  font-family: var(--font-body);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.43;
+}
+
 /* Card Title */
 .hy-card-title {
   font-family: var(--font-display);
