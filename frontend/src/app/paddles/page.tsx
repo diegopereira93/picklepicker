@@ -30,30 +30,30 @@ export default async function PaddlesPage() {
   console.log('[PaddlesPage] paddles count:', paddles.length)
 
   return (
-    <div className="nv-dark-section">
-      <div className="nv-container nv-catalog-header">
-      <nav aria-label="Breadcrumb" className="nv-breadcrumb">
+    <div className="hy-dark-section">
+      <div className="hy-container hy-catalog-header">
+      <nav aria-label="Breadcrumb" className="hy-breadcrumb">
         <ol className="flex gap-1">
           <li><a href="/">Home</a></li>
           <li aria-hidden>/</li>
           <li aria-current="page">Raquetes</li>
         </ol>
       </nav>
-      <p className="nv-section-label">CATÁLOGO</p>
-      <h1 className="nv-section-heading mb-8">Catálogo de Raquetes</h1>
+      <p className="hy-section-label">CATÁLOGO</p>
+      <h1 className="hy-section-heading mb-8">Catálogo de Raquetes</h1>
       <Suspense fallback={<PaddleGridSkeleton count={6} />}>
       {paddles.length === 0 ? (
-        <p className="nv-body">Nenhuma raquete encontrada.</p>
+        <p className="hy-body">Nenhuma raquete encontrada.</p>
       ) : (
-        <div className="nv-catalog-grid">
+        <div className="hy-catalog-grid">
           {paddles.map((paddle) => (
             <article
               key={paddle.id}
-              className="nv-product-card"
+              className="hy-product-card"
             >
               <a
                 href={`/paddles/${encodeURIComponent(paddle.brand?.toLowerCase() ?? '')}/${encodeURIComponent(paddle.model_slug ?? String(paddle.id))}`}
-                className="nv-product-card-inner"
+                className="hy-product-card-inner"
                 data-testid="paddle-card-link"
               >
                 {paddle.image_url && (
@@ -62,25 +62,25 @@ export default async function PaddlesPage() {
                     alt={`${paddle.brand} ${paddle.name} paddle`}
                     width={320}
                     height={192}
-                    className="w-full h-48 object-contain mb-3 nv-product-image"
+                    className="w-full h-48 object-contain mb-3 hy-product-image"
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                   />
                 )}
-                <h2 className="nv-product-card-title">
+                <h2 className="hy-product-card-title">
                   {paddle.name}
                 </h2>
-                <p className="nv-product-card-brand">{paddle.brand}</p>
+                <p className="hy-product-card-brand">{paddle.brand}</p>
 
                 {/* Skill level badge */}
                 {paddle.skill_level && (
-                  <span className="nv-skill-badge">
+                  <span className="hy-skill-badge">
                     {paddle.skill_level === 'beginner' ? 'Iniciante' : paddle.skill_level === 'intermediate' ? 'Intermediário' : paddle.skill_level === 'advanced' ? 'Avançado' : paddle.skill_level}
                   </span>
                 )}
 
                 {/* Specs row */}
                 {(paddle.specs?.swingweight || paddle.specs?.core_thickness_mm) && (
-                  <p className="nv-specs-row">
+                  <p className="hy-specs-row">
                     {paddle.specs?.swingweight && <span>SW: {paddle.specs.swingweight}</span>}
                     {paddle.specs?.swingweight && paddle.specs?.core_thickness_mm && <span> · </span>}
                     {paddle.specs?.core_thickness_mm && <span>Core: {paddle.specs.core_thickness_mm}mm</span>}
@@ -89,13 +89,13 @@ export default async function PaddlesPage() {
 
                 {/* Stock badge */}
                 {paddle.in_stock != null && (
-                  <span className={paddle.in_stock ? 'nv-stock-in' : 'nv-stock-out'}>
+                  <span className={paddle.in_stock ? 'hy-stock-in' : 'hy-stock-out'}>
                     {paddle.in_stock ? 'Em estoque' : 'Fora de estoque'}
                   </span>
                 )}
 
                 {(paddle.price_brl != null || paddle.price_min_brl != null) && (
-                  <p className="nv-product-card-price">
+                  <p className="hy-product-card-price">
                     R${' '}
                     {(paddle.price_brl ?? paddle.price_min_brl ?? 0).toFixed(2)}
                   </p>
