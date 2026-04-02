@@ -13,6 +13,8 @@ const buttonVariants = cva(
           "bg-transparent border-[2px] border-[#76b900] text-white hover:bg-[#1eaedb] hover:text-white active:bg-[#007fff] active:border-[#003eff] active:border rounded-[2px] focus-visible:bg-[#1eaedb] focus-visible:opacity-90",
         secondary:
           "bg-transparent border border-[#76b900] text-white hover:bg-[#1eaedb] hover:text-white active:bg-[#007fff] active:border-[#003eff] rounded-[2px] focus-visible:bg-[#1eaedb] focus-visible:opacity-90",
+        light:
+          "bg-transparent border-[2px] border-[#76b900] text-black hover:bg-[#76b900] hover:text-black active:bg-[#5a9100] active:border-[#5a9100] rounded-[2px] focus-visible:bg-[#76b900] focus-visible:opacity-90",
         compact:
           "bg-transparent border border-[#76b900] text-white hover:bg-[#1eaedb] hover:text-white rounded-[2px] tracking-[0.144px] leading-none",
         outline:

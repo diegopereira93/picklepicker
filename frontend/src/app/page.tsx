@@ -9,18 +9,21 @@ const valueProps = [
     title: "Recomendacao IA",
     description:
       "Descreva seu estilo de jogo e orcamento. Nosso agente de IA recomenda as melhores raquetes com justificativa personalizada em linguagem simples.",
+    size: "default" as const,
   },
   {
     icon: BarChart2,
     title: "Comparador",
     description:
       "Compare raquetes lado a lado com graficos de radar. Swingweight, twistweight, espessura do nucleo — tudo traduzido para voce.",
+    size: "default" as const,
   },
   {
     icon: Tag,
     title: "Melhores Precos",
     description:
       "Precos atualizados diariamente dos principais varejistas brasileiros. Encontre o melhor negocio sem precisar visitar varios sites.",
+    size: "compact" as const,
   },
 ];
 
@@ -60,11 +63,12 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {valueProps.map((prop) => {
               const Icon = prop.icon;
+              const isCompact = prop.size === "compact";
               return (
-                <Card key={prop.title} className="nv-card flex flex-col">
+                <Card key={prop.title} className={`nv-card flex flex-col ${isCompact ? 'md:transform md:translate-y-4' : ''}`}>
                   <CardHeader>
-                    <div className="mb-2 w-10 h-10 flex items-center justify-center">
-                      <Icon className="h-5 w-5" style={{ color: '#76b900' }} />
+                    <div className={`mb-2 flex items-center justify-center ${isCompact ? 'w-8 h-8' : 'w-10 h-10'}`}>
+                      <Icon className={`${isCompact ? 'h-4 w-4' : 'h-5 w-5'}`} style={{ color: '#76b900' }} />
                     </div>
                     <CardTitle className="nv-card-title-text">{prop.title}</CardTitle>
                   </CardHeader>
