@@ -35,34 +35,38 @@ export const metadata: Metadata = {
   },
 };
 
+// Check if Clerk keys are available
+const hasClerkKeys = process.env.CLERK_SECRET_KEY && process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <ClerkProvider>
-      <html lang="pt-BR" className={inter.variable} suppressHydrationWarning>
-        <body className="min-h-screen bg-background font-sans antialiased flex flex-col">
-          <a
-            href="#main-content"
-            className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md"
-          >
-            Pular para o conteúdo principal
-          </a>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <Header />
-            <main id="main-content" className="flex-1">{children}</main>
-            <Footer />
-            <SpeedInsights sampleRate={1.0} />
-          </ThemeProvider>
-        </body>
-      </html>
-    </ClerkProvider>
+  const content = (
+    <html lang="pt-BR" className={inter.variable} suppressHydrationWarning>
+      <body className="min-h-screen bg-background font-sans antialiased flex flex-col">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md"
+        >
+          Pular para o conteúdo principal
+        </a>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Header />
+          <main id="main-content" className="flex-1">{children}</main>
+          <Footer />
+          <SpeedInsights sampleRate={1.0} />
+        </ThemeProvider>
+      </body>
+    </html>
   );
+
+  // Only wrap with ClerkProvider if keys are available
+  return hasClerkKeys ? <ClerkProvider>{content}</ClerkProvider> : content;
 }
