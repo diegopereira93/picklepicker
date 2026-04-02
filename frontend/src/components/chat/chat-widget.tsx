@@ -19,6 +19,7 @@ const SUGGESTED_QUESTIONS = [
 export function ChatWidget({ profile }: ChatWidgetProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const [input, setInput] = useState('')
+  const [lastMessage, setLastMessage] = useState<string>('')
 
   const { messages, sendMessage, status, error } = useChat({
     transport: new DefaultChatTransport({
@@ -37,13 +38,20 @@ export function ChatWidget({ profile }: ChatWidgetProps) {
     e.preventDefault()
     const text = input.trim()
     if (!text || isLoading) return
+    setLastMessage(text)
     setInput('')
     sendMessage({ text })
   }
 
   function handleSuggestedQuestion(question: string) {
     if (isLoading) return
+    setLastMessage(question)
     sendMessage({ text: question })
+  }
+
+  function handleRetry() {
+    if (!lastMessage) return
+    sendMessage({ text: lastMessage })
   }
 
   return (
@@ -52,9 +60,14 @@ export function ChatWidget({ profile }: ChatWidgetProps) {
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-1">
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full gap-6 pb-8">
-            <p className="text-muted-foreground text-sm text-center max-w-xs">
-              Oi! Sou o PickleIQ. Me conta o que voce procura e vou recomendar as melhores raquetes para voce.
-            </p>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-sm font-bold">
+                PI
+              </div>
+              <p className="text-muted-foreground text-sm">
+                Oi! Sou o PickleIQ. Me conta o que voce procura e vou recomendar as melhores raquetes para voce.
+              </p>
+            </div>
             <div className="flex flex-wrap gap-2 justify-center">
               {SUGGESTED_QUESTIONS.map((q) => (
                 <button
@@ -93,7 +106,10 @@ export function ChatWidget({ profile }: ChatWidgetProps) {
         })}
 
         {isLoading && (
-          <div className="flex justify-start mb-3">
+          <div className="flex justify-start mb-3 gap-2">
+            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold shrink-0" aria-hidden="true">
+              PI
+            </div>
             <div className="bg-muted rounded-2xl rounded-bl-sm px-4 py-3 text-sm text-muted-foreground">
               <span className="inline-flex gap-1">
                 <span className="animate-bounce [animation-delay:0ms]">.</span>
@@ -104,10 +120,18 @@ export function ChatWidget({ profile }: ChatWidgetProps) {
           </div>
         )}
 
+        {/* Error handling per DESIGN.md: inline retry */}
         {error && (
-          <div className="flex justify-center my-2">
-            <div className="bg-destructive/10 text-destructive text-sm rounded-lg px-4 py-2">
-              Erro ao conectar. Tente novamente.
+          <div className="flex justify-start mb-3">
+            <div className="bg-destructive/10 text-destructive text-sm rounded-lg px-4 py-2 flex items-center gap-2">
+              <span>⚠️ Erro ao carregar.</span>
+              <button
+                type="button"
+                onClick={handleRetry}
+                className="underline hover:no-underline font-medium"
+              >
+                Tentar novamente
+              </button>
             </div>
           </div>
         )}
