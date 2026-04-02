@@ -134,6 +134,12 @@ See: `.planning/PROJECT.md` (updated 2026-04-01)
 | Phase 13 P07 | 2 min | 1 tasks | 1 files |
 | Phase 13 P08 | 4 min | 4 tasks | 5 files |
 
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260402-ntf | Fix chat page components to match DESIGN.md v2.0 | 2026-04-02 | 2607bdd | [260402-ntf-fix-chat-page-components-to-match-design](./quick/260402-ntf-fix-chat-page-components-to-match-design/) |
+
 ## Open Questions (não bloqueantes para Phase 1)
 
 - [ ] Confirmar Fromuth affiliate program details
