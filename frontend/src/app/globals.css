@@ -500,3 +500,232 @@ a.nv-link-muted:hover {
     text-wrap: balance;
   }
 }
+
+/* === Hero section (NV-09, NV-12) === */
+.nv-hero {
+  background-color: #000000;
+  background-image: linear-gradient(135deg, #000000 60%, #1a3a00 100%);
+  color: #ffffff;
+}
+
+/* === Product card (NV-06) === */
+.nv-product-card {
+  background-color: #ffffff;
+  border-radius: 2px;
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 5px 0px;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease;
+  border: none;
+}
+
+.nv-dark-section .nv-product-card {
+  background-color: #1a1a1a;
+}
+
+.nv-product-card:hover {
+  box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 8px 0px;
+}
+
+.nv-product-card-inner {
+  display: block;
+  padding: 16px;
+  text-decoration: none;
+  color: inherit;
+  height: 100%;
+}
+
+.nv-product-card-title {
+  font-size: 1.50rem;         /* 24px */
+  font-weight: 700;
+  line-height: 1.25;
+  color: #000000;
+  border-bottom: 2px solid #76b900;
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+}
+
+.nv-dark-section .nv-product-card-title {
+  color: #ffffff;
+}
+
+.nv-product-card-brand {
+  font-size: 0.875rem;        /* 14px */
+  font-weight: 700;
+  color: #757575;
+  margin-bottom: 4px;
+}
+
+.nv-product-card-body {
+  font-size: 1.00rem;         /* 16px */
+  font-weight: 400;
+  line-height: 1.67;
+  color: #757575;
+}
+
+.nv-product-card-price {
+  font-size: 1.00rem;
+  font-weight: 700;
+  color: #76b900;
+  margin-top: 8px;
+}
+
+/* Skill level badge — micro-label style */
+.nv-skill-badge {
+  display: inline-block;
+  font-size: 0.75rem;         /* 12px */
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: normal;
+  color: #76b900;
+  background-color: #1a1a1a;
+  border-radius: 1px;
+  padding: 2px 6px;
+  margin-top: 4px;
+}
+
+.nv-stock-in {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #3f8500;
+  margin-top: 4px;
+}
+
+.nv-stock-out {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: #757575;
+  margin-top: 4px;
+}
+
+.nv-specs-row {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: #898989;
+  margin-top: 4px;
+}
+
+/* === Catalog grid (NV-06, NV-10) === */
+.nv-catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  min-height: 800px;
+}
+
+@media (max-width: 1024px) {
+  .nv-catalog-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .nv-catalog-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* === Catalog page header === */
+.nv-catalog-header {
+  padding-top: 32px;
+  padding-bottom: 32px;
+}
+
+.nv-breadcrumb {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #757575;
+  margin-bottom: 16px;
+}
+
+.nv-breadcrumb a {
+  color: #757575;
+  text-decoration: none;
+}
+
+.nv-breadcrumb a:hover {
+  color: #3860be;
+}
+
+/* === Card component base (NV-06) === */
+.nv-card {
+  background-color: #ffffff;
+  border-radius: 2px;
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 5px 0px;
+  border: none;
+  overflow: hidden;
+}
+
+.nv-dark-section .nv-card {
+  background-color: #1a1a1a;
+  color: #ffffff;
+}
+
+.nv-card:hover {
+  box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 8px 0px;
+}
+
+.nv-card-header {
+  padding: 16px 16px 8px 16px;
+}
+
+.nv-card-title-text {
+  font-size: 1.50rem;         /* 24px */
+  font-weight: 700;
+  line-height: 1.25;
+  border-bottom: 2px solid #76b900;
+  padding-bottom: 4px;
+  display: inline-block;
+}
+
+.nv-card-content {
+  padding: 0 16px 16px 16px;
+}
+
+.nv-card-footer {
+  padding: 0 16px 16px 16px;
+  display: flex;
+  align-items: center;
+}
+
+.nv-card-description {
+  font-size: 1.00rem;
+  font-weight: 400;
+  line-height: 1.67;
+  color: #757575;
+}
+
+/* === Skeleton cards (NV-06) === */
+.nv-skeleton-card {
+  background-color: #1a1a1a;
+  border-radius: 2px;
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 5px 0px;
+  overflow: hidden;
+  padding: 16px;
+  min-height: 280px;
+}
+
+.nv-skeleton-line {
+  background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
+  background-size: 200% 100%;
+  animation: nv-skeleton-shimmer 1.5s infinite;
+  border-radius: 2px;
+  height: 16px;
+  margin-bottom: 8px;
+}
+
+.nv-skeleton-line-title {
+  height: 24px;
+  width: 70%;
+  margin-bottom: 12px;
+}
+
+.nv-skeleton-image {
+  height: 192px;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+@keyframes nv-skeleton-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
