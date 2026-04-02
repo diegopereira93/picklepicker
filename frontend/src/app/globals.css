@@ -4,63 +4,261 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    /* PickleIQ brand: sport-appropriate lime/amber palette */
-    /* CONTRAST NOTE: lime-500 on white = 2.7:1 (fails WCAG AA for small text) */
-    /* Rule: use lime-500 only as button/CTA background (bg-primary), never as small text color */
-    --primary: 84 81% 44%;              /* lime-500 #84CC16 — pickleball yellow-green */
-    --primary-foreground: 224 48% 11%;  /* near-black #0F172A — text on lime buttons */
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 45 96% 65%;               /* amber-300 #FCD34D — paddle face/ball color */
-    --accent-foreground: 224 48% 11%;   /* near-black on amber */
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-    --radius: 0.5rem;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-  }
+    /* === NVIDIA Brand Colors === */
+    --color-green: #76b900;
+    --color-black: #000000;
+    --color-white: #ffffff;
+    --color-green-light: #bff230;
 
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    /* Brand preserved in dark mode: lime-400 desaturated ~15% */
-    --primary: 84 70% 50%;              /* #A3E635 — lime stays visible */
-    --primary-foreground: 224 48% 11%; /* keep dark text on lime */
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 45 90% 60%;               /* amber-300 slightly muted */
-    --accent-foreground: 224 48% 11%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 84 70% 50%;                /* lime ring for focus states */
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    /* === Extended Brand === */
+    --color-orange-400: #df6500;
+    --color-yellow-300: #ef9100;
+    --color-yellow-050: #feeeb2;
+
+    /* === Status / Semantic === */
+    --color-red-500: #e52020;
+    --color-red-800: #650b0b;
+    --color-green-500: #3f8500;
+    --color-blue-700: #0046a4;
+
+    /* === Decorative === */
+    --color-purple-800: #4d1368;
+    --color-purple-100: #f9d4ff;
+    --color-fuchsia-700: #8c1c55;
+
+    /* === Neutral Scale === */
+    --color-gray-300: #a7a7a7;
+    --color-gray-400: #898989;
+    --color-gray-500: #757575;
+    --color-gray-border: #5e5e5e;
+    --color-near-black: #1a1a1a;
+
+    /* === Interactive States === */
+    --color-link-hover: #3860be;
+    --color-button-hover: #1eaedb;
+    --color-button-active: #007fff;
+    --color-button-active-border: #003eff;
+
+    /* === Typography === */
+    --font-family-base: 'NVIDIA-EMEA', Arial, Helvetica, sans-serif;
+    --font-size-display: 1.50rem;   /* 24px */
+    --font-size-body: 1.00rem;      /* 16px */
+    --font-size-link: 0.875rem;     /* 14px */
+    --font-size-caption: 0.75rem;   /* 12px */
+    --font-weight-regular: 400;
+    --font-weight-bold: 700;
+
+    /* === Spacing Scale (base unit: 8px) === */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-button-v: 11px;
+    --space-button-h: 13px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-2xl: 48px;
+    --space-3xl: 64px;
+    --space-4xl: 80px;
+    --space-card-gap: 20px;
+
+    /* === Border Radius === */
+    --radius-micro: 1px;
+    --radius-standard: 2px;
+    --radius-circle: 50%;
+
+    /* === Depth & Elevation === */
+    --shadow-standard: rgba(0, 0, 0, 0.3) 0px 0px 5px 0px;
+    --shadow-hover: rgba(0, 0, 0, 0.5) 0px 0px 8px 0px;
+    --border-accent: 2px solid #76b900;
+    --border-subtle: 1px solid #5e5e5e;
+
+    /* === Layout === */
+    --max-content-width: 1200px;
+
+    /* === Shadcn compatibility shims (for existing Tailwind classes) === */
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 78 100% 36%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 78 100% 36%;
+    --accent-foreground: 0 0% 0%;
+    --destructive: 0 80% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 37%;
+    --input: 0 0% 37%;
+    --ring: 0 0% 0%;
+    --radius: 0.125rem;
   }
+}
+
+/* === NVIDIA-EMEA Font === */
+@font-face {
+  font-family: 'NVIDIA-EMEA';
+  src: local('NVIDIA-EMEA'), local('NVIDIASans'), local('Arial');
+  font-weight: 400 700;
+  font-display: swap;
+}
+
+/* === Base element resets === */
+html {
+  font-family: var(--font-family-base);
+  background-color: var(--color-black);
+  color: var(--color-white);
+}
+
+body {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.50;
+  background-color: var(--color-black);
+  color: var(--color-white);
+  min-height: 100vh;
+}
+
+/* === Typography scale === */
+.nv-display,
+.nv-section-heading,
+.nv-card-title {
+  font-size: var(--font-size-display);   /* 24px */
+  font-weight: var(--font-weight-bold);  /* 700 */
+  line-height: 1.25;
+  letter-spacing: normal;
+}
+
+.nv-subheading {
+  font-size: var(--font-size-display);   /* 24px */
+  font-weight: var(--font-weight-regular); /* 400 */
+  line-height: 1.75;
+  letter-spacing: normal;
+}
+
+.nv-body {
+  font-size: var(--font-size-body);      /* 16px */
+  font-weight: var(--font-weight-regular);
+  line-height: 1.50;
+}
+
+.nv-body-bold {
+  font-size: var(--font-size-body);      /* 16px */
+  font-weight: var(--font-weight-bold);
+  line-height: 1.50;
+}
+
+.nv-button-label {
+  font-size: var(--font-size-body);      /* 16px */
+  font-weight: var(--font-weight-bold);
+  line-height: 1.25;
+  letter-spacing: normal;
+}
+
+.nv-button-compact {
+  font-size: var(--font-size-body);      /* 16px */
+  font-weight: var(--font-weight-bold);
+  line-height: 1.00;
+  letter-spacing: 0.144px;
+}
+
+.nv-link,
+.nv-caption {
+  font-size: var(--font-size-link);      /* 14px */
+  font-weight: var(--font-weight-bold);
+  line-height: 1.43;
+}
+
+.nv-link-uppercase {
+  font-size: var(--font-size-link);      /* 14px */
+  font-weight: var(--font-weight-bold);
+  line-height: 1.43;
+  text-transform: uppercase;
+}
+
+.nv-caption-small {
+  font-size: var(--font-size-caption);   /* 12px */
+  font-weight: var(--font-weight-regular);
+  line-height: 1.25;
+}
+
+.nv-micro-label {
+  font-size: var(--font-size-caption);   /* 12px */
+  font-weight: var(--font-weight-bold);
+  line-height: 1.50;
+  text-transform: uppercase;
+}
+
+.nv-micro {
+  font-size: var(--font-size-caption);   /* 12px */
+  font-weight: var(--font-weight-bold);
+  line-height: 1.00;
+}
+
+/* === Section label (dark bg) === */
+.nv-section-label {
+  font-size: var(--font-size-link);      /* 14px */
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  color: var(--color-green);
+  letter-spacing: normal;
+}
+
+/* === Layout helpers === */
+.nv-container {
+  max-width: var(--max-content-width);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--space-md);
+  padding-right: var(--space-md);
+}
+
+/* === Section alternation === */
+.nv-dark-section {
+  background-color: var(--color-black);
+  color: var(--color-white);
+}
+
+.nv-light-section {
+  background-color: var(--color-white);
+  color: var(--color-black);
+}
+
+/* === Image treatment === */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+.nv-img-screenshot {
+  box-shadow: var(--shadow-standard);
+}
+
+.nv-avatar {
+  border-radius: var(--radius-circle);
+}
+
+/* === Focus rings — WCAG AA, NVIDIA spec === */
+*:focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: 2px;
+  border-radius: var(--radius-standard);
+}
+
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: 2px;
+  border-radius: var(--radius-standard);
 }
 
 @layer base {
@@ -76,132 +274,4 @@
   .text-balance {
     text-wrap: balance;
   }
-
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-
-  .sr-only:focus {
-    position: static;
-    width: auto;
-    height: auto;
-    padding: inherit;
-    margin: inherit;
-    overflow: visible;
-    clip: auto;
-    white-space: normal;
-  }
-
-  /* Focus indicators for accessibility - WCAG 2.1 AA */
-  *:focus-visible {
-    outline: 2px solid hsl(var(--primary));
-    outline-offset: 2px;
-    border-radius: 2px;
-  }
-
-  /* High contrast focus for buttons and interactive elements */
-  button:focus-visible,
-  a:focus-visible,
-  [role="button"]:focus-visible,
-  input:focus-visible,
-  select:focus-visible,
-  textarea:focus-visible {
-    outline: 2px solid hsl(var(--primary));
-    outline-offset: 2px;
-    border-radius: 4px;
-  }
-
-  /* Skip link styling */
-  .skip-link:focus {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 50;
-    padding: 0.5rem 1rem;
-    background: hsl(var(--primary));
-    color: hsl(var(--primary-foreground));
-    text-decoration: none;
-    font-weight: 500;
-  }
-}
-
-@layer utilities {
-  /* Motion system - respects prefers-reduced-motion */
-  @media (prefers-reduced-motion: no-preference) {
-    .animate-in {
-      animation: fade-in 0.3s ease-out;
-    }
-
-    .animate-in-slide-up {
-      animation: slide-up 0.3s ease-out;
-    }
-
-    .animate-in-scale {
-      animation: scale-in 0.2s ease-out;
-    }
-
-    .transition-transform {
-      transition-property: transform;
-      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-      transition-duration: 200ms;
-    }
-
-    .hover\:lift:hover {
-      transform: translateY(-4px);
-    }
-  }
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes scale-in {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes message-enter {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.message-enter {
-  animation: message-enter 0.25s ease-out;
 }
