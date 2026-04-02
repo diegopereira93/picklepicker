@@ -93,20 +93,20 @@ export function Header() {
   const clerkAvailable = useClerkAvailable()
 
   return (
-    <header className="nv-nav sticky top-0 z-50 w-full">
-      <div className="nv-container flex h-14 items-center">
+    <header className="hy-nav sticky top-0 z-50 w-full">
+      <div className="hy-container flex h-14 items-center">
         {/* Logo */}
-        <Link href="/" className="nv-nav-logo mr-6 flex items-center">
-          <span className="nv-nav-brand">PickleIQ</span>
+        <Link href="/" className="hy-nav-logo mr-6 flex items-center">
+          <span className="hy-nav-brand">Pickle<span>IQ</span></span>
         </Link>
 
         {/* Desktop nav */}
-        <nav className="nv-nav-links hidden items-center space-x-6 flex-1">
+        <nav className="hy-nav-links hidden items-center space-x-6 flex-1">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="nv-nav-link"
+              className="hy-nav-link"
             >
               {link.label}
             </Link>
@@ -114,7 +114,7 @@ export function Header() {
         </nav>
 
         {/* Desktop CTA */}
-        <div className="nv-nav-cta hidden items-center space-x-2 ml-auto">
+        <div className="hy-nav-cta hidden items-center space-x-2 ml-auto">
           <Button asChild>
             <Link href="/chat">Encontrar raquete</Link>
           </Button>
@@ -122,18 +122,18 @@ export function Header() {
         </div>
 
         {/* Mobile hamburger */}
-        <div className="nv-nav-mobile flex ml-auto">
+        <div className="hy-nav-mobile flex ml-auto">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" aria-label="Abrir menu">
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="nv-nav-overlay">
+            <SheetContent side="right" className="hy-nav-overlay">
               <SheetHeader>
                 <SheetTitle>
-                  <Link href="/" onClick={() => setOpen(false)} className="nv-nav-brand">
-                    PickleIQ
+                  <Link href="/" onClick={() => setOpen(false)} className="hy-nav-brand">
+                    Pickle<span>IQ</span>
                   </Link>
                 </SheetTitle>
               </SheetHeader>
@@ -142,7 +142,7 @@ export function Header() {
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="nv-nav-link-mobile"
+                    className="hy-nav-link-mobile"
                     onClick={() => setOpen(false)}
                   >
                     {link.label}
