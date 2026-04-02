@@ -39,9 +39,9 @@ PickleIQ resolve ambos os problemas:
 | Camada | Tecnologia |
 |--------|-----------|
 | **Scraping** | Firecrawl API |
-| **Pipeline** | Python + Prefect |
+| **Pipeline** | GitHub Actions (cron) |
 | **Banco Relacional** | PostgreSQL (Supabase em produção) |
-| **Banco Vetorial** | Pinecone (RAG embeddings) |
+| **Banco Vetorial** | pgvector (extensão Supabase) |
 | **LLM** | Claude 3.5 Sonnet (Anthropic API) |
 | **Embeddings** | OpenAI text-embedding-3-small |
 | **Backend API** | Python + FastAPI |
@@ -55,20 +55,40 @@ PickleIQ resolve ambos os problemas:
 
 ## Roadmap de Desenvolvimento
 
-A plataforma é desenvolvida em **8 fases** com duração estimada de **14 semanas** até o lançamento beta:
+A plataforma é desenvolvida em fases organizadas em milestones:
 
-| Fase | Objetivo | Duração | Status |
-|------|----------|---------|--------|
-| **1** | Ambiente dev + primeiro crawler funcional | 2 sem | ✅ Concluído (2026-03-26) |
-| **2** | Pipeline completo + scraping de todos os varejistas | 3 sem | ✅ Concluído (2026-03-26) |
-| **3** | Agente RAG de recomendação com latência < 3s | 2 sem | ✅ Concluído (2026-03-27) |
-| **4** | Frontend: chat, comparador, tracking de afiliados | 2 sem | ✅ Concluído (2026-03-27) |
-| **5** | Autenticação Clerk, SEO, alertas de preço, blog, admin | 2 sem | ✅ Concluído (2026-03-28) |
-| **6** | Deploy produção, beta launch com 50 usuários | 1 sem | ✅ Concluído (2026-03-29) |
-| **7** | E2E testing & validação dos scrapers — 101 testes, 90% cobertura | 1 sem | ✅ Concluído (2026-03-29) |
-| **8** | Navigation UX fixes — catalog cards, hero CTA, header nav | 1 sem | ✅ Concluído (2026-03-29) |
+### v1.3 — Hybrid UI Redesign (2026-04-02)
 
-**Beta launch:** Fases 1-8 concluídas — pronto para Milestone 2
+| Fase | Objetivo | Status |
+|------|----------|--------|
+| **13** | Hybrid Modern Sports Tech design system — typography, colors, components | ✅ Concluído |
+
+### v1.2 — Core Web Vitals Optimization (2026-04-01)
+
+| Fase | Objetivo | Status |
+|------|----------|--------|
+| **11** | Performance optimization — images, fonts, layout stability, accessibility | ✅ Concluído |
+
+### v1.1 — Scraper Validation & E2E Testing (2026-04-01)
+
+| Fase | Objetivo | Status |
+|------|----------|--------|
+| **7** | E2E Testing & Scraper Validation — 101 testes, 94% coverage | ✅ Concluído |
+| **8** | Navigation UX Fixes — /compare 404, quiz gate, mobile nav | ✅ Concluído |
+| **9** | Image Extraction — real product images from Brazil Store | ✅ Concluído |
+
+### v1.0 — MVP (2026-03-28)
+
+| Fase | Objetivo | Status |
+|------|----------|--------|
+| **1** | Ambiente dev + primeiro crawler funcional | ✅ Concluído |
+| **2** | Pipeline completo + scraping de todos os varejistas | ✅ Concluído |
+| **3** | Agente RAG de recomendação com latência < 3s | ✅ Concluído |
+| **4** | Frontend: chat, comparador, tracking de afiliados | ✅ Concluído |
+| **5** | Autenticação Clerk, SEO, alertas de preço, blog, admin | ✅ Concluído |
+| **6** | Deploy produção, beta launch com 50 usuários | ✅ Concluído |
+
+**Status atual:** v1.3 Hybrid UI Redesign completo. Ver [ROADMAP.md](./.planning/ROADMAP.md) para detalhes.
 
 ---
 
