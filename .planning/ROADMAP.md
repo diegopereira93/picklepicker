@@ -47,7 +47,18 @@
 
 ### 📋 v1.3 — Next Milestone (Planning)
 
-*Run `/gsd:new-milestone` to start planning*
+#### Phase 13: NVIDIA UI Redesign
+
+**Goal:** Restyle the PickleIQ frontend to match the NVIDIA-inspired design system defined in `frontend/nvidia/UI-SPEC.md` — custom CSS only, NVIDIA color palette, NVIDIA-EMEA typography, green-border CTA buttons, dark/light alternating sections, and responsive grid.
+
+**Requirements:** UI-SPEC.md (design contract)
+
+**Plans:**
+1/4 plans executed
+- [x] 13-01-PLAN.md — Design Tokens & Typography Foundation (NV-01–NV-04, NV-11)
+- [ ] 13-02-PLAN.md — Button & Link Components (NV-05, NV-08)
+- [ ] 13-03-PLAN.md — Navigation & Layout Shell (NV-07, NV-09, NV-10)
+- [ ] 13-04-PLAN.md — Pages & Product Cards (NV-06, NV-09, NV-10, NV-12)
 
 ## Progress
 
