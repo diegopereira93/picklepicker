@@ -100,6 +100,16 @@
 }
 
 /* === NVIDIA-EMEA Font === */
+/*
+ * NVIDIA-EMEA is a proprietary font. This implementation uses system fallbacks
+ * (Arial, Helvetica, sans-serif) for users without the font installed.
+ *
+ * If you have a license to use NVIDIA-EMEA, host the font files and update
+ * the @font-face below with the correct URLs.
+ *
+ * Alternative: Consider using a similar industrial sans-serif like "IBM Plex Sans"
+ * or "Space Grotesk" if you need a web font with similar characteristics.
+ */
 @font-face {
   font-family: 'NVIDIA-EMEA';
   src: local('NVIDIA-EMEA'), local('NVIDIASans'), local('Arial');
