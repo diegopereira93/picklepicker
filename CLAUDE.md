@@ -32,3 +32,19 @@ Use the `/browse` skill from gstack for all web browsing. Never use `mcp__claude
 - `/guard` — Guard and protect
 - `/unfreeze` — Unfreeze changes
 - `/gstack-upgrade` — Update gstack to latest version
+
+## Design System
+
+Always read DESIGN.md before making any visual or UI decisions.
+All font choices, colors, spacing, and aesthetic direction are defined there.
+Do not deviate without explicit user approval.
+In QA mode, flag any code that doesn't match DESIGN.md.
+
+**Key decisions (DESIGN.md v2.0):**
+- Hybrid Modern Sports Tech aesthetic (sport energy + data credibility)
+- Lime (#84CC16) on dark backgrounds only — never on white
+- Green (#76b900) for data elements: charts, tables, section labels
+- JetBrains Mono for specs/tables — signals "we take data seriously"
+- 2px border radius everywhere — sharp corners = precision
+- Alternating dark/light sections
+- Section labels: 14px, weight 700, uppercase, green accent
