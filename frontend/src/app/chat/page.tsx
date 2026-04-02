@@ -3,8 +3,27 @@
 import { useState, useEffect } from 'react'
 import type { UserProfile } from '@/types/paddle'
 import { getProfile, saveProfile } from '@/lib/profile'
-import { QuizFlow } from '@/components/quiz/quiz-flow'
-import { ChatWidget } from '@/components/chat/chat-widget'
+import dynamic from 'next/dynamic'
+
+// Code-split heavy components - not needed for initial page load
+const QuizFlow = dynamic(() => import('@/components/quiz/quiz-flow'), {
+  loading: () => (
+    <div className="animate-pulse space-y-4">
+      <div className="h-4 bg-muted rounded w-3/4"></div>
+      <div className="h-10 bg-muted rounded"></div>
+    </div>
+  ),
+})
+
+const ChatWidget = dynamic(() => import('@/components/chat/chat-widget'), {
+  loading: () => (
+    <div className="animate-pulse space-y-4 p-4">
+      <div className="h-12 bg-muted rounded"></div>
+      <div className="h-12 bg-muted rounded"></div>
+      <div className="h-12 bg-muted rounded"></div>
+    </div>
+  ),
+})
 
 export default function ChatPage() {
   const [profile, setProfile] = useState<UserProfile | null>(null)

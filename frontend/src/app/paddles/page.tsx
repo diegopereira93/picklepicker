@@ -1,8 +1,12 @@
 import { Metadata } from 'next'
+import { Suspense } from 'react'
+import Image from 'next/image'
 import { fetchPaddlesList } from '@/lib/seo'
+import { PaddleGridSkeleton } from '@/components/paddle-card-skeleton'
 
-// ISR: regenerate every minute during development
-export const revalidate = 60
+// Force dynamic rendering to avoid build-time data fetching
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -26,7 +30,7 @@ export default async function PaddlesPage() {
   console.log('[PaddlesPage] paddles count:', paddles.length)
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="max-w-6xl mx-auto px-4 py-8 min-h-[600px]">
       <nav aria-label="Breadcrumb" className="text-sm text-gray-500 mb-4">
         <ol className="flex gap-1">
           <li><a href="/">Home</a></li>
@@ -35,10 +39,11 @@ export default async function PaddlesPage() {
         </ol>
       </nav>
       <h1 className="text-3xl font-bold mb-8">Catálogo de Raquetes</h1>
+      <Suspense fallback={<PaddleGridSkeleton count={6} />}>
       {paddles.length === 0 ? (
         <p className="text-gray-500">Nenhuma raquete encontrada.</p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 min-h-[800px]">
           {paddles.map((paddle) => (
             <article
               key={paddle.id}
@@ -50,10 +55,13 @@ export default async function PaddlesPage() {
                 data-testid="paddle-card-link"
               >
                 {paddle.image_url && (
-                  <img
+                  <Image
                     src={paddle.image_url}
-                    alt={paddle.name}
+                    alt={`${paddle.brand} ${paddle.name} paddle`}
+                    width={320}
+                    height={192}
                     className="w-full h-48 object-contain mb-3"
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                   />
                 )}
                 <h2 className="font-semibold text-lg hover:text-blue-600">
@@ -95,6 +103,7 @@ export default async function PaddlesPage() {
           ))}
         </div>
       )}
+      </Suspense>
     </div>
   )
 }

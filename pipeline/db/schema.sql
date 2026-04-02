@@ -15,7 +15,8 @@ CREATE TABLE paddles (
     manufacturer_sku TEXT,
     images          TEXT[],
     created_at      TIMESTAMPTZ DEFAULT NOW(),
-    updated_at      TIMESTAMPTZ DEFAULT NOW()
+    updated_at      TIMESTAMPTZ DEFAULT NOW(),
+    CONSTRAINT unique_paddle_name UNIQUE (name)
 );
 
 -- ============================================================

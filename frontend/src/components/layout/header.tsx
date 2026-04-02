@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
+import { useState, createContext, useContext, ReactNode } from "react"
 import { Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -11,16 +11,88 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
-import { SignInButton, UserButton, useAuth } from "@clerk/nextjs"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/paddles", label: "Catalogo" },
 ]
 
+// Check if Clerk is available by checking for the provider context
+const ClerkAvailableContext = createContext<boolean>(false)
+
+export function ClerkAvailableProvider({
+  available,
+  children
+}: {
+  available: boolean
+  children: ReactNode
+}) {
+  return (
+    <ClerkAvailableContext.Provider value={available}>
+      {children}
+    </ClerkAvailableContext.Provider>
+  )
+}
+
+function useClerkAvailable() {
+  return useContext(ClerkAvailableContext)
+}
+
+// Auth buttons that only render if Clerk is available
+function AuthButtons() {
+  const clerkAvailable = useClerkAvailable()
+
+  if (!clerkAvailable) {
+    return null
+  }
+
+  // Dynamically import Clerk components only when available
+  const { SignInButton, UserButton, useAuth } = require("@clerk/nextjs")
+  const { isSignedIn } = useAuth()
+
+  return (
+    <>
+      {!isSignedIn && (
+        <SignInButton mode="modal">
+          <Button variant="outline" size="sm">Entrar</Button>
+        </SignInButton>
+      )}
+      {isSignedIn && <UserButton afterSignOutUrl="/" />}
+    </>
+  )
+}
+
+// Mobile auth buttons
+function MobileAuth() {
+  const clerkAvailable = useClerkAvailable()
+
+  if (!clerkAvailable) {
+    return null
+  }
+
+  const { SignInButton, UserButton, useAuth } = require("@clerk/nextjs")
+  const { isSignedIn } = useAuth()
+
+  return (
+    <>
+      {!isSignedIn && (
+        <SignInButton mode="modal">
+          <Button variant="outline" className="mt-2 w-full">Entrar</Button>
+        </SignInButton>
+      )}
+      {isSignedIn && (
+        <div className="mt-2">
+          <UserButton afterSignOutUrl="/" />
+        </div>
+      )}
+    </>
+  )
+}
+
 export function Header() {
   const [open, setOpen] = useState(false)
-  const { isSignedIn } = useAuth()
+  const clerkAvailable = useClerkAvailable()
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -45,17 +117,11 @@ export function Header() {
 
         {/* Desktop CTA */}
         <div className="hidden md:flex items-center space-x-2 ml-auto">
+          <ThemeToggle />
           <Button asChild size="sm">
             <Link href="/chat">Encontrar raquete</Link>
           </Button>
-          {!isSignedIn && (
-            <SignInButton mode="modal">
-              <Button variant="outline" size="sm">Entrar</Button>
-            </SignInButton>
-          )}
-          {isSignedIn && (
-            <UserButton afterSignOutUrl="/" />
-          )}
+          {clerkAvailable && <AuthButtons />}
         </div>
 
         {/* Mobile hamburger */}
@@ -85,16 +151,7 @@ export function Header() {
                     {link.label}
                   </Link>
                 ))}
-                {!isSignedIn && (
-                  <SignInButton mode="modal">
-                    <Button variant="outline" className="mt-2 w-full">Entrar</Button>
-                  </SignInButton>
-                )}
-                {isSignedIn && (
-                  <div className="mt-2">
-                    <UserButton afterSignOutUrl="/" />
-                  </div>
-                )}
+                {clerkAvailable && <MobileAuth />}
               </nav>
             </SheetContent>
           </Sheet>
