@@ -1,13 +1,13 @@
 import { Metadata } from 'next'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
-import dynamic from 'next/dynamic'
+import nextDynamic from 'next/dynamic'
 import { generateProductMetadata, fetchProductData } from '@/lib/seo'
 import { ProductSchema } from '@/components/schema/product-schema'
 import { FTCDisclosure } from '@/components/ftc-disclosure'
 
 // Price chart imported with ssr:false to prevent Recharts hydration mismatch
-const PriceHistoryChart = dynamic(
+const PriceHistoryChart = nextDynamic(
   () => import('@/components/price-history-chart').catch(() => ({ default: () => null })),
   { ssr: false }
 )
@@ -24,8 +24,9 @@ export async function generateMetadata({
   return generateProductMetadata(params.brand, params['model-slug'], paddle)
 }
 
-// SSR: always fresh — no caching
-export const revalidate = false
+// Force dynamic rendering to avoid build-time data fetching
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export default async function ProductPage({ params }: { params: PageParams }) {
   const paddle = await fetchProductData(params.brand, params['model-slug'])
