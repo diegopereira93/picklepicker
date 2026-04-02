@@ -47,18 +47,22 @@
 
 ### 📋 v1.3 — Next Milestone (Planning)
 
-#### Phase 13: NVIDIA UI Redesign
+#### Phase 13: Hybrid UI Redesign
 
-**Goal:** Restyle the PickleIQ frontend to match the NVIDIA-inspired design system defined in `frontend/nvidia/UI-SPEC.md` — custom CSS only, NVIDIA color palette, NVIDIA-EMEA typography, green-border CTA buttons, dark/light alternating sections, and responsive grid.
+**Goal:** Restyle the PickleIQ frontend with the Hybrid Modern Sports Tech design system — lime (#84CC16) accent on dark, green (#76b900) for data, JetBrains Mono for specs, 2px border radius, dark/light alternation, responsive grid.
 
-**Requirements:** UI-SPEC.md (design contract)
+**Requirements:** HY-01 through HY-12
 
 **Plans:**
-1/4 plans executed
-- [x] 13-01-PLAN.md — Design Tokens & Typography Foundation (NV-01–NV-04, NV-11)
-- [ ] 13-02-PLAN.md — Button & Link Components (NV-05, NV-08)
-- [ ] 13-03-PLAN.md — Navigation & Layout Shell (NV-07, NV-09, NV-10)
-- [ ] 13-04-PLAN.md — Pages & Product Cards (NV-06, NV-09, NV-10, NV-12)
+1/8 plans executed (4 gap closure plans added)
+- [x] 13-01-PLAN.md — Design Tokens & Typography Foundation (HY-01–HY-04, HY-11)
+- [ ] 13-02-PLAN.md — Button & Link Components (HY-05, HY-07)
+- [ ] 13-03-PLAN.md — Navigation & Layout Shell (HY-06, HY-08, HY-09)
+- [ ] 13-04-PLAN.md — Pages & Product Cards (HY-05, HY-08, HY-09, HY-12)
+- [ ] 13-05-PLAN.md — Gap Closure: Typography System (HY-01) — Google Fonts CDN
+- [ ] 13-06-PLAN.md — Gap Closure: Button Border Color (HY-04) — Lime borders
+- [ ] 13-07-PLAN.md — Gap Closure: Navigation Logo Accent (HY-06, HY-11) — IQ highlight + header classes
+- [ ] 13-08-PLAN.md — Gap Closure: Class Migration (HY-11) — Footer, pages, card components
 
 ## Progress
 
