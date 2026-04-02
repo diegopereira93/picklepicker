@@ -11,17 +11,60 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
-import { SignInButton, UserButton, useAuth } from "@clerk/nextjs"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { SignInButton, UserButton, useAuth } from "@clerk/nextjs"
 
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/paddles", label: "Catalogo" },
 ]
 
+// Auth buttons component that safely handles Clerk
+function AuthButtons() {
+  try {
+    const { isSignedIn } = useAuth()
+    return (
+      <>
+        {!isSignedIn && (
+          <SignInButton mode="modal">
+            <Button variant="outline" size="sm">Entrar</Button>
+          </SignInButton>
+        )}
+        {isSignedIn && <UserButton afterSignOutUrl="/" />}
+      </>
+    )
+  } catch {
+    // Clerk not available (CI environment without keys)
+    return null
+  }
+}
+
+// Mobile auth component
+function MobileAuth() {
+  try {
+    const { isSignedIn } = useAuth()
+    return (
+      <>
+        {!isSignedIn && (
+          <SignInButton mode="modal">
+            <Button variant="outline" className="mt-2 w-full">Entrar</Button>
+          </SignInButton>
+        )}
+        {isSignedIn && (
+          <div className="mt-2">
+            <UserButton afterSignOutUrl="/" />
+          </div>
+        )}
+      </>
+    )
+  } catch {
+    // Clerk not available (CI environment without keys)
+    return null
+  }
+}
+
 export function Header() {
   const [open, setOpen] = useState(false)
-  const { isSignedIn } = useAuth()
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -50,14 +93,7 @@ export function Header() {
           <Button asChild size="sm">
             <Link href="/chat">Encontrar raquete</Link>
           </Button>
-          {!isSignedIn && (
-            <SignInButton mode="modal">
-              <Button variant="outline" size="sm">Entrar</Button>
-            </SignInButton>
-          )}
-          {isSignedIn && (
-            <UserButton afterSignOutUrl="/" />
-          )}
+          <AuthButtons />
         </div>
 
         {/* Mobile hamburger */}
@@ -87,16 +123,7 @@ export function Header() {
                     {link.label}
                   </Link>
                 ))}
-                {!isSignedIn && (
-                  <SignInButton mode="modal">
-                    <Button variant="outline" className="mt-2 w-full">Entrar</Button>
-                  </SignInButton>
-                )}
-                {isSignedIn && (
-                  <div className="mt-2">
-                    <UserButton afterSignOutUrl="/" />
-                  </div>
-                )}
+                <MobileAuth />
               </nav>
             </SheetContent>
           </Sheet>
