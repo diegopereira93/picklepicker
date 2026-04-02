@@ -4,16 +4,25 @@
 
 @layer base {
   :root {
-    /* === NVIDIA Brand Colors === */
-    --color-green: #76b900;
+    /* === Sport Energy Colors === */
+    --sport-primary: #84CC16;        /* lime-500: primary actions on dark */
+    --sport-secondary: #FCD34D;      /* amber-300: secondary highlights */
+
+    /* === Data Credibility Colors === */
+    --data-green: #76b900;           /* green for charts, tables, section labels */
+    --data-green-light: #bff230;     /* hover state */
+
+    /* === Base Palette === */
+    --color-green: #76b900;          /* alias for compatibility */
     --color-black: #000000;
     --color-white: #ffffff;
-    --color-green-light: #bff230;
+    --color-near-black: #1a1a1a;
 
-    /* === Extended Brand === */
-    --color-orange-400: #df6500;
-    --color-yellow-300: #ef9100;
-    --color-yellow-050: #feeeb2;
+    /* === Neutral Scale === */
+    --color-gray-300: #a7a7a7;
+    --color-gray-400: #898989;
+    --color-gray-500: #757575;
+    --color-gray-border: #5e5e5e;
 
     /* === Status / Semantic === */
     --color-red-500: #e52020;
@@ -21,61 +30,62 @@
     --color-green-500: #3f8500;
     --color-blue-700: #0046a4;
 
-    /* === Decorative === */
-    --color-purple-800: #4d1368;
-    --color-purple-100: #f9d4ff;
-    --color-fuchsia-700: #8c1c55;
-
-    /* === Neutral Scale === */
-    --color-gray-300: #a7a7a7;
-    --color-gray-400: #898989;
-    --color-gray-500: #757575;
-    --color-gray-border: #5e5e5e;
-    --color-near-black: #1a1a1a;
-
     /* === Interactive States === */
     --color-link-hover: #3860be;
     --color-button-hover: #1eaedb;
     --color-button-active: #007fff;
-    --color-button-active-border: #003eff;
 
-    /* === Typography === */
-    --font-family-base: 'NVIDIA-EMEA', Arial, Helvetica, sans-serif;
-    --font-size-display: 1.50rem;   /* 24px */
-    --font-size-body: 1.00rem;      /* 16px */
-    --font-size-link: 0.875rem;     /* 14px */
-    --font-size-caption: 0.75rem;   /* 12px */
+    /* === Typography Scale === */
+    --font-display: 'Instrument Sans', 'Inter', system-ui, sans-serif;
+    --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-data: 'JetBrains Mono', 'Fira Code', monospace;
+
+    /* === Font Sizes === */
+    --font-size-hero: 4rem;          /* 64px - H1 hero */
+    --font-size-h2: 1.75rem;         /* 28px - section heading */
+    --font-size-h3: 1.25rem;         /* 20px - card title */
+    --font-size-body: 1rem;          /* 16px - body */
+    --font-size-link: 0.875rem;     /* 14px - navigation, labels */
+    --font-size-caption: 0.75rem;   /* 12px - captions */
+
+    /* === Font Weights === */
     --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
     --font-weight-bold: 700;
 
+    /* === Line Heights === */
+    --line-height-tight: 1.1;
+    --line-height-snug: 1.25;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.75;
+
     /* === Spacing Scale (base unit: 8px) === */
-    --space-xs: 4px;
-    --space-sm: 8px;
-    --space-button-v: 11px;
-    --space-button-h: 13px;
-    --space-md: 16px;
-    --space-lg: 24px;
-    --space-xl: 32px;
-    --space-2xl: 48px;
-    --space-3xl: 64px;
-    --space-4xl: 80px;
+    --space-2xs: 4px;
+    --space-xs: 8px;
+    --space-sm: 16px;
+    --space-md: 24px;
+    --space-lg: 32px;
+    --space-xl: 48px;
+    --space-2xl: 64px;
+    --space-3xl: 80px;
     --space-card-gap: 20px;
 
     /* === Border Radius === */
-    --radius-micro: 1px;
-    --radius-standard: 2px;
+    --radius-sharp: 2px;
+    --radius-card: 4px;
     --radius-circle: 50%;
 
     /* === Depth & Elevation === */
     --shadow-standard: rgba(0, 0, 0, 0.3) 0px 0px 5px 0px;
-    --shadow-hover: rgba(0, 0, 0, 0.5) 0px 0px 8px 0px;
-    --border-accent: 2px solid #76b900;
-    --border-subtle: 1px solid #5e5e5e;
+    --shadow-hover: rgba(0, 0, 0, 0.5) 0px 4px 12px 0px;
+    --border-accent: 2px solid var(--data-green);
+    --border-sport: 2px solid var(--sport-primary);
 
     /* === Layout === */
     --max-content-width: 1200px;
 
-    /* === Shadcn compatibility shims (for existing Tailwind classes) === */
+    /* === Shadcn compatibility shims === */
     --background: 0 0% 0%;
     --foreground: 0 0% 100%;
     --card: 0 0% 10%;
@@ -99,144 +109,150 @@
   }
 }
 
-/* === NVIDIA-EMEA Font === */
-/*
- * NVIDIA-EMEA is a proprietary font. This implementation uses system fallbacks
- * (Arial, Helvetica, sans-serif) for users without the font installed.
- *
- * If you have a license to use NVIDIA-EMEA, host the font files and update
- * the @font-face below with the correct URLs.
- *
- * Alternative: Consider using a similar industrial sans-serif like "IBM Plex Sans"
- * or "Space Grotesk" if you need a web font with similar characteristics.
- */
-@font-face {
-  font-family: 'NVIDIA-EMEA';
-  src: local('NVIDIA-EMEA'), local('NVIDIASans'), local('Arial');
-  font-weight: 400 700;
-  font-display: swap;
-}
+/* === Google Fonts: Instrument Sans, Inter, JetBrains Mono === */
+/* Loaded via layout.tsx <link> tags for Next.js 14 optimization */
 
 /* === Base element resets === */
 html {
-  font-family: var(--font-family-base);
+  font-family: var(--font-body);
   background-color: var(--color-black);
   color: var(--color-white);
 }
 
 body {
-  font-family: var(--font-family-base);
+  font-family: var(--font-body);
   font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);
-  line-height: 1.50;
+  line-height: var(--line-height-normal);
   background-color: var(--color-black);
   color: var(--color-white);
   min-height: 100vh;
 }
 
-/* === Typography scale === */
-.nv-display,
-.nv-section-heading,
-.nv-card-title {
-  font-size: var(--font-size-display);   /* 24px */
-  font-weight: var(--font-weight-bold);  /* 700 */
-  line-height: 1.25;
-  letter-spacing: normal;
+/* === Typography Scale === */
+
+/* Hero / Display */
+.hy-display,
+.hy-hero {
+  font-family: var(--font-display);
+  font-size: var(--font-size-hero);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: -0.02em;
 }
 
-.nv-subheading {
-  font-size: var(--font-size-display);   /* 24px */
-  font-weight: var(--font-weight-regular); /* 400 */
-  line-height: 1.75;
-  letter-spacing: normal;
+@media (max-width: 768px) {
+  .hy-display,
+  .hy-hero {
+    font-size: 2.5rem; /* 40px on mobile */
+  }
 }
 
-.nv-body {
-  font-size: var(--font-size-body);      /* 16px */
+/* Section Heading */
+.hy-heading {
+  font-family: var(--font-display);
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-snug);
+}
+
+/* Card Title */
+.hy-card-title {
+  font-family: var(--font-display);
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.3;
+}
+
+/* Body */
+.hy-body {
+  font-family: var(--font-body);
+  font-size: var(--font-size-body);
   font-weight: var(--font-weight-regular);
-  line-height: 1.50;
+  line-height: var(--line-height-normal);
 }
 
-.nv-body-bold {
-  font-size: var(--font-size-body);      /* 16px */
+/* Body Bold */
+.hy-body-bold {
+  font-family: var(--font-body);
+  font-size: var(--font-size-body);
   font-weight: var(--font-weight-bold);
-  line-height: 1.50;
+  line-height: var(--line-height-normal);
 }
 
-.nv-button-label {
-  font-size: var(--font-size-body);      /* 16px */
-  font-weight: var(--font-weight-bold);
-  line-height: 1.25;
-  letter-spacing: normal;
+/* Data / Specs (JetBrains Mono) */
+.hy-data {
+  font-family: var(--font-data);
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-regular);
+  line-height: 1.4;
 }
 
-.nv-button-compact {
-  font-size: var(--font-size-body);      /* 16px */
+/* Navigation */
+.hy-nav-link {
+  font-family: var(--font-body);
+  font-size: var(--font-size-link);
   font-weight: var(--font-weight-bold);
-  line-height: 1.00;
-  letter-spacing: 0.144px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-.nv-link,
-.nv-caption {
-  font-size: var(--font-size-link);      /* 14px */
+/* Section Label (uppercase, green accent) */
+.hy-section-label,
+.hy-label {
+  font-family: var(--font-body);
+  font-size: var(--font-size-link);
   font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--data-green);
+}
+
+.hy-light-section .hy-section-label,
+.hy-light-section .hy-label {
+  color: var(--sport-primary);
+}
+
+/* Caption */
+.hy-caption {
+  font-family: var(--font-body);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-regular);
   line-height: 1.43;
 }
 
-.nv-link-uppercase {
-  font-size: var(--font-size-link);      /* 14px */
-  font-weight: var(--font-weight-bold);
-  line-height: 1.43;
-  text-transform: uppercase;
-}
-
-.nv-caption-small {
-  font-size: var(--font-size-caption);   /* 12px */
-  font-weight: var(--font-weight-regular);
-  line-height: 1.25;
-}
-
-.nv-micro-label {
-  font-size: var(--font-size-caption);   /* 12px */
-  font-weight: var(--font-weight-bold);
-  line-height: 1.50;
-  text-transform: uppercase;
-}
-
-.nv-micro {
-  font-size: var(--font-size-caption);   /* 12px */
-  font-weight: var(--font-weight-bold);
-  line-height: 1.00;
-}
-
-/* === Section label (dark bg) === */
-.nv-section-label {
-  font-size: var(--font-size-link);      /* 14px */
+/* Micro Label */
+.hy-micro {
+  font-family: var(--font-body);
+  font-size: var(--font-size-caption);
   font-weight: var(--font-weight-bold);
   text-transform: uppercase;
-  color: var(--color-green);
   letter-spacing: normal;
 }
 
 /* === Layout helpers === */
-.nv-container {
+.hy-container {
   max-width: var(--max-content-width);
   margin-left: auto;
   margin-right: auto;
-  padding-left: var(--space-md);
-  padding-right: var(--space-md);
+  padding-left: var(--space-sm);
+  padding-right: var(--space-sm);
 }
 
 /* === Section alternation === */
-.nv-dark-section {
+.hy-dark-section {
   background-color: var(--color-black);
   color: var(--color-white);
 }
 
-.nv-light-section {
+.hy-light-section {
   background-color: var(--color-white);
-  color: var(--color-black);
+  color: var(--color-near-black);
+}
+
+.hy-near-black-section {
+  background-color: var(--color-near-black);
+  color: var(--color-white);
 }
 
 /* === Image treatment === */
@@ -245,19 +261,19 @@ img {
   height: auto;
 }
 
-.nv-img-screenshot {
+.hy-screenshot {
   box-shadow: var(--shadow-standard);
 }
 
-.nv-avatar {
+.hy-avatar {
   border-radius: var(--radius-circle);
 }
 
-/* === Focus rings — WCAG AA, NVIDIA spec === */
+/* === Focus rings — WCAG AA === */
 *:focus-visible {
-  outline: 2px solid #000000;
+  outline: 2px solid var(--color-black);
   outline-offset: 2px;
-  border-radius: var(--radius-standard);
+  border-radius: var(--radius-sharp);
 }
 
 button:focus-visible,
@@ -266,62 +282,50 @@ a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid #000000;
+  outline: 2px solid var(--color-black);
   outline-offset: 2px;
-  border-radius: var(--radius-standard);
+  border-radius: var(--radius-sharp);
 }
 
-/* === Global link styles (NV-08) === */
+/* === Global link styles === */
 
-/* Links on dark backgrounds (#000000 / #1a1a1a sections) */
-.nv-dark-section a,
-a.nv-link-dark {
-  color: #ffffff;
+/* Links on dark backgrounds */
+.hy-dark-section a,
+a.hy-link-dark {
+  color: var(--color-white);
   text-decoration: none;
 }
 
-.nv-dark-section a:hover,
-a.nv-link-dark:hover {
-  color: #3860be;
+.hy-dark-section a:hover,
+a.hy-link-dark:hover {
+  color: var(--color-link-hover);
   text-decoration: none;
 }
 
-/* Links on light backgrounds (#ffffff sections) */
-.nv-light-section a,
-a.nv-link-light {
-  color: #000000;
+/* Links on light backgrounds */
+.hy-light-section a,
+a.hy-link-light {
+  color: var(--color-near-black);
   text-decoration: underline;
-  text-decoration-color: #76b900;
+  text-decoration-color: var(--data-green);
   text-decoration-thickness: 2px;
   text-underline-offset: 2px;
 }
 
-.nv-light-section a:hover,
-a.nv-link-light:hover {
-  color: #3860be;
+.hy-light-section a:hover,
+a.hy-link-light:hover {
+  color: var(--color-link-hover);
   text-decoration: none;
 }
 
-/* Green links (standalone accent links) */
-a.nv-link-green {
-  color: #76b900;
+/* Sport accent links (lime on dark) */
+a.hy-link-sport {
+  color: var(--sport-primary);
   text-decoration: none;
 }
 
-a.nv-link-green:hover {
-  color: #3860be;
-  text-decoration: none;
-}
-
-/* Muted links */
-a.nv-link-muted {
-  color: #666666;
-  text-decoration: none;
-}
-
-a.nv-link-muted:hover {
-  color: #3860be;
-  text-decoration: none;
+a.hy-link-sport:hover {
+  color: var(--sport-secondary);
 }
 
 @layer base {
@@ -333,175 +337,218 @@ a.nv-link-muted:hover {
   }
 }
 
-/* === Navigation (NV-07) === */
-.nv-nav {
-  background-color: #000000;
-  border-bottom: 1px solid #5e5e5e;
+/* === Navigation === */
+.hy-nav {
+  background-color: var(--color-black);
+  border-bottom: 1px solid var(--color-gray-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
-.nv-nav-brand {
+.hy-nav-brand {
+  font-family: var(--font-display);
   font-size: 1.25rem;
-  font-weight: 700;
-  color: #ffffff;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white);
   text-decoration: none;
 }
 
-.nv-nav-links {
-  display: none; /* shown via media query below */
+.hy-nav-brand span {
+  color: var(--sport-primary);
 }
 
-.nv-nav-link {
-  font-size: 0.875rem;     /* 14px */
-  font-weight: 700;
+.hy-nav-links {
+  display: none;
+}
+
+.hy-nav-link {
+  font-family: var(--font-body);
+  font-size: var(--font-size-link);
+  font-weight: var(--font-weight-bold);
   text-transform: uppercase;
-  color: #ffffff;
+  color: var(--color-white);
   text-decoration: none;
-  letter-spacing: normal;
-  transition: color 0.15s ease;
+  letter-spacing: 0.05em;
+  transition: color 150ms ease;
 }
 
-.nv-nav-link:hover {
-  color: #3860be;
+.hy-nav-link:hover {
+  color: var(--color-link-hover);
 }
 
-.nv-nav-link:focus-visible {
-  outline: 2px solid #000000;
+.hy-nav-link:focus-visible {
+  outline: 2px solid var(--color-black);
   outline-offset: 2px;
 }
 
-.nv-nav-cta {
-  display: none; /* shown via media query below */
+.hy-nav-cta {
+  display: none;
 }
 
-.nv-nav-mobile {
-  display: flex; /* always visible on mobile */
+.hy-nav-cta-button {
+  background: transparent;
+  border: 2px solid var(--sport-primary);
+  color: var(--color-white);
+  padding: 11px 13px;
+  font-size: var(--font-size-link);
+  font-weight: var(--font-weight-bold);
+  border-radius: var(--radius-sharp);
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
 }
 
-.nv-nav-link-mobile {
-  font-size: 1.00rem;
-  font-weight: 700;
+.hy-nav-cta-button:hover {
+  background: var(--color-button-hover);
+  border-color: var(--color-button-hover);
+  color: var(--color-white);
+}
+
+.hy-nav-mobile {
+  display: flex;
+}
+
+.hy-nav-link-mobile {
+  font-size: 1rem;
+  font-weight: var(--font-weight-bold);
   text-transform: uppercase;
-  color: #ffffff;
+  color: var(--color-white);
   text-decoration: none;
   padding: 8px 0;
   display: block;
-  transition: color 0.15s ease;
+  transition: color 150ms ease;
 }
 
-.nv-nav-link-mobile:hover {
-  color: #3860be;
+.hy-nav-link-mobile:hover {
+  color: var(--color-link-hover);
 }
 
 /* SheetContent overlay for mobile nav */
-.nv-nav-overlay {
-  background-color: #000000 !important;
-  color: #ffffff;
-  border-left: 1px solid #5e5e5e;
+.hy-nav-overlay {
+  background-color: var(--color-black) !important;
+  color: var(--color-white);
+  border-left: 1px solid var(--color-gray-border);
 }
 
-/* === Footer (NV-09) === */
-.nv-footer {
-  background-color: #000000;
-  border-top: 1px solid #5e5e5e;
-  padding-top: 48px;
-  padding-bottom: 48px;
+/* === Footer === */
+.hy-footer {
+  background-color: var(--color-black);
+  border-top: 1px solid var(--color-gray-border);
+  padding-top: var(--space-xl);
+  padding-bottom: var(--space-xl);
 }
 
-.nv-footer-grid {
+.hy-footer-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 32px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-lg);
 }
 
-.nv-footer .nv-caption-small,
-.nv-footer p,
-.nv-footer span {
-  color: #757575;
+.hy-footer h4 {
+  font-family: var(--font-display);
+  font-size: var(--font-size-link);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-white);
+  margin-bottom: var(--space-xs);
 }
 
-/* === Section padding scale (NV-09) === */
-.nv-section {
-  padding-top: 64px;
-  padding-bottom: 64px;
+.hy-footer a {
+  color: var(--color-gray-500);
+  text-decoration: none;
+  display: block;
+  margin-bottom: 8px;
 }
 
-.nv-section-hero {
-  padding-top: 80px;
-  padding-bottom: 80px;
+.hy-footer a:hover {
+  color: var(--color-link-hover);
 }
 
-/* === Responsive breakpoints (NV-10) === */
+/* === Section padding scale === */
+.hy-section {
+  padding-top: var(--space-2xl);
+  padding-bottom: var(--space-2xl);
+}
 
-/* > 1350px — Large desktop: max content width with margins */
+.hy-section-hero {
+  padding-top: var(--space-3xl);
+  padding-bottom: var(--space-3xl);
+}
+
+/* === Responsive breakpoints === */
+
+/* > 1350px — Large desktop */
 @media (min-width: 1350px) {
-  .nv-container {
-    padding-left: 48px;
-    padding-right: 48px;
+  .hy-container {
+    padding-left: var(--space-lg);
+    padding-right: var(--space-lg);
   }
 }
 
 /* 1024px–1350px — Desktop: show full nav */
 @media (min-width: 1024px) {
-  .nv-nav-links {
+  .hy-nav-links {
+    display: flex;
+    gap: var(--space-lg);
+  }
+
+  .hy-nav-cta {
     display: flex;
   }
 
-  .nv-nav-cta {
-    display: flex;
-  }
-
-  .nv-nav-mobile {
+  .hy-nav-mobile {
     display: none;
   }
 }
 
 /* 768px–1024px — Tablet: full card grids, 2-col footer */
 @media (max-width: 1024px) {
-  .nv-section {
-    padding-top: 48px;
-    padding-bottom: 48px;
+  .hy-section {
+    padding-top: var(--space-xl);
+    padding-bottom: var(--space-xl);
   }
 
-  .nv-section-hero {
-    padding-top: 64px;
-    padding-bottom: 64px;
+  .hy-section-hero {
+    padding-top: var(--space-2xl);
+    padding-bottom: var(--space-2xl);
   }
 
-  .nv-footer-grid {
+  .hy-footer-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 /* 600px–768px — Tablet small: 2-col grids */
 @media (max-width: 768px) {
-  .nv-footer-grid {
+  .hy-footer-grid {
     grid-template-columns: 1fr;
   }
 }
 
 /* 375px–600px — Mobile */
 @media (max-width: 600px) {
-  .nv-section {
-    padding-top: 32px;
-    padding-bottom: 32px;
+  .hy-section {
+    padding-top: var(--space-md);
+    padding-bottom: var(--space-md);
   }
 
-  .nv-section-hero {
-    padding-top: 48px;
-    padding-bottom: 48px;
+  .hy-section-hero {
+    padding-top: var(--space-xl);
+    padding-bottom: var(--space-xl);
   }
 }
 
-/* < 375px — Mobile small: compact single column */
+/* < 375px — Mobile small: compact */
 @media (max-width: 375px) {
-  .nv-container {
+  .hy-container {
     padding-left: 12px;
     padding-right: 12px;
   }
 
-  .nv-section {
-    padding-top: 32px;
-    padding-bottom: 32px;
+  .hy-section {
+    padding-top: var(--space-sm);
+    padding-bottom: var(--space-sm);
   }
 }
 
@@ -511,231 +558,496 @@ a.nv-link-muted:hover {
   }
 }
 
-/* === Hero section (NV-09, NV-12) === */
-.nv-hero {
-  background-color: #000000;
-  background-image: linear-gradient(135deg, #000000 60%, #1a3a00 100%);
-  color: #ffffff;
+/* === Hero section === */
+.hy-hero {
+  background-color: var(--color-black);
+  color: var(--color-white);
+  text-align: center;
 }
 
-/* === Product card (NV-06) === */
-.nv-product-card {
-  background-color: #ffffff;
-  border-radius: 2px;
-  box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 5px 0px;
+.hy-hero-gradient {
+  background-image: linear-gradient(135deg, var(--color-black) 60%, #1a3a00 100%);
+}
+
+.hy-hero h1 {
+  color: var(--color-white);
+}
+
+.hy-hero h1 span {
+  color: var(--sport-primary);
+}
+
+/* === Product card === */
+.hy-product-card {
+  background-color: var(--color-white);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-standard);
   overflow: hidden;
-  transition: box-shadow 0.2s ease;
+  transition: transform 150ms ease, box-shadow 150ms ease;
   border: none;
 }
 
-.nv-dark-section .nv-product-card {
-  background-color: #1a1a1a;
+.hy-dark-section .hy-product-card,
+.hy-near-black-section .hy-product-card {
+  background-color: var(--color-near-black);
 }
 
-.nv-product-card:hover {
-  box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 8px 0px;
+.hy-product-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
 }
 
-.nv-product-card-inner {
+.hy-product-card-inner {
   display: block;
-  padding: 16px;
+  padding: var(--space-sm);
   text-decoration: none;
   color: inherit;
   height: 100%;
 }
 
-.nv-product-card-title {
-  font-size: 1.50rem;         /* 24px */
-  font-weight: 700;
-  line-height: 1.25;
-  color: #000000;
-  border-bottom: 2px solid #76b900;
+.hy-product-card-brand {
+  font-family: var(--font-body);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--data-green);
+  margin-bottom: 4px;
+}
+
+.hy-product-card-title {
+  font-family: var(--font-display);
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.3;
+  color: var(--color-near-black);
+  border-bottom: 2px solid var(--data-green);
   padding-bottom: 4px;
   margin-bottom: 8px;
 }
 
-.nv-dark-section .nv-product-card-title {
-  color: #ffffff;
+.hy-dark-section .hy-product-card-title,
+.hy-near-black-section .hy-product-card-title {
+  color: var(--color-white);
 }
 
-.nv-product-card-brand {
-  font-size: 0.875rem;        /* 14px */
-  font-weight: 700;
-  color: #757575;
-  margin-bottom: 4px;
+.hy-product-card-body {
+  font-family: var(--font-body);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+  color: var(--color-gray-500);
 }
 
-.nv-product-card-body {
-  font-size: 1.00rem;         /* 16px */
-  font-weight: 400;
-  line-height: 1.67;
-  color: #757575;
-}
-
-.nv-product-card-price {
-  font-size: 1.00rem;
-  font-weight: 700;
-  color: #76b900;
+.hy-product-card-price {
+  font-family: var(--font-data);
+  font-size: 1.125rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--data-green);
   margin-top: 8px;
 }
 
-/* Skill level badge — micro-label style */
-.nv-skill-badge {
+.hy-product-card-price span {
+  font-size: var(--font-size-link);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-500);
+}
+
+/* Skill level badge */
+.hy-skill-badge {
   display: inline-block;
-  font-size: 0.75rem;         /* 12px */
-  font-weight: 700;
+  font-family: var(--font-body);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
   text-transform: uppercase;
   letter-spacing: normal;
-  color: #76b900;
-  background-color: #1a1a1a;
+  color: var(--data-green);
+  background-color: var(--color-near-black);
   border-radius: 1px;
   padding: 2px 6px;
   margin-top: 4px;
 }
 
-.nv-stock-in {
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: #3f8500;
+/* Stock status */
+.hy-stock-in {
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-green-500);
   margin-top: 4px;
 }
 
-.nv-stock-out {
-  font-size: 0.75rem;
-  font-weight: 400;
-  color: #757575;
+.hy-stock-out {
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-500);
   margin-top: 4px;
 }
 
-.nv-specs-row {
-  font-size: 0.75rem;
-  font-weight: 400;
-  color: #898989;
+/* Specs row */
+.hy-specs-row {
+  font-family: var(--font-data);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-400);
   margin-top: 4px;
 }
 
-/* === Catalog grid (NV-06, NV-10) === */
-.nv-catalog-grid {
+/* === Catalog grid === */
+.hy-catalog-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: var(--space-card-gap);
   min-height: 800px;
 }
 
 @media (max-width: 1024px) {
-  .nv-catalog-grid {
+  .hy-catalog-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 600px) {
-  .nv-catalog-grid {
+  .hy-catalog-grid {
     grid-template-columns: 1fr;
   }
 }
 
 /* === Catalog page header === */
-.nv-catalog-header {
-  padding-top: 32px;
-  padding-bottom: 32px;
+.hy-catalog-header {
+  padding-top: var(--space-lg);
+  padding-bottom: var(--space-lg);
 }
 
-.nv-breadcrumb {
-  font-size: 0.875rem;
-  font-weight: 400;
-  color: #757575;
-  margin-bottom: 16px;
+.hy-breadcrumb {
+  font-family: var(--font-body);
+  font-size: var(--font-size-link);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-500);
+  margin-bottom: var(--space-xs);
 }
 
-.nv-breadcrumb a {
-  color: #757575;
+.hy-breadcrumb a {
+  color: var(--color-gray-500);
   text-decoration: none;
 }
 
-.nv-breadcrumb a:hover {
-  color: #3860be;
+.hy-breadcrumb a:hover {
+  color: var(--color-link-hover);
 }
 
-/* === Card component base (NV-06) === */
-.nv-card {
-  background-color: #ffffff;
-  border-radius: 2px;
-  box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 5px 0px;
+/* === Card component base === */
+.hy-card {
+  background-color: var(--color-white);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-standard);
   border: none;
   overflow: hidden;
 }
 
-.nv-dark-section .nv-card {
-  background-color: #1a1a1a;
-  color: #ffffff;
+.hy-dark-section .hy-card,
+.hy-near-black-section .hy-card {
+  background-color: var(--color-near-black);
+  color: var(--color-white);
 }
 
-.nv-card:hover {
-  box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 8px 0px;
+.hy-card:hover {
+  box-shadow: var(--shadow-hover);
 }
 
-.nv-card-header {
-  padding: 16px 16px 8px 16px;
+.hy-card-header {
+  padding: var(--space-sm) var(--space-sm) 8px var(--space-sm);
 }
 
-.nv-card-title-text {
-  font-size: 1.50rem;         /* 24px */
-  font-weight: 700;
-  line-height: 1.25;
-  border-bottom: 2px solid #76b900;
+.hy-card-title-text {
+  font-family: var(--font-display);
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-snug);
+  border-bottom: 2px solid var(--data-green);
   padding-bottom: 4px;
   display: inline-block;
 }
 
-.nv-card-content {
-  padding: 0 16px 16px 16px;
+.hy-card-content {
+  padding: 0 var(--space-sm) var(--space-sm) var(--space-sm);
 }
 
-.nv-card-footer {
-  padding: 0 16px 16px 16px;
+.hy-card-footer {
+  padding: 0 var(--space-sm) var(--space-sm) var(--space-sm);
   display: flex;
   align-items: center;
 }
 
-.nv-card-description {
-  font-size: 1.00rem;
-  font-weight: 400;
-  line-height: 1.67;
-  color: #757575;
+.hy-card-description {
+  font-family: var(--font-body);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+  color: var(--color-gray-500);
 }
 
-/* === Skeleton cards (NV-06) === */
-.nv-skeleton-card {
-  background-color: #1a1a1a;
-  border-radius: 2px;
-  box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 5px 0px;
+/* === Skeleton cards === */
+.hy-skeleton-card {
+  background-color: var(--color-near-black);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-standard);
   overflow: hidden;
-  padding: 16px;
+  padding: var(--space-sm);
   min-height: 280px;
 }
 
-.nv-skeleton-line {
+.hy-skeleton-line {
   background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
   background-size: 200% 100%;
-  animation: nv-skeleton-shimmer 1.5s infinite;
-  border-radius: 2px;
+  animation: hy-skeleton-shimmer 1.5s infinite;
+  border-radius: var(--radius-sharp);
   height: 16px;
   margin-bottom: 8px;
 }
 
-.nv-skeleton-line-title {
+.hy-skeleton-line-title {
   height: 24px;
   width: 70%;
   margin-bottom: 12px;
 }
 
-.nv-skeleton-image {
+.hy-skeleton-image {
   height: 192px;
   width: 100%;
   margin-bottom: 12px;
 }
 
-@keyframes nv-skeleton-shimmer {
+@keyframes hy-skeleton-shimmer {
   0%   { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+
+/* === Buttons === */
+.hy-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 13px;
+  font-family: var(--font-body);
+  font-size: var(--font-size-link);
+  font-weight: var(--font-weight-bold);
+  border-radius: var(--radius-sharp);
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+  text-decoration: none;
+}
+
+.hy-button-primary {
+  background: transparent;
+  border: 2px solid var(--sport-primary);
+  color: var(--color-white);
+}
+
+.hy-button-primary:hover {
+  background: var(--color-button-hover);
+  border-color: var(--color-button-hover);
+  color: var(--color-white);
+}
+
+.hy-button-secondary {
+  background: transparent;
+  border: 1px solid var(--sport-primary);
+  color: var(--color-white);
+}
+
+.hy-button-cta {
+  background: var(--sport-primary);
+  border: none;
+  color: var(--color-near-black);
+}
+
+.hy-button-cta:hover {
+  background: var(--sport-secondary);
+}
+
+/* === Quiz cards === */
+.hy-quiz-card {
+  background-color: var(--color-near-black);
+  border: 2px solid var(--color-gray-border);
+  border-radius: var(--radius-card);
+  padding: var(--space-md);
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
+}
+
+.hy-quiz-card:hover {
+  border-color: var(--sport-primary);
+}
+
+.hy-quiz-card-selected,
+.hy-quiz-card.selected {
+  border-color: var(--sport-primary);
+  background: rgba(132, 204, 22, 0.1);
+  box-shadow: 0 0 0 2px var(--sport-primary), 0 0 0 4px rgba(132, 204, 22, 0.2);
+}
+
+.hy-quiz-card-title {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: 8px;
+}
+
+.hy-quiz-card-desc {
+  font-family: var(--font-body);
+  font-size: var(--font-size-body);
+  color: var(--color-gray-500);
+}
+
+/* === Comparison table === */
+.hy-comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--color-white);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: var(--shadow-standard);
+}
+
+.hy-comparison-table th {
+  background-color: var(--color-near-black);
+  color: var(--color-white);
+  padding: var(--space-sm);
+  text-align: left;
+  font-family: var(--font-display);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+}
+
+.hy-comparison-table th:first-child {
+  background-color: var(--color-black);
+}
+
+.hy-comparison-table td {
+  padding: var(--space-sm);
+  border-bottom: 1px solid var(--color-gray-border);
+  font-family: var(--font-data);
+  font-size: var(--font-size-link);
+}
+
+.hy-comparison-table tr:last-child td {
+  border-bottom: none;
+}
+
+.hy-comparison-table .hy-highlight {
+  background: rgba(118, 185, 0, 0.1);
+}
+
+.hy-comparison-table .hy-best {
+  color: var(--data-green);
+  font-weight: var(--font-weight-bold);
+}
+
+/* === Chat widget === */
+.hy-chat-container {
+  max-width: 600px;
+  margin: var(--space-lg) auto 0;
+  background-color: var(--color-near-black);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+.hy-chat-messages {
+  padding: var(--space-md);
+  min-height: 300px;
+}
+
+.hy-chat-message {
+  margin-bottom: var(--space-xs);
+}
+
+.hy-chat-message-ai {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.hy-chat-avatar {
+  width: 32px;
+  height: 32px;
+  background-color: var(--sport-primary);
+  border-radius: var(--radius-circle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-near-black);
+  flex-shrink: 0;
+}
+
+.hy-chat-bubble {
+  background-color: var(--color-near-black);
+  border: 1px solid var(--color-gray-border);
+  border-radius: var(--radius-card);
+  padding: 12px var(--space-sm);
+  color: var(--color-white);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-normal);
+}
+
+.hy-chat-message-user {
+  text-align: right;
+}
+
+.hy-chat-message-user .hy-chat-bubble {
+  background-color: var(--sport-primary);
+  color: var(--color-near-black);
+  display: inline-block;
+}
+
+.hy-chat-input-container {
+  padding: var(--space-xs);
+  border-top: 1px solid var(--color-gray-border);
+  display: flex;
+  gap: 12px;
+}
+
+.hy-chat-input {
+  flex: 1;
+  background-color: var(--color-black);
+  border: 1px solid var(--color-gray-border);
+  border-radius: var(--radius-card);
+  padding: 12px;
+  color: var(--color-white);
+  font-size: var(--font-size-body);
+}
+
+.hy-chat-input::placeholder {
+  color: var(--color-gray-500);
+}
+
+.hy-chat-send {
+  background-color: var(--sport-primary);
+  border: none;
+  color: var(--color-near-black);
+  padding: 12px var(--space-md);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-bold);
+  border-radius: var(--radius-sharp);
+  cursor: pointer;
+}
+
+.hy-chat-send:hover {
+  background-color: var(--sport-secondary);
+}
+
+/* === NVIDIA compatibility aliases === */
+/* Keep old class names working for gradual migration */
+.nv-dark-section { @apply hy-dark-section; }
+.nv-light-section { @apply hy-light-section; }
+.nv-container { @apply hy-container; }
+.nv-section { @apply hy-section; }
+.nv-section-hero { @apply hy-section-hero; }
+.nv-section-label { @apply hy-section-label; }
+.nv-product-card { @apply hy-product-card; }
+.nv-catalog-grid { @apply hy-catalog-grid; }
+.nv-nav { @apply hy-nav; }
+.nv-nav-link { @apply hy-nav-link; }
+.nv-card { @apply hy-card; }
+.nv-skeleton-card { @apply hy-skeleton-card; }
