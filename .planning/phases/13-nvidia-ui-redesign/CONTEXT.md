@@ -1,84 +1,166 @@
-# Phase 13: NVIDIA UI Redesign — Context
+# Phase 13: Hybrid UI Redesign — Context
 
-**Source:** `frontend/nvidia/UI-SPEC.md` (approved design contract, 2026-04-02)
-**Goal:** Restyle the PickleIQ Next.js frontend to match the NVIDIA-inspired design system. Custom CSS only — no new component libraries. All styling decisions are locked in UI-SPEC.md; executor must not deviate.
+**Source:** `DESIGN.md` v2.0 (Hybrid Modern Sports Tech, 2026-04-02)
+**Goal:** Restyle the PickleIQ Next.js frontend with the Hybrid Modern Sports Tech design system. Custom CSS only — no new component libraries. All styling decisions are locked in DESIGN.md; executor must not deviate.
 
 ---
 
-## PRD Requirements (from UI-SPEC.md)
+## Design Philosophy
 
-### NV-01 — Design System Setup
-- Remove all Tailwind utility classes that conflict with the NVIDIA palette
-- Load NVIDIA-EMEA font with fallback: `font-family: 'NVIDIA-EMEA', Arial, Helvetica, sans-serif`
-- Load Font Awesome 6 Pro + FA 6 Sharp via CDN in `layout.tsx` (icon glyphs only)
-- Establish CSS custom properties for all palette colors in `globals.css`
+**Aesthetic:** Modern Sports Tech (Hybrid) — sport energy + data credibility
+**Mood:** Smart, friendly, Brazilian — sporty enough for players, techy enough for data-conscious buyers
+**Positioning:** "The smart way to buy a paddle"
 
-### NV-02 — Color Palette
-Apply the full palette as CSS variables:
-- `--color-green: #76b900` — borders, underlines, CTA outlines, active indicators (NOT fills)
-- `--color-black: #000000` — primary background, dominant bg tone
-- `--color-white: #ffffff` — text on dark, light section bg, card surfaces
-- `--color-green-light: #bff230` — hover highlights
-- `--color-near-black: #1a1a1a` — dark card bg
-- `--color-gray-border: #5e5e5e` — subtle borders, dividers
-- `--color-gray-300: #a7a7a7`, `--color-gray-400: #898989`, `--color-gray-500: #757575`
-- Status: error `#e52020`, success `#3f8500`, info `#0046a4`
-- Decorative: purple `#4d1368`, fuchsia `#8c1c55`
-- Interactive: link-hover `#3860be`, button-hover `#1eaedb`, button-active `#007fff`
+**Key differentiation from NVIDIA:**
+- Lime (#84CC16) is now the primary sport accent (on dark backgrounds)
+- Green (#76b900) is for data elements only (charts, tables, section labels)
+- JetBrains Mono for data/specs (signals "we take data seriously")
+- 2px border radius throughout (sharp corners = precision, not "fun and bouncy")
+- Section labels in uppercase with green accent (category/taxonomy visual language)
 
-### NV-03 — Typography
-Apply 4 canonical sizes with 2 weights only:
-- 24px / weight 700 / line-height 1.25 → Display Hero, Section Heading, Card Title, Button Large
-- 24px / weight 400 / line-height 1.75 → Sub-heading
-- 16px / weight 400 / line-height 1.50 → Body, Body Small
-- 16px / weight 700 / line-height 1.25–1.50 → Body Bold, Button, Button Compact
-- 14px / weight 700 / line-height 1.43 → Link, Link Uppercase, Caption
-- 12px / weight 400–700 → Caption Small, Micro Label, Micro
-- Navigation: 14px weight 700 `text-transform: uppercase`
-- Letter-spacing: normal everywhere except Button Compact (0.144px)
+---
 
-### NV-04 — Spacing & Border Radius
-- Base unit: 8px. Key tokens: xs=4px, sm=8px, md=16px, lg=24px, xl=32px, 2xl=48px, 3xl=64px, 4xl=80px
-- Button padding: exactly `11px 13px` (do not normalize)
-- Border radius: `2px` universal default; `50%` for avatars only; `1px` for inline spans
-- Card grid gap: 20px
+## Implementation Requirements
 
-### NV-05 — Button Components
-Replace all shadcn button variants with:
-- **Primary:** `background: transparent; border: 2px solid #76b900; border-radius: 2px; padding: 11px 13px; font: 16px weight 700`
-  - `:hover` → `background: #1eaedb; color: #fff`
-  - `:active` → `background: #007fff; border: 1px solid #003eff`
-  - `:focus` → `background: #1eaedb; outline: 2px solid #000`
-- **Secondary:** same but `border: 1px solid #76b900`
-- **Compact:** 16px weight 700, `letter-spacing: 0.144px`, `line-height: 1.00`
+### HY-01 — Typography System
+Load fonts via Google Fonts CDN in `layout.tsx`:
+```html
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+```
 
-### NV-06 — Cards & Containers
-- Light section: `background: #ffffff; border-radius: 2px; box-shadow: rgba(0,0,0,0.3) 0px 0px 5px 0px`
-- Dark section: `background: #1a1a1a` (same shadow)
-- Card title: green underline `border-bottom: 2px solid #76b900`
-- Product grid: 3-col desktop / 2-col tablet / 1-col mobile; gap: 20px
+Apply font families:
+- Display/Hero: `Instrument Sans` weight 700
+- Body: `Inter` weight 400/700
+- Data/Specs: `JetBrains Mono` weight 400
+- Navigation: `Inter` weight 700, uppercase, letter-spacing 0.05em
 
-### NV-07 — Navigation Bar
+### HY-02 — Color System
+Update CSS custom properties in `globals.css`:
+
+**Sport Energy (on dark backgrounds only):**
+- `--sport-primary: #84CC16` (lime-500) — primary actions, accent elements
+- `--sport-secondary: #FCD34D` (amber-300) — secondary highlights, CTAs
+
+**Data Credibility (charts, specs, comparison):**
+- `--data-green: #76b900` — chart accent, comparison highlights
+- `--data-green-light: #bff230` — hover state
+
+**Base Palette:**
+- `--color-white: #ffffff` — text on dark, light section backgrounds
+- `--color-near-black: #1a1a1a` — dark section backgrounds, cards
+- `--color-black: #000000` — navigation, hero sections
+- `--color-gray-border: #5e5e5e` — subtle dividers
+- `--color-gray-muted: #a7a7a7` — secondary text
+
+**Interactive:**
+- `--color-link-hover: #3860be` — universal link hover
+- `--color-button-hover: #1eaedb` — button hover state
+- `--color-button-active: #007fff` — button active state
+
+**Contrast rule:** Lime (#84CC16) has 2.7:1 contrast on white — fails WCAG AA. Use on dark backgrounds ONLY.
+
+### HY-03 — Spacing & Border Radius
+Base unit: 8px (not 4px)
+
+Key tokens:
+- `--space-2xs: 4px` — micro gaps, icon spacing
+- `--space-xs: 8px` — tight padding
+- `--space-sm: 16px` — default element gap
+- `--space-md: 24px` — card padding, section internal
+- `--space-lg: 32px` — section gaps
+- `--space-xl: 48px` — major section breaks
+- `--space-2xl: 64px` — page-level padding
+- `--space-3xl: 80px` — hero section padding
+
+**Border radius:**
+- `--radius-sharp: 2px` — default (sharp, tech edge)
+- `--radius-card: 4px` — subtle rounding for cards
+- `--radius-circle: 50%` — avatars only
+
+### HY-04 — Button Components
+Replace shadcn button variants with Hybrid styles:
+
+**Primary (green-border on transparent):**
+```css
+background: transparent;
+border: 2px solid #84CC16;
+color: #ffffff;
+padding: 11px 13px;
+font-size: 14px;
+font-weight: 700;
+border-radius: 2px;
+```
+- `:hover` → `background: #1eaedb; border-color: #1eaedb; color: #ffffff;`
+- `:focus` → `outline: 2px solid #000000; outline-offset: 2px;`
+
+**CTA (solid lime fill):**
+```css
+background: #84CC16;
+border: none;
+color: #1a1a1a;
+padding: 11px 13px;
+font-weight: 700;
+border-radius: 2px;
+```
+- `:hover` → `background: #FCD34D;`
+
+### HY-05 — Cards & Containers
+**Product card:**
+```css
+background: #1a1a1a;
+border-radius: 4px;
+box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 5px 0px;
+overflow: hidden;
+transition: transform 150ms ease, box-shadow 150ms ease;
+```
+- `:hover` → `transform: translateY(-2px); box-shadow: rgba(0, 0, 0, 0.5) 0px 4px 12px 0px;`
+
+**Card title:** `border-bottom: 2px solid #76b900;` (green underline for data accent)
+
+**Product grid:** 3-col desktop / 2-col tablet / 1-col mobile, `gap: 20px;`
+
+### HY-06 — Navigation Bar
 Restyle `header.tsx`:
 - `background: #000000` sticky full-width
-- Logo: left-aligned NVIDIA wordmark (use PickleIQ logo, left-aligned)
+- Logo: left-aligned, "PickleIQ" with `<span>` in lime
 - Links: 14px weight 700 uppercase white, `:hover` → `#3860be`
-- CTA: Primary green-border button, right-aligned
+- CTA: Primary lime-border button, right-aligned
 - Collapse to hamburger overlay at `≤1024px`
 
-### NV-08 — Links
-- On dark bg: `color: #ffffff; text-decoration: none` → hover `#3860be`
-- On light bg: `color: #000000; text-decoration: underline 2px solid #76b900` → hover `#3860be; text-decoration: none`
-- Universal hover: always `#3860be`
+### HY-07 — Links
+```css
+/* On dark bg */
+a { color: #ffffff; text-decoration: none; }
+a:hover { color: #3860be; }
 
-### NV-09 — Layout & Section Alternation
-- Max content width: 1200px centered
-- Dark sections (`background: #000000`, white text) alternate with light sections (`background: #ffffff`, black text)
-- Section labels on dark bg: uppercase 14px `#76b900`
-- Section vertical padding: 64–80px desktop, 48–64px tablet, 32–48px mobile
+/* On light bg */
+a { color: #1a1a1a; text-decoration: underline 2px solid #76b900; }
+a:hover { color: #3860be; text-decoration: none; }
 
-### NV-10 — Responsive Breakpoints
-Implement via CSS media queries (not Tailwind breakpoints):
+/* Universal */
+a:hover { color: #3860be; }
+```
+
+### HY-08 — Layout & Section Alternation
+Max content width: 1200px centered
+
+Alternation pattern:
+```
+[Hero: Dark #000000] →
+[Products: Light #ffffff] →
+[Quiz: Dark #1a1a1a] →
+[Comparison: Light #ffffff] →
+[Chat: Dark #1a1a1a]
+```
+
+Section labels:
+- On dark: 14px weight 700 uppercase, `color: #76b900`
+- On light: 14px weight 700 uppercase, `color: #84CC16`
+
+### HY-09 — Responsive Breakpoints
+CSS media queries (not Tailwind):
 - `< 375px` — compact single column
 - `375–600px` — standard mobile
 - `600–768px` — 2-col grids begin
@@ -86,65 +168,84 @@ Implement via CSS media queries (not Tailwind breakpoints):
 - `1024–1350px` — standard desktop
 - `> 1350px` — max width with margins
 
-### NV-11 — Depth & Elevation
-- Standard shadow: `rgba(0,0,0,0.3) 0px 0px 5px 0px`
-- Green accent border: `2px solid #76b900` (active/selected)
-- Focus ring: `2px solid #000000 outline` — all interactive elements
-- No glassmorphism, no blur effects
+### HY-10 — Motion System
+Duration scale:
+- `instant: 50ms` — hover states, micro-feedback
+- `fast: 150ms` — button presses, toggles
+- `normal: 250ms` — card transitions, modals
+- `slow: 400ms` — page transitions, reveals
 
-### NV-12 — Image Treatment
-- Product images: full-width hero, maintain aspect ratio
-- Screenshots: apply standard shadow
-- Avatars: `border-radius: 50%`
-- All images scale to container width
+Easing:
+- `ease-enter: cubic-bezier(0, 0, 0.2, 1)` — elements entering
+- `ease-exit: cubic-bezier(0.4, 0, 1, 1)` — elements leaving
+- `ease-move: cubic-bezier(0.4, 0, 0.2, 1)` — position/size changes
+
+### HY-11 — Class Prefix Migration
+Replace `nv-*` prefixes with `hy-*` prefixes:
+- `nv-dark-section` → `hy-dark-section`
+- `nv-light-section` → `hy-light-section`
+- `nv-product-card` → `hy-product-card`
+- `nv-catalog-grid` → `hy-catalog-grid`
+- `nv-nav` → `hy-nav`
+- `nv-section-label` → `hy-section-label`
+- `nv-card` → `hy-card`
+- etc.
+
+**Compatibility aliases:** Keep `nv-*` classes as aliases for gradual migration.
+
+### HY-12 — AI Slop Avoidance
+Verify before shipping:
+- [ ] No 3-column feature grid with icons in colored circles
+- [ ] No icons in colored circles as decoration
+- [ ] No centered-everything layout (left-align body copy)
+- [ ] No "Welcome to..." / "Your all-in-one solution" copy
+- [ ] No decorative blobs or wavy SVG dividers
+- [ ] No purple/violet gradient backgrounds
+- [ ] No rounded corners on buttons (use 2px, not 8px+)
+- [ ] Cards exist because they're functional, not decorative
 
 ---
 
-## Scope — Files to Restyle
+## Scope — Files to Update
 
-**High priority:**
-- `frontend/src/app/globals.css` — CSS custom properties, base resets, typography scale
-- `frontend/src/components/layout/header.tsx` — Nav bar redesign
-- `frontend/src/components/layout/footer.tsx` — Footer multi-column → stacked mobile
-- `frontend/src/app/page.tsx` — Home page section alternation, hero, CTAs
-- `frontend/src/app/paddles/page.tsx` — Product catalog grid
-- `frontend/src/app/paddles/[brand]/[model-slug]/page.tsx` — Product detail page
-- `frontend/src/components/ui/button.tsx` — Replace with NVIDIA button contracts
-- `frontend/src/components/ui/card.tsx` — NVIDIA card contract
+**CSS (already updated):**
+- `frontend/src/app/globals.css` — Hybrid CSS system with `.hy-*` classes
 
-**Medium priority:**
-- `frontend/src/components/chat/chat-widget.tsx` — Dark surface styling
-- `frontend/src/components/quiz/quiz-flow.tsx` — Green accent interactive elements
-- `frontend/src/app/chat/page.tsx` — Page layout
-- `frontend/src/components/paddle-card-skeleton.tsx` — Match card styling
+**Components to restyle:**
+- `frontend/src/components/layout/header.tsx` — Nav with lime accent on logo
+- `frontend/src/components/layout/footer.tsx` — Footer with green section labels
+- `frontend/src/app/page.tsx` — Home page with dark/light alternation
+- `frontend/src/app/paddles/page.tsx` — Catalog grid with updated classes
+- `frontend/src/app/paddles/[brand]/[model-slug]/page.tsx` — Detail page
+- `frontend/src/components/ui/card.tsx` — Card with green underline
+- `frontend/src/components/paddle-card-skeleton.tsx` — Skeleton with shimmer
 
-**Out of scope (do not touch):**
-- API routes (`src/app/api/`)
-- Business logic (`src/lib/`)
-- Admin pages (separate concern)
-- Tests
+**Font loading:**
+- `frontend/src/app/layout.tsx` — Add Google Fonts CDN link
 
 ---
 
 ## Constraints
 
-1. **Custom CSS only** — no new npm packages, no Tailwind utility overrides beyond globals
-2. **Preserve existing functionality** — all existing interactions, forms, navigation links must still work
+1. **Custom CSS only** — no new npm packages
+2. **Preserve existing functionality** — all interactions must still work
 3. **No breaking changes to component props** — only restyle, do not refactor APIs
-4. **Font Awesome via CDN only** — add `<link>` tag in `layout.tsx`, do not `npm install` it
-5. **NVIDIA-EMEA font** — load via `@font-face` if available locally, fallback to Arial if not found
-6. **Accessibility** — maintain WCAG AA compliance; focus rings required on all interactive elements
+4. **Google Fonts** — Instrument Sans, Inter, JetBrains Mono via CDN
+5. **Accessibility** — maintain WCAG AA compliance; focus rings required
 
 ---
 
 ## Acceptance Criteria
 
-- [ ] All pages use #000000 / #ffffff as dominant bg/text with #76b900 accents only on borders/underlines
-- [ ] Buttons match green-border contract exactly (2px solid #76b900, 11px 13px padding)
-- [ ] Navigation is sticky black, uppercase links, collapses at ≤1024px
-- [ ] Product grid is 3-col/2-col/1-col at respective breakpoints
-- [ ] Dark/light section alternation visible on home and catalog pages
-- [ ] Card titles have green underline (2px solid #76b900)
-- [ ] All links hover to #3860be universally
+- [ ] Google Fonts loaded: Instrument Sans, Inter, JetBrains Mono
+- [ ] Lime (#84CC16) used on dark backgrounds only
+- [ ] Green (#76b900) used for data elements (tables, charts, section labels)
+- [ ] All `nv-*` classes migrated to `hy-*` (with aliases)
+- [ ] Navigation has lime accent on "IQ" in logo
+- [ ] Product grid is 3-col/2-col/1-col at breakpoints
+- [ ] Dark/light section alternation visible on home page
+- [ ] Card titles have green underline
+- [ ] Links hover to #3860be universally
 - [ ] Focus rings present on all interactive elements
-- [ ] Typography uses only 24px/16px/14px/12px at weights 400/700
+- [ ] Typography uses correct fonts per role (display/body/data)
+- [ ] No AI slop patterns (verify checklist)
