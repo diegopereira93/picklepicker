@@ -84,11 +84,31 @@ O mercado de pickleball cresceu no Brasil e os compradores enfrentam dois proble
 
 Receita via comissões de afiliados (10-40% por venda). Distribuição primária via parceiro treinador → alunos (WhatsApp groups). SEO como canal secundário (maturação 6-12 meses, começa Phase 5). URLs de afiliado geradas server-side — LLM nunca constrói URLs diretamente.
 
-## Current State — v1.2 Shipped
+## Current State — v1.3 In Progress
+
+**Phase 13 Complete:** 2026-04-02
+
+Hybrid Modern Sports Tech design system implemented:
+
+**Design System (HY-01–HY-12):**
+- **Typography:** Google Fonts CDN (Instrument Sans, Inter, JetBrains Mono), CSS font variables
+- **Color System:** Lime (#84CC16) for primary actions, Green (#76b900) for data elements
+- **Components:** Button variants with lime borders, card components with hy-* classes
+- **Navigation:** Logo with lime "IQ" accent, responsive header/footer
+- **Class Migration:** Complete nv-* → hy-* migration, CSS aliases for backwards compatibility
+
+**Key Deliverables:**
+- 12 requirements (HY-01 through HY-12) verified
+- 8 plans completed (4 original + 4 gap closure)
+- Design system documented in DESIGN.md v2.0
+
+---
+
+### v1.2 — Core Web Vitals Optimization
 
 **Shipped:** 2026-04-01
 
-Milestone v1.2 (Core Web Vitals Optimization) complete. Production performance and accessibility compliance achieved:
+Milestone v1.2 complete. Production performance and accessibility compliance achieved:
 
 **Performance:**
 - **Image Optimization (11.1):** All images migrated to next/Image with responsive sizes, priority loading for hero images, automatic WebP/AVIF via Next.js
@@ -148,7 +168,8 @@ All 6 phases complete. MVP delivered:
 
 ## Next Milestone: v1.3
 
-Ready for v1.3 planning. Run `/gsd:new-milestone` to start.
+Phase 13 (Hybrid UI Redesign) complete. Ready for next phase planning or milestone completion.
+Run `/gsd:progress` to see status, or `/gsd:complete-milestone` to finalize v1.3.
 
 ## Evolução
 
@@ -171,4 +192,4 @@ Este documento evolui nas transições de fase e limites de milestone.
 
 ---
 
-*Last updated: 2026-04-01
+*Last updated: 2026-04-02
