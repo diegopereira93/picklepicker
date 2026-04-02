@@ -11,11 +11,9 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
-import { ThemeToggle } from "@/components/theme-toggle"
-
 const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/paddles", label: "Catalogo" },
+  { href: "/", label: "HOME" },
+  { href: "/paddles", label: "CATÁLOGO" },
 ]
 
 // Check if Clerk is available by checking for the provider context
@@ -95,20 +93,20 @@ export function Header() {
   const clerkAvailable = useClerkAvailable()
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center">
+    <header className="nv-nav sticky top-0 z-50 w-full">
+      <div className="nv-container flex h-14 items-center">
         {/* Logo */}
-        <Link href="/" className="mr-6 flex items-center space-x-2">
-          <span className="font-bold text-xl text-primary">PickleIQ</span>
+        <Link href="/" className="nv-nav-logo mr-6 flex items-center">
+          <span className="nv-nav-brand">PickleIQ</span>
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden md:flex items-center space-x-6 text-sm font-medium flex-1">
+        <nav className="nv-nav-links hidden items-center space-x-6 flex-1">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="text-foreground/60 transition-colors hover:text-foreground"
+              className="nv-nav-link"
             >
               {link.label}
             </Link>
@@ -116,26 +114,25 @@ export function Header() {
         </nav>
 
         {/* Desktop CTA */}
-        <div className="hidden md:flex items-center space-x-2 ml-auto">
-          <ThemeToggle />
-          <Button asChild size="sm">
+        <div className="nv-nav-cta hidden items-center space-x-2 ml-auto">
+          <Button asChild>
             <Link href="/chat">Encontrar raquete</Link>
           </Button>
           {clerkAvailable && <AuthButtons />}
         </div>
 
         {/* Mobile hamburger */}
-        <div className="flex md:hidden ml-auto">
+        <div className="nv-nav-mobile flex ml-auto">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" aria-label="Abrir menu">
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right">
+            <SheetContent side="right" className="nv-nav-overlay">
               <SheetHeader>
                 <SheetTitle>
-                  <Link href="/" onClick={() => setOpen(false)} className="font-bold text-xl text-primary">
+                  <Link href="/" onClick={() => setOpen(false)} className="nv-nav-brand">
                     PickleIQ
                   </Link>
                 </SheetTitle>
@@ -145,7 +142,7 @@ export function Header() {
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="text-foreground/80 text-lg font-medium transition-colors hover:text-foreground"
+                    className="nv-nav-link-mobile"
                     onClick={() => setOpen(false)}
                   >
                     {link.label}
