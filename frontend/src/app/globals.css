@@ -323,6 +323,178 @@ a.nv-link-muted:hover {
   }
 }
 
+/* === Navigation (NV-07) === */
+.nv-nav {
+  background-color: #000000;
+  border-bottom: 1px solid #5e5e5e;
+}
+
+.nv-nav-brand {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.nv-nav-links {
+  display: none; /* shown via media query below */
+}
+
+.nv-nav-link {
+  font-size: 0.875rem;     /* 14px */
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #ffffff;
+  text-decoration: none;
+  letter-spacing: normal;
+  transition: color 0.15s ease;
+}
+
+.nv-nav-link:hover {
+  color: #3860be;
+}
+
+.nv-nav-link:focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: 2px;
+}
+
+.nv-nav-cta {
+  display: none; /* shown via media query below */
+}
+
+.nv-nav-mobile {
+  display: flex; /* always visible on mobile */
+}
+
+.nv-nav-link-mobile {
+  font-size: 1.00rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #ffffff;
+  text-decoration: none;
+  padding: 8px 0;
+  display: block;
+  transition: color 0.15s ease;
+}
+
+.nv-nav-link-mobile:hover {
+  color: #3860be;
+}
+
+/* SheetContent overlay for mobile nav */
+.nv-nav-overlay {
+  background-color: #000000 !important;
+  color: #ffffff;
+  border-left: 1px solid #5e5e5e;
+}
+
+/* === Footer (NV-09) === */
+.nv-footer {
+  background-color: #000000;
+  border-top: 1px solid #5e5e5e;
+  padding-top: 48px;
+  padding-bottom: 48px;
+}
+
+.nv-footer-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+.nv-footer .nv-caption-small,
+.nv-footer p,
+.nv-footer span {
+  color: #757575;
+}
+
+/* === Section padding scale (NV-09) === */
+.nv-section {
+  padding-top: 64px;
+  padding-bottom: 64px;
+}
+
+.nv-section-hero {
+  padding-top: 80px;
+  padding-bottom: 80px;
+}
+
+/* === Responsive breakpoints (NV-10) === */
+
+/* > 1350px — Large desktop: max content width with margins */
+@media (min-width: 1350px) {
+  .nv-container {
+    padding-left: 48px;
+    padding-right: 48px;
+  }
+}
+
+/* 1024px–1350px — Desktop: show full nav */
+@media (min-width: 1024px) {
+  .nv-nav-links {
+    display: flex;
+  }
+
+  .nv-nav-cta {
+    display: flex;
+  }
+
+  .nv-nav-mobile {
+    display: none;
+  }
+}
+
+/* 768px–1024px — Tablet: full card grids, 2-col footer */
+@media (max-width: 1024px) {
+  .nv-section {
+    padding-top: 48px;
+    padding-bottom: 48px;
+  }
+
+  .nv-section-hero {
+    padding-top: 64px;
+    padding-bottom: 64px;
+  }
+
+  .nv-footer-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* 600px–768px — Tablet small: 2-col grids */
+@media (max-width: 768px) {
+  .nv-footer-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 375px–600px — Mobile */
+@media (max-width: 600px) {
+  .nv-section {
+    padding-top: 32px;
+    padding-bottom: 32px;
+  }
+
+  .nv-section-hero {
+    padding-top: 48px;
+    padding-bottom: 48px;
+  }
+}
+
+/* < 375px — Mobile small: compact single column */
+@media (max-width: 375px) {
+  .nv-container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .nv-section {
+    padding-top: 32px;
+    padding-bottom: 32px;
+  }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
