@@ -31,13 +31,13 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       {/* Hero section */}
-      <section className="nv-dark-section nv-hero nv-section-hero">
-        <div className="nv-container flex flex-col items-center text-center gap-6">
-          <h1 className="nv-display max-w-3xl">
+      <section className="hy-dark-section hy-hero hy-section-hero">
+        <div className="hy-container flex flex-col items-center text-center gap-6">
+          <h1 className="hy-display max-w-3xl">
             Encontre a raquete{" "}
             <span style={{ color: '#76b900' }}>perfeita</span> para voce
           </h1>
-          <p className="nv-subheading max-w-2xl">
+          <p className="hy-subheading max-w-2xl">
             PickleIQ usa inteligencia artificial para recomendar raquetes de
             pickleball com base no seu nivel de jogo, estilo e orcamento.
             Precos em tempo real dos varejistas brasileiros.
@@ -54,10 +54,10 @@ export default function Home() {
       </section>
 
       {/* Value props */}
-      <section className="nv-light-section nv-section">
-        <div className="nv-container">
-          <p className="nv-section-label text-center">RECURSOS</p>
-          <h2 className="nv-section-heading text-center mb-10" style={{ color: '#000000' }}>
+      <section className="hy-light-section hy-section">
+        <div className="hy-container">
+          <p className="hy-section-label text-center">RECURSOS</p>
+          <h2 className="hy-section-heading text-center mb-10" style={{ color: '#000000' }}>
             Tudo que voce precisa para escolher bem
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -65,15 +65,15 @@ export default function Home() {
               const Icon = prop.icon;
               const isCompact = prop.size === "compact";
               return (
-                <Card key={prop.title} className={`nv-card flex flex-col ${isCompact ? 'md:transform md:translate-y-4' : ''}`}>
+                <Card key={prop.title} className={`hy-card flex flex-col ${isCompact ? 'md:transform md:translate-y-4' : ''}`}>
                   <CardHeader>
                     <div className={`mb-2 flex items-center justify-center ${isCompact ? 'w-8 h-8' : 'w-10 h-10'}`}>
                       <Icon className={`${isCompact ? 'h-4 w-4' : 'h-5 w-5'}`} style={{ color: '#76b900' }} />
                     </div>
-                    <CardTitle className="nv-card-title-text">{prop.title}</CardTitle>
+                    <CardTitle className="hy-card-title-text">{prop.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <CardDescription className="nv-card-description">
+                    <CardDescription className="hy-card-description">
                       {prop.description}
                     </CardDescription>
                   </CardContent>
@@ -85,13 +85,13 @@ export default function Home() {
       </section>
 
       {/* CTA banner */}
-      <section className="nv-dark-section nv-section">
-        <div className="nv-container flex flex-col items-center text-center gap-4">
-          <p className="nv-section-label">COMECE AGORA</p>
-          <h2 className="nv-section-heading">
+      <section className="hy-dark-section hy-section">
+        <div className="hy-container flex flex-col items-center text-center gap-4">
+          <p className="hy-section-label">COMECE AGORA</p>
+          <h2 className="hy-section-heading">
             Pronto para encontrar sua raquete?
           </h2>
-          <p className="nv-subheading max-w-lg">
+          <p className="hy-subheading max-w-lg">
             Responda 3 perguntas rapidas e receba recomendacoes personalizadas
             com os melhores precos do mercado brasileiro.
           </p>
