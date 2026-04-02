@@ -28,13 +28,13 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       {/* Hero section */}
-      <section className="py-20 md:py-28 bg-gradient-to-b from-background to-muted/20">
-        <div className="container flex flex-col items-center text-center gap-6">
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight max-w-3xl">
+      <section className="nv-dark-section nv-hero nv-section-hero">
+        <div className="nv-container flex flex-col items-center text-center gap-6">
+          <h1 className="nv-display max-w-3xl">
             Encontre a raquete{" "}
-            <span className="text-primary">perfeita</span> para voce
+            <span style={{ color: '#76b900' }}>perfeita</span> para voce
           </h1>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl">
+          <p className="nv-subheading max-w-2xl">
             PickleIQ usa inteligencia artificial para recomendar raquetes de
             pickleball com base no seu nivel de jogo, estilo e orcamento.
             Precos em tempo real dos varejistas brasileiros.
@@ -51,24 +51,25 @@ export default function Home() {
       </section>
 
       {/* Value props */}
-      <section className="py-16 bg-background">
-        <div className="container">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-10">
+      <section className="nv-light-section nv-section">
+        <div className="nv-container">
+          <p className="nv-section-label text-center">RECURSOS</p>
+          <h2 className="nv-section-heading text-center mb-10" style={{ color: '#000000' }}>
             Tudo que voce precisa para escolher bem
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {valueProps.map((prop) => {
               const Icon = prop.icon;
               return (
-                <Card key={prop.title} className="flex flex-col">
+                <Card key={prop.title} className="nv-card flex flex-col">
                   <CardHeader>
-                    <div className="mb-2 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <Icon className="h-5 w-5 text-primary" />
+                    <div className="mb-2 w-10 h-10 flex items-center justify-center">
+                      <Icon className="h-5 w-5" style={{ color: '#76b900' }} />
                     </div>
-                    <CardTitle className="text-lg">{prop.title}</CardTitle>
+                    <CardTitle className="nv-card-title-text">{prop.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <CardDescription className="text-sm leading-relaxed">
+                    <CardDescription className="nv-card-description">
                       {prop.description}
                     </CardDescription>
                   </CardContent>
@@ -80,12 +81,13 @@ export default function Home() {
       </section>
 
       {/* CTA banner */}
-      <section className="py-16 bg-muted/30">
-        <div className="container flex flex-col items-center text-center gap-4">
-          <h2 className="text-2xl md:text-3xl font-bold">
+      <section className="nv-dark-section nv-section">
+        <div className="nv-container flex flex-col items-center text-center gap-4">
+          <p className="nv-section-label">COMECE AGORA</p>
+          <h2 className="nv-section-heading">
             Pronto para encontrar sua raquete?
           </h2>
-          <p className="text-muted-foreground max-w-lg">
+          <p className="nv-subheading max-w-lg">
             Responda 3 perguntas rapidas e receba recomendacoes personalizadas
             com os melhores precos do mercado brasileiro.
           </p>
