@@ -261,6 +261,59 @@ textarea:focus-visible {
   border-radius: var(--radius-standard);
 }
 
+/* === Global link styles (NV-08) === */
+
+/* Links on dark backgrounds (#000000 / #1a1a1a sections) */
+.nv-dark-section a,
+a.nv-link-dark {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.nv-dark-section a:hover,
+a.nv-link-dark:hover {
+  color: #3860be;
+  text-decoration: none;
+}
+
+/* Links on light backgrounds (#ffffff sections) */
+.nv-light-section a,
+a.nv-link-light {
+  color: #000000;
+  text-decoration: underline;
+  text-decoration-color: #76b900;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 2px;
+}
+
+.nv-light-section a:hover,
+a.nv-link-light:hover {
+  color: #3860be;
+  text-decoration: none;
+}
+
+/* Green links (standalone accent links) */
+a.nv-link-green {
+  color: #76b900;
+  text-decoration: none;
+}
+
+a.nv-link-green:hover {
+  color: #3860be;
+  text-decoration: none;
+}
+
+/* Muted links */
+a.nv-link-muted {
+  color: #666666;
+  text-decoration: none;
+}
+
+a.nv-link-muted:hover {
+  color: #3860be;
+  text-decoration: none;
+}
+
 @layer base {
   * {
     @apply border-border;
