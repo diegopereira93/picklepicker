@@ -7,6 +7,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { ClerkAvailableProvider } from "@/components/layout/header";
 
 // Dynamic import for SpeedInsights to defer loading until after interactive
 const SpeedInsights = dynamic(
@@ -58,9 +59,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Header />
-          <main id="main-content" className="flex-1">{children}</main>
-          <Footer />
+          <ClerkAvailableProvider available={hasClerkKeys}>
+            <Header />
+            <main id="main-content" className="flex-1">{children}</main>
+            <Footer />
+          </ClerkAvailableProvider>
           <SpeedInsights sampleRate={1.0} />
         </ThemeProvider>
       </body>
