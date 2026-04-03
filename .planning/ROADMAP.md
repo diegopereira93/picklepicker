@@ -5,7 +5,8 @@
 - ✅ **v1.0 MVP** — Phases 1-6 (shipped 2026-03-28)
 - ✅ **v1.1 Scraper Validation & E2E Testing** — Phases 7-9 (shipped 2026-04-01)
 - ✅ **v1.2 Core Web Vitals Optimization** — Phase 11 (shipped 2026-04-01)
-- 📋 **v1.3** — Next milestone (planning)
+- ✅ **v1.3 Data Quality & Hybrid UI** — Phases 12-13 (shipped 2026-04-02)
+- 📋 **v1.4** — Next milestone (planning)
 
 ## Phases
 
@@ -45,24 +46,35 @@
 
 </details>
 
-### 📋 v1.3 — Next Milestone (Planning)
+### ✅ v1.3 Data Quality & Hybrid UI (Phases 12-13) — SHIPPED 2026-04-02
+
+#### Phase 12: Data Pipeline Quality & Reliability
+
+**Goal:** Fix production-critical operational issues — race conditions, API key exposure, transaction safety, observability.
+
+**Requirements:** PIPE-01 through PIPE-12
+
+**Plans:** 4/4 complete
+- [x] 12-01-P1-schema-foundation-PLAN.md — Schema fixes, NOT NULL constraints
+- [x] 12-02-P1-transactions-and-retry-PLAN.md — Transaction rollback, ML retry logic
+- [x] 12-03-P1-memory-and-concurrency-PLAN.md — Memory limits, atomic upsert
+- [x] 12-04-P2-observability-infrastructure-PLAN.md — Metrics, DLQ, freshness alerts
 
 #### Phase 13: Hybrid UI Redesign
 
-**Goal:** Restyle the PickleIQ frontend with the Hybrid Modern Sports Tech design system — lime (#84CC16) accent on dark, green (#76b900) for data, JetBrains Mono for specs, 2px border radius, dark/light alternation, responsive grid.
+**Goal:** Restyle with Hybrid Modern Sports Tech design — lime (#84CC16) accent, green (#76b900) for data, JetBrains Mono, 2px radius, dark/light alternation.
 
 **Requirements:** HY-01 through HY-12
 
-**Plans:**
-8/8 plans complete
-- [x] 13-01-PLAN.md — Design Tokens & Typography Foundation (HY-01–HY-04, HY-11)
-- [x] 13-02-PLAN.md — Button & Link Components (HY-05, HY-07)
-- [x] 13-03-PLAN.md — Navigation & Layout Shell (HY-06, HY-08, HY-09)
-- [x] 13-04-PLAN.md — Pages & Product Cards (HY-05, HY-08, HY-09, HY-12)
-- [x] 13-05-PLAN.md — Gap Closure: Typography System (HY-01) — Google Fonts CDN
-- [x] 13-06-PLAN.md — Gap Closure: Button Border Color (HY-04) — Lime borders
-- [x] 13-07-PLAN.md — Gap Closure: Navigation Logo Accent (HY-06, HY-11) — IQ highlight + header classes
-- [x] 13-08-PLAN.md — Gap Closure: Class Migration (HY-11) — Footer, pages, card components
+**Plans:** 8/8 complete
+- [x] 13-01-PLAN.md — Design Tokens & Typography Foundation
+- [x] 13-02-PLAN.md — Button & Link Components
+- [x] 13-03-PLAN.md — Navigation & Layout Shell
+- [x] 13-04-PLAN.md — Pages & Product Cards
+- [x] 13-05-PLAN.md — Gap Closure: Typography System
+- [x] 13-06-PLAN.md — Gap Closure: Button Border Color
+- [x] 13-07-PLAN.md — Gap Closure: Navigation Logo Accent
+- [x] 13-08-PLAN.md — Gap Closure: Class Migration
 
 ## Progress
 
@@ -79,21 +91,9 @@
 | 9 | v1.1 | 1/1 | Complete | 2026-04-01 |
 | 10 | v1.1 | 2/2 | Complete | 2026-04-01 |
 | 11 | v1.2 | 4/4 | Complete | 2026-04-01 |
-| 12 | v1.3 | 4/4 | Complete    | 2026-04-01 |
-
-### Phase 12: Data Pipeline Quality & Reliability
-
-**Goal:** Fix production-critical operational issues identified in engineering review — race conditions, API key exposure, transaction safety, and observability.
-
-**Requirements:** PIPE-01 through PIPE-12
-
-**Plans:**
-4/4 plans complete
-- [x] 12-01-P1-schema-foundation-PLAN.md — Schema fixes, NOT NULL constraints
-- [x] 12-02-P1-transactions-and-retry-PLAN.md — Transaction rollback, ML retry logic
-- [x] 12-03-P1-memory-and-concurrency-PLAN.md — Memory limits, atomic upsert
-- [x] 12-04-P2-observability-infrastructure-PLAN.md — Metrics, DLQ, freshness alerts
+| 12 | v1.3 | 4/4 | Complete | 2026-04-02 |
+| 13 | v1.3 | 8/8 | Complete | 2026-04-02 |
 
 ---
 
-*For detailed milestone archives, see `.planning/milestones/`*
+*For detailed milestone archives, see `.planning/archive/`*
