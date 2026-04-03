@@ -6,8 +6,8 @@ import os
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
-# Add backend to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+# Add backend/ to path so 'from backend.app.xxx' imports work
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 # Mock psycopg_pool module before any imports that depend on it
 sys.modules['psycopg_pool'] = MagicMock()

@@ -61,7 +61,7 @@ test: test-backend test-frontend ## Roda todos os testes unitários
 
 test-backend: ## Roda testes do backend com pytest
 	@echo "$(BLUE)🧪 Rodando testes do backend...$(NC)"
-	cd backend && pytest -v
+	cd backend && PYTHONPATH=$(PWD) python3 -m pytest -v
 
 test-backend-cov: ## Roda testes do backend com cobertura
 	@echo "$(BLUE)🧪 Rodando testes do backend com cobertura...$(NC)"
