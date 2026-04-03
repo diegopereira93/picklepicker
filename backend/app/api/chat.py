@@ -6,16 +6,16 @@ import os
 import time
 from typing import Optional
 
-import anthropic
+from groq import AsyncGroq
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, field_validator
 
 from app.agents.rag_agent import RAGAgent, UserProfile
 
-# Initialize Claude client
-anthropic_client = anthropic.AsyncAnthropic(
-    api_key=os.environ.get("ANTHROPIC_API_KEY")
+# Initialize Groq client
+groq_client = AsyncGroq(
+    api_key=os.environ.get("GROQ_API_KEY")
 )
 
 router = APIRouter()
@@ -125,9 +125,9 @@ async def chat_stream(request: ChatRequest) -> StreamingResponse:
 
             # Try LLM reasoning with timeout
             try:
-                # Check if Anthropic API key is available
-                if not os.environ.get("ANTHROPIC_API_KEY"):
-                    raise ValueError("ANTHROPIC_API_KEY not set")
+                # Check if Groq API key is available
+                if not os.environ.get("GROQ_API_KEY"):
+                    raise ValueError("GROQ_API_KEY not set")
 
                 # Build prompt with context
                 prompt = f"""Você é um especialista em pickleball. 
@@ -145,10 +145,10 @@ Pergunta do usuário: {request.message}
 Forneça uma explicação em português de por que estas raquetes são adequadas, em 2-3 frases."""
 
                 response = await asyncio.wait_for(
-                    anthropic_client.messages.create(
-                        model="claude-3-5-sonnet-20241022",
-                        max_tokens=1024,
+                    groq_client.chat.completions.create(
+                        model="mixtral-8x7b-32768",
                         messages=[{"role": "user", "content": prompt}],
+                        max_tokens=1024,
                         stream=True,
                     ),
                     timeout=8.0,
@@ -156,16 +156,16 @@ Forneça uma explicação em português de por que estas raquetes são adequadas
 
                 reasoning_text = ""
                 async for chunk in response:
-                    if chunk.type == "content_block_delta" and hasattr(chunk.delta, "text"):
-                        reasoning_text += chunk.delta.text
+                    if chunk.choices[0].delta.content:
+                        reasoning_text += chunk.choices[0].delta.content
 
                 reasoning = reasoning_text
-                model_used = "claude-3-5-sonnet-20241022"
+                model_used = "mixtral-8x7b-32768"
 
                 # Get token counts if available
-                if hasattr(response, "usage"):
-                    input_tokens = response.usage.input_tokens
-                    output_tokens = response.usage.output_tokens
+                if hasattr(response, "usage") and response.usage:
+                    input_tokens = response.usage.prompt_tokens
+                    output_tokens = response.usage.completion_tokens
 
             except (asyncio.TimeoutError, Exception) as e:
                 # Degraded mode: use template response

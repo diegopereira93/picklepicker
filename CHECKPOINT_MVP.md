@@ -18,14 +18,14 @@
 - ❌ **NÃO TESTADO** - Requer API key + banco populado
 
 #### 2. Chat API (`backend/app/api/chat.py`)
-- ✅ Integração real com Claude 3.5 Sonnet via Anthropic SDK
+- ✅ Integração real com Groq (Mixtral 8x7B) via Groq SDK
 - ✅ Streaming SSE com respostas reais (não hardcoded)
 - ✅ Timeout de 8s com fallback para degraded mode
 - ✅ Token counting real da API
-- ❌ **NÃO TESTADO** - Requer ANTHROPIC_API_KEY
+- ❌ **NÃO TESTADO** - Requer GROQ_API_KEY
 
 #### 3. Dependências (`backend/pyproject.toml`)
-- ✅ Adicionados: openai>=1.0.0, anthropic>=0.25.0, httpx>=0.27.0
+- ✅ Adicionados: openai>=1.0.0, groq>=0.4.0, httpx>=0.27.0
 
 #### 4. Backend Tests
 - ✅ Corrigido sys.path em `backend/tests/conftest.py`
@@ -50,7 +50,7 @@
 
 2. **Chat LLM - Integração Real NÃO Validada**
    - Código escrito mas não testado com API real
-   - Necessita: `ANTHROPIC_API_KEY`
+   - Necessita: `GROQ_API_KEY` (modelo: mixtral-8x7b-32768)
    - Pendente: Verificar se respostas variam (não templates)
 
 3. **Embeddings NÃO Gerados**
@@ -61,11 +61,7 @@
 ### Testes Manuais Pendentes:
 
 ```bash
-# 1. Iniciar backend
-make dev-backend
-
-# 2. Testar RAG + Chat
-export ANTHROPIC_API_KEY="sk-ant-..."
+export GROQ_API_KEY="gsk_..."
 curl -N http://localhost:8000/api/v1/chat \
   -H "Content-Type: application/json" \
   -d '{"message":"Qual raquete para iniciante?","skill_level":"beginner","budget_brl":500}'
@@ -87,7 +83,7 @@ make test-frontend  # Deve passar 152/152
 ## 📋 PRÓXIMOS PASSOS (Próxima Sessão ULW)
 
 ### Fase 1: Configuração de Ambiente
-- [ ] Obter API keys (OpenAI + Anthropic)
+- [ ] Obter API keys (OpenAI + Groq)
 - [ ] Configurar `.env` no backend
 - [ ] Instalar novas dependências: `cd backend && pip install -e .`
 - [ ] Popular banco com embeddings: `python -m pipeline.embeddings.batch_embedder`
@@ -126,7 +122,7 @@ Makefile                                      # Fix PYTHONPATH
 | Critério | Status | Como Validar |
 |----------|--------|--------------|
 | RAG retorna paddles reais | ❌ Pendente | Log mostra query pgvector, retorna dados do banco |
-| Chat responde com Claude real | ❌ Pendente | Respostas variam por input, não são templates |
+| Chat responde com Groq real | ❌ Pendente | Respostas variam por input, não são templates |
 | Backend tests 100% | ⚠️ Parcial | 141/144 → precisa 144/144 |
 | Frontend tests 100% | ✅ OK | 152/152 passando |
 | Scraper workflow | ✅ OK | Corrigido, aguardando validação em prod |
@@ -138,7 +134,7 @@ Makefile                                      # Fix PYTHONPATH
 ```bash
 # backend/.env (não commitado)
 OPENAI_API_KEY=sk-...           # Para embeddings RAG
-ANTHROPIC_API_KEY=sk-ant-...    # Para Chat LLM
+GROQ_API_KEY=gsk_...            # Para Chat LLM (Mixtral via Groq)
 DATABASE_URL=postgresql://...   # Production DB
 ```
 
@@ -148,7 +144,7 @@ DATABASE_URL=postgresql://...   # Production DB
 
 1. **Sem testes reais**, não sabemos se o código funciona
 2. **Sem embeddings**, RAG não funciona (tabela vazia)
-3. **Sem API keys**, não podemos testar Claude/OpenAI
+3. **Sem API keys**, não podemos testar Groq/OpenAI
 4. **Sem banco populado**, não há dados para retornar
 
 ---
