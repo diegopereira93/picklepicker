@@ -38,25 +38,64 @@ class UserProfile(BaseModel):
 
 
 async def generate_query_embedding(query_text: str) -> list[float]:
-    """Generate embedding for user query using OpenAI.
+    """Generate embedding for user query using OpenAI (paid) or Hugging Face (free).
+    
+    Priority:
+    1. OpenAI (if OPENAI_API_KEY available) - 1536 dims
+    2. Hugging Face Inference API (free) - 384 dims
+    3. Zero vector fallback
     
     Args:
         query_text: User's natural language query
         
     Returns:
-        1536-dimensional embedding vector
+        Embedding vector (1536 dims for OpenAI, 384 for Hugging Face)
     """
+    import httpx
+    
+    # Try OpenAI first (if key available)
+    openai_key = os.environ.get("OPENAI_API_KEY")
+    if openai_key:
+        try:
+            client = AsyncOpenAI(api_key=openai_key)
+            response = await client.embeddings.create(
+                model="text-embedding-3-small",
+                input=query_text
+            )
+            return response.data[0].embedding
+        except Exception as e:
+            logger.warning(f"OpenAI embedding failed: {e}, trying Hugging Face...")
+    
+    # Try Hugging Face Inference API (FREE tier: 30k calls/month)
+    # No API key required for public models!
     try:
-        client = AsyncOpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-        response = await client.embeddings.create(
-            model="text-embedding-3-small",
-            input=query_text
-        )
-        return response.data[0].embedding
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.post(
+                "https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2",
+                json={"inputs": query_text},
+                headers={"Authorization": f"Bearer {os.environ.get('HUGGINGFACE_API_KEY', '')}"} if os.environ.get('HUGGINGFACE_API_KEY') else {}
+            )
+            if response.status_code == 200:
+                # Response is list of embeddings (one per input token), take mean
+                embeddings = response.json()
+                if isinstance(embeddings, list) and len(embeddings) > 0:
+                    # all-MiniLM-L6-v2 returns 384-dimensional vectors
+                    # If we need 1536 dims for pgvector compatibility, we pad with zeros
+                    embedding_384 = embeddings[0] if isinstance(embeddings[0], list) else embeddings
+                    if len(embedding_384) == 384:
+                        # Pad to 1536 dimensions to match OpenAI/pgvector schema
+                        embedding_1536 = embedding_384 + [0.0] * (1536 - 384)
+                        logger.info("Generated embedding via Hugging Face (free)")
+                        return embedding_1536
+                    return embedding_384
+            else:
+                logger.warning(f"Hugging Face API returned {response.status_code}: {response.text}")
     except Exception as e:
-        logger.error(f"Failed to generate embedding: {e}")
-        # Return zero vector as fallback
-        return [0.0] * 1536
+        logger.error(f"Hugging Face embedding failed: {e}")
+    
+    # Fallback: zero vector
+    logger.warning("All embedding providers failed, returning zero vector")
+    return [0.0] * 1536
 
 
 class RAGAgent:

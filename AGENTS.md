@@ -120,7 +120,7 @@ Scrapers → paddle_embeddings (pgvector)
 ## COMPLETED FIXES (MVP Launch)
 
 - ✅ **RAG Agent** — Integrated with real pgvector (OpenAI embeddings + semantic search)
-- ✅ **Chat LLM** — Integrated with Claude 3.5 Sonnet (streaming SSE, real responses)
+- ✅ **Chat LLM** — Integrated with Groq (Mixtral 8x7B, streaming SSE, real responses)
 - ✅ **Backend Tests** — ModuleNotFoundError fixed (141/144 passing)
 - ✅ **Frontend Tests** — 152/152 passing
 - ✅ **Dropshot Retailer** — Added to schema (id=3)
