@@ -127,4 +127,5 @@ CREATE TABLE price_alerts (
 -- ============================================================
 INSERT INTO retailers (name, base_url, integration_type, is_active) VALUES
     ('Brazil Pickleball Store', 'https://brazilpickleballstore.com.br', 'firecrawl', TRUE),
-    ('Mercado Livre', 'https://www.mercadolivre.com.br', 'ml_api', TRUE);
+    ('Mercado Livre', 'https://www.mercadolivre.com.br', 'ml_api', TRUE),
+    ('Drop Shot Brasil', 'https://www.dropshotbrasil.com.br', 'firecrawl', TRUE);
