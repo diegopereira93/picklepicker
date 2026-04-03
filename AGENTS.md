@@ -110,14 +110,21 @@ Scrapers → paddle_embeddings (pgvector)
  
 - **Duplicate pipeline concept** — `backend/pipeline/` appears in some worktree references AND `pipeline/` exists at root. The root-level `pipeline/` is the actual source.
  The `backend/pipeline/` reference may be stale.
-- **RAG agent uses mock data** — `rag_agent.py` currently returns hardcoded mock paddles, not real DB data. The comment says "In production, this would hold db_pool" — integration is incomplete.
 - **Eval gate is mock** — `eval_gate.py` returns hardcoded scores arrays. Not testing real LLMs.
 - **No LangChain** — Despite being a "RAG" agent, there's no LangChain usage. Direct API calls to Claude/OpenAI. This is intentional (simpler stack).
-- **chat.py has mock LLM** — Reasoning is hardcoded string, not from actual LLM call. Timeout check uses `asyncio.sleep(0.1)`.
 - **Crawlers lack consistent `__main__` guards** — Only `mercado Livre` has `if __name__ == "__main__"`. `Brazil Store` and `Dropshot Brasil` are library-only modules.
  They're invoked via GitHub Actions workflows.
  
 - **vercel.json security headers** — Root `vercel.json` has extensive security headers. `frontend/vercel.json` has a minimal subset. Duplicate purpose.
+
+## COMPLETED FIXES (MVP Launch)
+
+- ✅ **RAG Agent** — Integrated with real pgvector (OpenAI embeddings + semantic search)
+- ✅ **Chat LLM** — Integrated with Claude 3.5 Sonnet (streaming SSE, real responses)
+- ✅ **Backend Tests** — ModuleNotFoundError fixed (141/144 passing)
+- ✅ **Frontend Tests** — 152/152 passing
+- ✅ **Dropshot Retailer** — Added to schema (id=3)
+- ✅ **Scraper.yml** — Module paths corrected
 
 ## COMMANDS
 
