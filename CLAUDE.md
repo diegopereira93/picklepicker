@@ -1,37 +1,44 @@
-# Claude Code Configuration
+# PickleIQ — AI Assistant Configuration
 
-## gstack
+## Project Overview
 
-Use the `/browse` skill from gstack for all web browsing. Never use `mcp__claude-in-chrome__*` tools.
+Pickleball paddle intelligence platform for Brazilian market. Scrapes prices/specs from BR retailers, runs a RAG AI agent for personalized recommendations, and monetizes via affiliate links.
 
-**Available gstack skills:**
-- `/office-hours` — Q&A and guidance from gstack team
-- `/plan-ceo-review` — CEO-level review and stakeholder alignment
-- `/plan-eng-review` — Engineering review for technical decisions
-- `/plan-design-review` — Design review for UI/UX validation
-- `/design-consultation` — Design consultation for frontend work
-- `/review` — General review and feedback
-- `/ship` — Ship PR and merge process
-- `/land-and-deploy` — Landing and deployment management
-- `/canary` — Canary deployment and rollout
-- `/benchmark` — Performance benchmarking
-- `/browse` — Fast headless browser for QA, testing, and site dogfooding
-- `/qa` — Full QA testing workflow
-- `/qa-only` — QA testing only (no deployment)
-- `/design-review` — Detailed design review
-- `/setup-browser-cookies` — Configure browser cookies for testing
-- `/setup-deploy` — Set up deployment configuration
-- `/retro` — Retrospective and post-mortem
-- `/investigate` — Investigation and debugging
-- `/document-release` — Release documentation
-- `/codex` — Codebase knowledge and generation
-- `/cso` — Chief Security Officer review
-- `/autoplan` — Automatic planning
-- `/careful` — Careful/safe execution mode
-- `/freeze` — Freeze changes
-- `/guard` — Guard and protect
-- `/unfreeze` — Unfreeze changes
-- `/gstack-upgrade` — Update gstack to latest version
+**Current Version:** See VERSION file
+**Stack:** Python 3.12 + FastAPI (backend) | Next.js 14 App Router (frontend) | PostgreSQL + pgvector (DB)
+
+## Workflow
+
+Type `ultrawork` to activate the full agent orchestration engine. Describe what you want and the agents handle exploration, planning, delegation, and verification.
+
+### Available Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/ship` | Ship PR and merge process |
+| `/review` | Pre-landing code review |
+| `/investigate` | Systematic debugging with root cause analysis |
+| `/qa` | Full QA testing workflow |
+| `/browse` | Headless browser for QA and testing |
+| `/design-review` | Visual audit against DESIGN.md |
+| `/canary` | Post-deploy canary monitoring |
+
+### Agent Delegation
+
+| Category | Use For |
+|----------|---------|
+| `visual-engineering` | Frontend, UI/UX, design — load skill `frontend-ui-ux` |
+| `deep` | Autonomous backend/pipeline work |
+| `ultrabrain` | Hard architecture decisions |
+| `quick` | Single-file changes, typos, config |
+| `writing` | Documentation, prose |
+
+### Subagents
+
+- **explore** — Codebase grep for finding patterns (always background)
+- **librarian** — External docs/API reference lookup (always background)
+- **oracle** — Architecture/debugging consultation (expensive, use sparingly)
+- **plan** — Task decomposition and parallel execution planning
 
 ## Design System
 

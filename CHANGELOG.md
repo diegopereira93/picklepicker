@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0.1] - 2026-04-03
+
+### Changed
+- **Workflow Migration** — Migrated from GSD/gstack to native oh-my-openagent (omo) workflow. Updated CLAUDE.md with omo agent delegation, categories, and subagent configuration.
+- **CLAUDE.md Rewritten** — Replaced all gstack/GSD references with omo-native workflow: project overview, agent delegation table, subagent descriptions, command table, design system section.
+
+### Removed
+- **GSD Planning Artifacts** — Deleted entire `.planning/` directory (100+ files across milestones, phases, research, archives, quick tasks, memory backups, optimization plans).
+- **Old Tooling Directories** — Removed `.gstack/`, `.claire/`, `.clone/` directories.
+- **Debug/Temp Files** — Removed `debug-catalog.mjs`, `debug-catalog.playwright.ts`, `debug-paddles.png`, `test_firecrawl.py`, `run-e2e-test.sh`, `conftest.py`, UAT screenshots.
+- **Cache/Build Artifacts** — Removed `playwright_chromiumdev_profile-*`, `playwright-artifacts-*`, `tsx-1000/`, `v8-compile-cache-1000/`, `node-jiti/`, `__pycache__/`, `pickleiq_pipeline.egg-info/`, `test-results/`.
+- **Orphan Playwright Configs** — Removed root-level and frontend-level debug `playwright.config.ts`.
+
+### Fixed
+- **`.gitignore` Rewritten** — Comprehensive patterns for Python, Node, testing, Playwright, build artifacts, GSD/planning, Claude/Omo configs, OS files, debug files.
+
+---
+
 ## [1.3.0.0] - 2026-04-02
 
 ### Added

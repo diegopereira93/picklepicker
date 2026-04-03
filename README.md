@@ -88,7 +88,7 @@ A plataforma é desenvolvida em fases organizadas em milestones:
 | **5** | Autenticação Clerk, SEO, alertas de preço, blog, admin | ✅ Concluído |
 | **6** | Deploy produção, beta launch com 50 usuários | ✅ Concluído |
 
-**Status atual:** v1.3 Hybrid UI Redesign completo. Ver [ROADMAP.md](./.planning/ROADMAP.md) para detalhes.
+**Status atual:** v1.3 Hybrid UI Redesign completo.
 
 ---
 
@@ -105,14 +105,11 @@ A plataforma é desenvolvida em fases organizadas em milestones:
 ## Documentação
 
 - **[PickleIQ_PRD_v1.0.md](./PickleIQ_PRD_v1.0.md)** — Produto completo: problema, solução, personas, user stories, requisitos técnicos, roadmap
-- **[.planning/PROJECT.md](./.planning/PROJECT.md)** — Resumo executivo: o que estamos construindo, por que, para quem, decisões
-- **[.planning/milestones/v1.0-REQUIREMENTS.md](./.planning/milestones/v1.0-REQUIREMENTS.md)** — Requisitos técnicos detalhados por fase (v1.0, 8 fases)
-- **[.planning/ROADMAP.md](./.planning/ROADMAP.md)** — Roadmap executivo com timeline, KPIs e backlog
-- **[.planning/STATE.md](./.planning/STATE.md)** — Estado atual do projeto, decisões de pesquisa, questões abertas
 - **[TODOS.md](./TODOS.md)** — 7 itens deferred do eng review (T1-T7): infraestrutura, monitoring, legal, testes
-- **[CLAUDE.md](./CLAUDE.md)** — Configuração Claude Code: skills gstack disponíveis
+- **[CLAUDE.md](./CLAUDE.md)** — Configuração AI assistant: workflow, skills, design system
 - **[CONTRIBUTING.md](./CONTRIBUTING.md)** — Setup de desenvolvimento, CI/CD, workflow de contribuição
 - **[DESIGN.md](./DESIGN.md)** — Design system e diretrizes visuais do projeto
+- **[CHANGELOG.md](./CHANGELOG.md)** — Histórico de versões e mudanças
 
 ---
 
@@ -169,31 +166,34 @@ Frontend: http://localhost:3000
 
 ```
 picklepicker/
-├── backend/              # FastAPI + pipeline
+├── backend/              # FastAPI + RAG agent
 │   ├── app/
 │   │   ├── main.py
 │   │   ├── api/
-│   │   └── models/
-│   ├── pipeline/        # Scripts de scraping e processamento
-│   ├── evals/           # Resultados de eval gate + testes de carga
-│   └── requirements.txt
-├── frontend/             # Next.js
-│   ├── app/
-│   ├── components/
-│   └── public/
-├── .github/workflows/    # GitHub Actions (scraping schedule)
-├── .planning/            # Artefatos de planejamento GSD
-│   ├── PROJECT.md
-│   ├── REQUIREMENTS.md
-│   ├── ROADMAP.md
-│   └── STATE.md
+│   │   └── agents/
+│   ├── pipeline/         # Crawlers, embeddings, dedup, alerts
+│   ├── tests/
+│   └── pyproject.toml
+├── frontend/             # Next.js 14 (App Router)
+│   ├── src/
+│   │   ├── app/
+│   │   ├── components/
+│   │   ├── lib/
+│   │   └── types/
+│   └── package.json
+├── pipeline/             # Standalone scraping pipeline
+│   ├── crawlers/
+│   ├── embeddings/
+│   ├── dedup/
+│   └── alerts/
+├── .github/workflows/    # CI/CD + scheduled scraping
+├── prisma/               # Database migrations
+├── scripts/              # Utility scripts
 ├── docker-compose.yml
-├── .gitignore
-├── CHANGELOG.md
 ├── CLAUDE.md
 ├── CONTRIBUTING.md
 ├── DESIGN.md
-├── PickleIQ_PRD_v1.0.md
+├── CHANGELOG.md
 ├── TODOS.md
 └── VERSION
 ```
@@ -202,17 +202,16 @@ picklepicker/
 
 ## Próximas Ações
 
-Fases 1-8 concluídas — projeto em Milestone 2 (v1.1).
-Veja [.planning/ROADMAP.md](./.planning/ROADMAP.md) para o roadmap completo.
+v1.3 Hybrid UI Redesign completo. Planejando v1.4.
 
 ---
 
 ## Contato & Suporte
 
-- **Documentação interna:** Veja [CLAUDE.md](./CLAUDE.md) para skills gstack disponíveis
+- **Workflow:** Type `ultrawork` para AI-assisted development
 - **Deferred work:** Veja [TODOS.md](./TODOS.md) para 7 itens do eng review
 
 ---
 
-**Status do Projeto:** v0.2.4.0 — Fases 1-8 concluídas, Milestone 2 em progresso
-**Última atualização:** 2026-03-29
+**Status do Projeto:** v1.3.0.1 — 4 milestones entregues
+**Última atualização:** 2026-04-03
