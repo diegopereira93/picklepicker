@@ -30,6 +30,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
+          pip install -e ./pipeline
           pip install -e ./backend
 
       - name: Add jitter delay
@@ -45,30 +46,27 @@ jobs:
           max_attempts: 3
           retry_on: error
           command: |
-            cd backend
-            echo "Running Brazil Pickleball Store crawler (attempt $GITHUB_RUN_ATTEMPT)..."
-            python -m pipeline.crawlers.brazil_pickleball_store
+            echo "Running Brazil Store crawler (attempt $GITHUB_RUN_ATTEMPT)..."
+            python -m pipeline.crawlers.brazil_store
             echo "Running Mercado Livre crawler (attempt $GITHUB_RUN_ATTEMPT)..."
             python -m pipeline.crawlers.mercado_livre
-            echo "Running Drop Shot Brasil crawler (attempt $GITHUB_RUN_ATTEMPT)..."
-            python -m pipeline.crawlers.drop_shot_brasil
+            echo "Running Dropshot Brasil crawler (attempt $GITHUB_RUN_ATTEMPT)..."
+            python -m pipeline.crawlers.dropshot_brasil
 
       - name: Verify crawl results
         run: |
-          cd backend
           python -c "
 import asyncio
-from app.db import get_db
-from sqlalchemy import text
+from pipeline.db.connection import get_pool
 
 async def count_paddles():
     try:
-        async with get_db() as conn:
-            result = await conn.execute(text('SELECT COUNT(*) FROM paddles'))
-            count = result.scalar()
-            print(f'Total paddles indexed: {count}')
-            if count < 200:
-                print(f'WARNING: Expected >= 200 paddles, got {count}')
+        pool = await get_pool()
+        async with pool.acquire() as conn:
+            result = await conn.fetchval('SELECT COUNT(*) FROM paddles')
+            print(f'Total paddles indexed: {result}')
+            if result < 200:
+                print(f'WARNING: Expected >= 200 paddles, got {result}')
     except Exception as e:
         print(f'Database check failed: {e}')
 
@@ -78,7 +76,6 @@ asyncio.run(count_paddles())
       - name: Check data freshness
         if: always()
         run: |
-          cd backend
           python -c "
 import asyncio
 import sys
