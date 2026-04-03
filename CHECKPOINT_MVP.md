@@ -12,10 +12,11 @@
 
 #### 1. RAG Agent (`backend/app/agents/rag_agent.py`)
 - ✅ Integração real com pgvector via `get_similar_paddle_ids()`
-- ✅ Geração de embeddings via OpenAI (`generate_query_embedding()`)
+- ✅ Geração de embeddings via **OpenAI** (pago) ou **Hugging Face** (grátis, 30k calls/mês)
+  - Hugging Face: `sentence-transformers/all-MiniLM-L6-v2` (384 dims → pad para 1536)
 - ✅ Queries SQL reais em `paddle_embeddings` e `latest_prices`
-- ✅ Fallback para mock quando OPENAI_API_KEY não disponível
-- ❌ **NÃO TESTADO** - Requer API key + banco populado
+- ✅ Fallback para mock quando nenhuma API disponível
+- ❌ **NÃO TESTADO** - Requer banco populado
 
 #### 2. Chat API (`backend/app/api/chat.py`)
 - ✅ Integração real com Groq (Mixtral 8x7B) via Groq SDK
@@ -83,7 +84,7 @@ make test-frontend  # Deve passar 152/152
 ## 📋 PRÓXIMOS PASSOS (Próxima Sessão ULW)
 
 ### Fase 1: Configuração de Ambiente
-- [ ] Obter API keys (OpenAI + Groq)
+- [ ] Obter API keys (OpenAI ou Hugging Face + Groq)
 - [ ] Configurar `.env` no backend
 - [ ] Instalar novas dependências: `cd backend && pip install -e .`
 - [ ] Popular banco com embeddings: `python -m pipeline.embeddings.batch_embedder`
@@ -133,8 +134,16 @@ Makefile                                      # Fix PYTHONPATH
 
 ```bash
 # backend/.env (não commitado)
-OPENAI_API_KEY=sk-...           # Para embeddings RAG
-GROQ_API_KEY=gsk_...            # Para Chat LLM (Mixtral via Groq)
+# Opção 1 (paga, melhor qualidade): OpenAI para embeddings
+OPENAI_API_KEY=sk-...           
+
+# Opção 2 (grátis, 30k calls/mês): Hugging Face para embeddings  
+# Não requer API key para modelos públicos, mas recomendado para rate limits
+HUGGINGFACE_API_KEY=hf_...
+
+# Groq para Chat LLM (grátis com limites generosos)
+GROQ_API_KEY=gsk_...            
+
 DATABASE_URL=postgresql://...   # Production DB
 ```
 
