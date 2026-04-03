@@ -38,52 +38,69 @@ class UserProfile(BaseModel):
 
 
 async def generate_query_embedding(query_text: str) -> list[float]:
-    """Generate embedding for user query using OpenAI (paid) or Hugging Face (free).
+    """Generate embedding using FREE cloud providers only.
     
     Priority:
-    1. OpenAI (if OPENAI_API_KEY available) - 1536 dims
-    2. Hugging Face Inference API (free) - 384 dims
+    1. Jina AI (FREE: 1M tokens/day) - jina-embeddings-v2 (768 dims)
+    2. Hugging Face (FREE: 30k calls/month) - all-MiniLM-L6-v2 (384 dims)
     3. Zero vector fallback
     
     Args:
         query_text: User's natural language query
         
     Returns:
-        Embedding vector (1536 dims for OpenAI, 384 for Hugging Face)
+        1536-dimensional embedding vector (padded if necessary)
     """
     import httpx
     
-    # Try OpenAI first (if key available)
-    openai_key = os.environ.get("OPENAI_API_KEY")
-    if openai_key:
-        try:
-            client = AsyncOpenAI(api_key=openai_key)
-            response = await client.embeddings.create(
-                model="text-embedding-3-small",
-                input=query_text
-            )
-            return response.data[0].embedding
-        except Exception as e:
-            logger.warning(f"OpenAI embedding failed: {e}, trying Hugging Face...")
-    
-    # Try Hugging Face Inference API (FREE tier: 30k calls/month)
-    # No API key required for public models!
+    # Provider 1: Jina AI (FREE tier: 1M tokens/day, no API key required!)
+    # Sign up at https://jina.ai/embeddings to get API key (optional but recommended)
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
+            headers = {"Content-Type": "application/json"}
+            jina_key = os.environ.get("JINA_API_KEY")
+            if jina_key:
+                headers["Authorization"] = f"Bearer {jina_key}"
+            
+            response = await client.post(
+                "https://api.jina.ai/v1/embeddings",
+                json={
+                    "model": "jina-embeddings-v2-base-en",
+                    "input": [query_text]
+                },
+                headers=headers
+            )
+            if response.status_code == 200:
+                data = response.json()
+                if "data" in data and len(data["data"]) > 0:
+                    embedding_768 = data["data"][0]["embedding"]
+                    # Pad from 768 to 1536 dimensions for pgvector compatibility
+                    embedding_1536 = embedding_768 + [0.0] * (1536 - 768)
+                    logger.info("Generated embedding via Jina AI (free)")
+                    return embedding_1536
+            else:
+                logger.warning(f"Jina AI API returned {response.status_code}: {response.text}")
+    except Exception as e:
+        logger.warning(f"Jina AI embedding failed: {e}, trying Hugging Face...")
+    
+    # Provider 2: Hugging Face Inference API (FREE tier: 30k calls/month)
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            headers = {}
+            hf_key = os.environ.get("HUGGINGFACE_API_KEY")
+            if hf_key:
+                headers["Authorization"] = f"Bearer {hf_key}"
+            
             response = await client.post(
                 "https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2",
                 json={"inputs": query_text},
-                headers={"Authorization": f"Bearer {os.environ.get('HUGGINGFACE_API_KEY', '')}"} if os.environ.get('HUGGINGFACE_API_KEY') else {}
+                headers=headers
             )
             if response.status_code == 200:
-                # Response is list of embeddings (one per input token), take mean
                 embeddings = response.json()
                 if isinstance(embeddings, list) and len(embeddings) > 0:
-                    # all-MiniLM-L6-v2 returns 384-dimensional vectors
-                    # If we need 1536 dims for pgvector compatibility, we pad with zeros
                     embedding_384 = embeddings[0] if isinstance(embeddings[0], list) else embeddings
                     if len(embedding_384) == 384:
-                        # Pad to 1536 dimensions to match OpenAI/pgvector schema
                         embedding_1536 = embedding_384 + [0.0] * (1536 - 384)
                         logger.info("Generated embedding via Hugging Face (free)")
                         return embedding_1536
@@ -94,7 +111,7 @@ async def generate_query_embedding(query_text: str) -> list[float]:
         logger.error(f"Hugging Face embedding failed: {e}")
     
     # Fallback: zero vector
-    logger.warning("All embedding providers failed, returning zero vector")
+    logger.warning("All free embedding providers failed, returning zero vector")
     return [0.0] * 1536
 
 
