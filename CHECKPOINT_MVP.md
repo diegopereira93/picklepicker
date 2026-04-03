@@ -12,8 +12,9 @@
 
 #### 1. RAG Agent (`backend/app/agents/rag_agent.py`)
 - ✅ Integração real com pgvector via `get_similar_paddle_ids()`
-- ✅ Geração de embeddings via **OpenAI** (pago) ou **Hugging Face** (grátis, 30k calls/mês)
-  - Hugging Face: `sentence-transformers/all-MiniLM-L6-v2` (384 dims → pad para 1536)
+- ✅ Geração de embeddings via **PROVEDORES GRÁTIS** na cloud:
+  - **Jina AI** (1M tokens/dia, grátis) - `jina-embeddings-v2` (768 dims → pad 1536)
+  - **Hugging Face** (30k calls/mês, grátis) - `all-MiniLM-L6-v2` (384 dims → pad 1536)
 - ✅ Queries SQL reais em `paddle_embeddings` e `latest_prices`
 - ✅ Fallback para mock quando nenhuma API disponível
 - ❌ **NÃO TESTADO** - Requer banco populado
@@ -26,7 +27,7 @@
 - ❌ **NÃO TESTADO** - Requer GROQ_API_KEY
 
 #### 3. Dependências (`backend/pyproject.toml`)
-- ✅ Adicionados: openai>=1.0.0, groq>=0.4.0, httpx>=0.27.0
+- ✅ Adicionados: groq>=0.4.0, httpx>=0.27.0 (sem OpenAI - 100% gratuito)
 
 #### 4. Backend Tests
 - ✅ Corrigido sys.path em `backend/tests/conftest.py`
