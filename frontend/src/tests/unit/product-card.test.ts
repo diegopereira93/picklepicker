@@ -31,9 +31,9 @@ describe('ProductCard', () => {
     expect(priceEl.textContent).toContain('599')
   })
 
-  it('Test 6d: renders affiliate link Comprar button', () => {
+  it('Test 6d: renders affiliate link VER NO SITE button', () => {
     render(React.createElement(ProductCard, SAMPLE_PADDLE))
-    const link = screen.getByRole('link', { name: /comprar/i })
+    const link = screen.getByRole('link', { name: /ver.*no site/i })
     expect(link).toBeDefined()
     expect(link.getAttribute('href')).toBe('https://example.com/buy/proking-elite-500')
     expect(link.getAttribute('target')).toBe('_blank')

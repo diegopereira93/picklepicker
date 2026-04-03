@@ -46,10 +46,19 @@ export function ProductCard({
 
   return (
     <article
-      className="border rounded-xl p-4 bg-card shadow-sm flex flex-col gap-3 transition-transform hover:lift"
+      className="relative border rounded-lg p-4 bg-card shadow-sm flex flex-col gap-3 transition-transform hover:lift"
       data-testid={`product-card-${paddle_id}`}
       aria-labelledby={`product-title-${paddle_id}`}
     >
+      {similarity_score > 0.8 && (
+        <div 
+          className="absolute top-2 right-2 bg-primary text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded-sm"
+          data-testid="recommended-badge"
+        >
+          Recomendado
+        </div>
+      )}
+
       {/* Image placeholder - 80x80 per DESIGN.md */}
       <div
         className="w-20 h-20 bg-muted rounded-lg flex items-center justify-center text-muted-foreground text-xs shrink-0"
@@ -60,7 +69,8 @@ export function ProductCard({
       </div>
 
       <div className="flex-1 space-y-1">
-        <h3 id={`product-title-${paddle_id}`} className="font-semibold text-base leading-tight">{brand} {name}</h3>
+        <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{brand}</div>
+        <h3 id={`product-title-${paddle_id}`} className="font-semibold text-base leading-tight">{name}</h3>
         <div className="text-lg font-bold">{formatPrice(price_min_brl)}</div>
       </div>
 
