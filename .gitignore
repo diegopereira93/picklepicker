@@ -1,11 +1,59 @@
-.gitstack
-.venv
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+.venv/
+venv/
+*.pyc
+
+# Node
+node_modules/
+.npmrc
+
+# Environment
 .env
-*.egg-info
-.claude
-__pycache__
+.env.local
+.env.*.local
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
+coverage.xml
+test-results/
+
+# Playwright
+playwright*/
+playwright-artifacts*/
+
+# Build artifacts
+.next/
+.tsx-*/
+.v8-compile-cache-*/
+node-jiti/
+
+# GSD / Planning (legacy — not used)
+.planning/
 .gstack/
-.node_modules
-playwright*
-venv
-pytest*
+
+# Claude / OmO configs (local only)
+.claude/
+.claire/
+.clone/
+.opencode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Debug / temp files
+debug-*.png
+debug-*.mjs
