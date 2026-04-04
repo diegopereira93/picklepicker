@@ -6,13 +6,10 @@ import os
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
-# Add backend/ to path so 'from backend.app.xxx' imports work
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-# Mock psycopg_pool module before any imports that depend on it
 sys.modules['psycopg_pool'] = MagicMock()
 
-# Set a dummy DATABASE_URL for tests
 os.environ.setdefault('DATABASE_URL', 'postgresql://test:test@localhost/test')
 
 
@@ -39,9 +36,9 @@ def mock_db_pool():
     mock_pool.__aenter__ = AsyncMock(return_value=mock_pool)
     mock_pool.__aexit__ = AsyncMock(return_value=None)
 
-    with patch('backend.app.db.get_pool', new_callable=AsyncMock) as mock_get:
-        with patch('backend.app.db.close_pool', new_callable=AsyncMock) as mock_close:
-            with patch('backend.app.db.get_connection') as mock_get_conn:
+    with patch('app.db.get_pool', new_callable=AsyncMock) as mock_get:
+        with patch('app.db.close_pool', new_callable=AsyncMock) as mock_close:
+            with patch('app.db.get_connection') as mock_get_conn:
                 mock_get.return_value = mock_pool
                 mock_close.return_value = None
                 mock_get_conn.return_value = mock_conn
