@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0.2] - 2026-04-04
+
+### Fixed
+- **Paddle Detail Page 404** — `fetchProductData` now handles `{items:[...]}` response shape from the backend API, not just `{data:[...]}` and `{paddles:[...]}`.
+- **Chat 422 Unprocessable Entity** — Frontend proxy now sanitizes `skill_level` against valid values (`beginner`, `intermediate`, `advanced`) before forwarding to FastAPI, preventing validation errors from malformed profiles.
+- **Chat 503 Error Masking** — Proxy now forwards the actual FastAPI status code and error body instead of returning a generic 503, making backend errors debuggable from the frontend.
+- **Broken Paddle Images** — Catalog and detail pages now show a "Foto" placeholder when `image_url` is missing, instead of rendering nothing.
+- **psycopg_pool Deprecation Warning** — Added `open=False` to `AsyncConnectionPool` constructor to prevent auto-open before explicit `await pool.open()`.
+
 ## [1.3.0.1] - 2026-04-03
 
 ### Changed
