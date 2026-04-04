@@ -51,7 +51,7 @@ export default async function ProductPage({ params }: { params: PageParams }) {
           </ol>
         </nav>
         <p className="nv-section-label">RAQUETE</p>
-        {paddle.image_url && (
+        {paddle.image_url ? (
           <Image
             src={paddle.image_url}
             alt={`${paddle.brand} ${paddle.name} paddle`}
@@ -61,6 +61,10 @@ export default async function ProductPage({ params }: { params: PageParams }) {
             className="w-full max-w-md mx-auto mb-6 nv-product-image"
             sizes="(max-width: 768px) 100vw, 50vw"
           />
+        ) : (
+          <div className="w-full max-w-md mx-auto mb-6 h-[300px] bg-muted/50 rounded-lg flex items-center justify-center text-muted-foreground text-sm" aria-label={`${paddle.brand} ${paddle.name} — imagem indisponível`}>
+            Foto
+          </div>
         )}
         <h1 className="nv-display mb-2">{paddle.name}</h1>
         <p className="nv-caption mb-4">{paddle.brand}</p>
