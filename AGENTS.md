@@ -48,7 +48,7 @@ picklepicker/
 ├── prisma/            # Database migrations (legacy)
 ├── scripts/          # Utility scripts (SQL seeds, image extraction, NPS surveys)
 ├── docker-compose.yml # Local Postgres (pgvector image)
-├── Makefile            # Dev orchestration (setup, db-up, dev, test)
+├── Makefile            # Dev orchestration (setup, db-up, dev, test, prod-local)
 ├── CLAUDE.md           # AI assistant config — READ THIS
 ├── DESIGN.md          # Design system v2.0 — follow strictly
 ├── TODOS.md            # 7 deferred items from eng review
@@ -66,7 +66,7 @@ picklepicker/
 | Fix UI component | `frontend/src/components/` | Read DESIGN.md first |
 | Change page/route | `frontend/src/app/` | App Router convention |
 | Debug deploy | `.github/workflows/deploy.yml` | Railway (backend) + Vercel (frontend) |
-| Run tests locally | `make test-backend` / `make test-frontend` | pytest + vitest |
+| Run tests locally | `make test` | pytest + vitest |
 
 ## DATA FLOW
 
@@ -119,46 +119,51 @@ Scrapers → paddle_embeddings (pgvector)
 
 ## COMPLETED FIXES (MVP Launch)
 
-- ✅ **RAG Agent** — Integrated with real pgvector (OpenAI embeddings + semantic search)
+- ✅ **RAG Agent** — Integrated with real pgvector (Jina AI embeddings + semantic search, OpenAI REMOVIDO)
 - ✅ **Chat LLM** — Integrated with Groq (Mixtral 8x7B, streaming SSE, real responses)
-- ✅ **Backend Tests** — ModuleNotFoundError fixed (141/144 passing)
+- ✅ **Backend Tests** — 167/167 passing (5 erros pre-existentes nao relacionados)
 - ✅ **Frontend Tests** — 152/152 passing
 - ✅ **Dropshot Retailer** — Added to schema (id=3)
 - ✅ **Scraper.yml** — Module paths corrected
+- ✅ **Embeddings Gratuitos** — Implementado Jina AI + Hugging Face como fallback (OpenAI removido)
+- ✅ **Schema** — Migrado de vector(1536) para vector(768) para compatibilidade com Jina/HF
+- ✅ **RAG Tests** — Embedding generation, vector search, price filtering validados
 
 ## COMMANDS
 
 ```bash
+# Setup
+make setup                    # Install all deps (backend + frontend)
+make setup-backend            # Install backend deps only
+make setup-frontend           # Install frontend deps only
+make env-check                # Validate environment (Docker, DB URL, API keys)
+
 # Development
-make setup                    # Install all deps
-make db-up                     # Start PostgreSQL
-make dev                      # Start DB + backend + frontend
-make dev-backend               # Backend only (uvicorn :8000)
-make dev-frontend              # Frontend only (npm run dev :3000)
+make dev                      # Start DB + backend + frontend (parallel, hot-reload)
+make dev-backend              # Backend only (uvicorn --reload :8000)
+make dev-frontend             # Frontend only (npm run dev :3000)
 
 # Testing
-make test                      # All tests
-make test-backend              # pytest (backend)
-make test-frontend             # vitest (frontend)
-make test-e2e                # E2E scraper tests (requires DB)
-make test-backend-cov          # pytest with coverage report
+make test                     # All tests (backend + frontend)
+make test-backend             # pytest (backend)
+make test-frontend            # vitest (frontend)
+make test-e2e                 # E2E scraper tests (requires DB)
+make test-backend-cov         # pytest with coverage report
 
 # Database
-make db-up                     # Start PostgreSQL
-make db-down                   # Stop PostgreSQL
-make db-shell                   # Open psql shell
-make db-clean                   # Remove all data (destructive!)
+make db-up                    # Start PostgreSQL (health check, max 30s wait)
+make db-down                  # Stop PostgreSQL
+make db-logs                  # Tail PostgreSQL logs
+make db-shell                 # Open psql shell
+make db-clean                 # Remove all data (destructive!)
 
-# CI/CD (GitHub Actions)
-# .github/workflows/deploy.yml        — Deploy to Railway + Vercel
-# .github/workflows/test.yml          — Test + coverage + lint
-# .github/workflows/scrape.yml       — Scheduled scraping (cron)
-# .github/workflows/scraper.yml      — Individual crawler runs
-# .github/workflows/lighthouse.yml   — Frontend performance
-# .github/workflows/price-alerts-check.yml — Price alert worker
-# .github/workflows/nps-survey.yml   — NPS survey distribution
-# .github/workflows/validate-production.yml — Playwright production validation
-```
+# Control
+make stop                     # Stop all services (DB + backend + frontend)
+make clean                    # Remove venvs, node_modules, DB data
+
+# Help
+make help                     # List all commands
+make help-full                # Grouped command reference
 
 ## NOTES
 
