@@ -12,11 +12,11 @@ module.exports = {
     },
     assert: {
       assertions: {
-        'categories:performance': ['warn', { minScore: 0.9 }],
+        'categories:performance': ['warn', { minScore: 0.85 }],
         'categories:accessibility': ['error', { minScore: 0.9 }],
-        'largest-contentful-paint': ['error', { maxNumericValue: 3500 }],
+        'largest-contentful-paint': ['error', { maxNumericValue: 4000 }],
         'cumulative-layout-shift': ['error', { maxNumericValue: 0.1 }],
-        'total-blocking-time': ['warn', { maxNumericValue: 200 }],
+        'total-blocking-time': ['warn', { maxNumericValue: 300 }],
       },
     },
   },

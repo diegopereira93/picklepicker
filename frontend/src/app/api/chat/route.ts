@@ -26,9 +26,16 @@ export async function POST(request: Request) {
     return new Response(JSON.stringify({ error: 'No user message' }), { status: 400 })
   }
 
+  // Sanitize skill_level to match backend validator (beginner | intermediate | advanced)
+  const VALID_LEVELS = ['beginner', 'intermediate', 'advanced'] as const
+  const rawLevel = profile?.level?.toLowerCase() ?? ''
+  const skill_level: ChatRequest['skill_level'] = VALID_LEVELS.includes(rawLevel as typeof VALID_LEVELS[number])
+    ? (rawLevel as ChatRequest['skill_level'])
+    : 'beginner'
+
   const chatRequest: ChatRequest = {
     message: lastUserMessage.content,
-    skill_level: (profile?.level as ChatRequest['skill_level']) ?? 'beginner',
+    skill_level,
     budget_brl: profile?.budget_max ?? 600,
     style: profile?.style,
   }
@@ -46,7 +53,11 @@ export async function POST(request: Request) {
   }
 
   if (!fastapiResponse.ok) {
-    return new Response(JSON.stringify({ error: 'FastAPI error' }), { status: 503 })
+    const errorBody = await fastapiResponse.text().catch(() => 'Unknown error')
+    return new Response(
+      JSON.stringify({ error: 'FastAPI error', status: fastapiResponse.status, detail: errorBody }),
+      { status: fastapiResponse.status, headers: { 'Content-Type': 'application/json' } }
+    )
   }
 
   const fastapiStream = fastapiResponse.body

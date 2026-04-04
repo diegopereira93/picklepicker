@@ -11,7 +11,7 @@ export async function fetchProductData(brand: string, modelSlug: string): Promis
     )
     if (!res.ok) return null
     const data = await res.json()
-    const paddle = data.data?.[0] ?? data.paddles?.[0] ?? null
+    const paddle = data.data?.[0] ?? data.paddles?.[0] ?? data.items?.[0] ?? null
 
     if (!paddle && /^\d+$/.test(modelSlug)) {
       const idRes = await fetch(`${FASTAPI_URL}/api/v1/paddles/${modelSlug}`)

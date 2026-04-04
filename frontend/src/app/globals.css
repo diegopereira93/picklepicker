@@ -4,63 +4,356 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    /* PickleIQ brand: sport-appropriate lime/amber palette */
-    /* CONTRAST NOTE: lime-500 on white = 2.7:1 (fails WCAG AA for small text) */
-    /* Rule: use lime-500 only as button/CTA background (bg-primary), never as small text color */
-    --primary: 84 81% 44%;              /* lime-500 #84CC16 — pickleball yellow-green */
-    --primary-foreground: 224 48% 11%;  /* near-black #0F172A — text on lime buttons */
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 45 96% 65%;               /* amber-300 #FCD34D — paddle face/ball color */
-    --accent-foreground: 224 48% 11%;   /* near-black on amber */
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-    --radius: 0.5rem;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-  }
+    /* === Sport Energy Colors === */
+    --sport-primary: #84CC16;        /* lime-500: primary actions on dark */
+    --sport-secondary: #FCD34D;      /* amber-300: secondary highlights */
 
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    /* Brand preserved in dark mode: lime-400 desaturated ~15% */
-    --primary: 84 70% 50%;              /* #A3E635 — lime stays visible */
-    --primary-foreground: 224 48% 11%; /* keep dark text on lime */
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 45 90% 60%;               /* amber-300 slightly muted */
-    --accent-foreground: 224 48% 11%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 84 70% 50%;                /* lime ring for focus states */
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    /* === Data Credibility Colors === */
+    --data-green: #76b900;           /* green for charts, tables, section labels */
+    --data-green-light: #bff230;     /* hover state */
+
+    /* === Base Palette === */
+    --color-green: #76b900;          /* alias for compatibility */
+    --color-black: #000000;
+    --color-white: #ffffff;
+    --color-near-black: #1a1a1a;
+
+    /* === Neutral Scale === */
+    --color-gray-300: #a7a7a7;
+    --color-gray-400: #898989;
+    --color-gray-500: #757575;
+    --color-gray-border: #5e5e5e;
+
+    /* === Status / Semantic === */
+    --color-red-500: #e52020;
+    --color-red-800: #650b0b;
+    --color-green-500: #3f8500;
+    --color-blue-700: #0046a4;
+
+    /* === Interactive States === */
+    --color-link-hover: #3860be;
+    --color-button-hover: #1eaedb;
+    --color-button-active: #007fff;
+
+    /* === Typography Scale === */
+    --font-display: var(--font-inter), system-ui, sans-serif;
+    --font-body: var(--font-inter), system-ui, -apple-system, sans-serif;
+    --font-data: var(--font-mono), 'Fira Code', monospace;
+
+    /* === Font Sizes === */
+    --font-size-hero: 4rem;          /* 64px - H1 hero */
+    --font-size-h2: 1.75rem;         /* 28px - section heading */
+    --font-size-h3: 1.25rem;         /* 20px - card title */
+    --font-size-body: 1rem;          /* 16px - body */
+    --font-size-link: 0.875rem;     /* 14px - navigation, labels */
+    --font-size-caption: 0.75rem;   /* 12px - captions */
+
+    /* === Font Weights === */
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    /* === Line Heights === */
+    --line-height-tight: 1.1;
+    --line-height-snug: 1.25;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.75;
+
+    /* === Spacing Scale (base unit: 8px) === */
+    --space-2xs: 4px;
+    --space-xs: 8px;
+    --space-sm: 16px;
+    --space-md: 24px;
+    --space-lg: 32px;
+    --space-xl: 48px;
+    --space-2xl: 64px;
+    --space-3xl: 80px;
+    --space-card-gap: 20px;
+
+    /* === Border Radius === */
+    --radius-sharp: 2px;
+    --radius-card: 4px;
+    --radius-circle: 50%;
+
+    /* === Depth & Elevation === */
+    --shadow-standard: rgba(0, 0, 0, 0.3) 0px 0px 5px 0px;
+    --shadow-hover: rgba(0, 0, 0, 0.5) 0px 4px 12px 0px;
+    --border-accent: 2px solid var(--data-green);
+    --border-sport: 2px solid var(--sport-primary);
+
+    /* === Layout === */
+    --max-content-width: 1200px;
+
+    /* === Shadcn compatibility shims === */
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 78 100% 36%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 65%;
+    --accent: 78 100% 36%;
+    --accent-foreground: 0 0% 0%;
+    --destructive: 0 80% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 37%;
+    --input: 0 0% 37%;
+    --ring: 0 0% 0%;
+    --radius: 0.125rem;
   }
+}
+
+/* === Fonts loaded via next/font in layout.tsx === */
+
+/* === Base element resets === */
+html {
+  font-family: var(--font-body);
+  background-color: var(--color-black);
+  color: var(--color-white);
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+  background-color: var(--color-black);
+  color: var(--color-white);
+  min-height: 100vh;
+}
+
+/* === Typography Scale === */
+
+/* Hero / Display */
+.hy-display,
+.hy-hero {
+  font-family: var(--font-display);
+  font-size: var(--font-size-hero);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  letter-spacing: -0.02em;
+}
+
+@media (max-width: 768px) {
+  .hy-display,
+  .hy-hero {
+    font-size: 2.5rem; /* 40px on mobile */
+  }
+}
+
+/* Section Heading */
+.hy-heading {
+  font-family: var(--font-display);
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-snug);
+}
+
+/* Section Heading (alias for semantic clarity) */
+.hy-section-heading {
+  font-family: var(--font-display);
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-snug);
+}
+
+/* Subheading (body text for descriptions under headings) */
+.hy-subheading {
+  font-family: var(--font-body);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+  color: var(--color-gray-300);
+}
+
+.hy-light-section .hy-subheading {
+  color: var(--color-gray-500);
+}
+
+/* Caption Small (alias for caption) */
+.hy-caption-small {
+  font-family: var(--font-body);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.43;
+}
+
+/* Card Title */
+.hy-card-title {
+  font-family: var(--font-display);
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.3;
+}
+
+/* Body */
+.hy-body {
+  font-family: var(--font-body);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+}
+
+/* Body Bold */
+.hy-body-bold {
+  font-family: var(--font-body);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-normal);
+}
+
+/* Data / Specs (JetBrains Mono) */
+.hy-data {
+  font-family: var(--font-data);
+  font-size: 0.875rem;
+  font-weight: var(--font-weight-regular);
+  line-height: 1.4;
+}
+
+/* Navigation */
+.hy-nav-link {
+  font-family: var(--font-body);
+  font-size: var(--font-size-link);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Section Label (uppercase, green accent) */
+.hy-section-label,
+.hy-label {
+  font-family: var(--font-body);
+  font-size: var(--font-size-link);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--data-green);
+}
+
+.hy-light-section .hy-section-label,
+.hy-light-section .hy-label {
+  color: var(--sport-primary);
+}
+
+/* Caption */
+.hy-caption {
+  font-family: var(--font-body);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-regular);
+  line-height: 1.43;
+}
+
+/* Micro Label */
+.hy-micro {
+  font-family: var(--font-body);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: normal;
+}
+
+/* === Layout helpers === */
+.hy-container {
+  max-width: var(--max-content-width);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--space-sm);
+  padding-right: var(--space-sm);
+}
+
+/* === Section alternation === */
+.hy-dark-section {
+  background-color: var(--color-black);
+  color: var(--color-white);
+}
+
+.hy-light-section {
+  background-color: var(--color-white);
+  color: var(--color-near-black);
+}
+
+.hy-near-black-section {
+  background-color: var(--color-near-black);
+  color: var(--color-white);
+}
+
+/* === Image treatment === */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+.hy-screenshot {
+  box-shadow: var(--shadow-standard);
+}
+
+.hy-avatar {
+  border-radius: var(--radius-circle);
+}
+
+/* === Focus rings — WCAG AA === */
+*:focus-visible {
+  outline: 2px solid var(--color-black);
+  outline-offset: 2px;
+  border-radius: var(--radius-sharp);
+}
+
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--color-black);
+  outline-offset: 2px;
+  border-radius: var(--radius-sharp);
+}
+
+/* === Global link styles === */
+
+/* Links on dark backgrounds */
+.hy-dark-section a,
+a.hy-link-dark {
+  color: var(--color-white);
+  text-decoration: none;
+}
+
+.hy-dark-section a:hover,
+a.hy-link-dark:hover {
+  color: var(--color-link-hover);
+  text-decoration: none;
+}
+
+/* Links on light backgrounds */
+.hy-light-section a,
+a.hy-link-light {
+  color: var(--color-near-black);
+  text-decoration: underline;
+  text-decoration-color: var(--data-green);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 2px;
+}
+
+.hy-light-section a:hover,
+a.hy-link-light:hover {
+  color: var(--color-link-hover);
+  text-decoration: none;
+}
+
+/* Sport accent links (lime on dark) */
+a.hy-link-sport {
+  color: var(--sport-primary);
+  text-decoration: none;
+}
+
+a.hy-link-sport:hover {
+  color: var(--sport-secondary);
 }
 
 @layer base {
@@ -72,136 +365,717 @@
   }
 }
 
+/* === Navigation === */
+.hy-nav {
+  background-color: var(--color-black);
+  border-bottom: 1px solid var(--color-gray-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.hy-nav-brand {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--color-white);
+  text-decoration: none;
+}
+
+.hy-nav-brand span {
+  color: var(--sport-primary);
+}
+
+.hy-nav-links {
+  display: none;
+}
+
+.hy-nav-link {
+  font-family: var(--font-body);
+  font-size: var(--font-size-link);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  color: var(--color-white);
+  text-decoration: none;
+  letter-spacing: 0.05em;
+  transition: color 150ms ease;
+}
+
+.hy-nav-link:hover {
+  color: var(--color-link-hover);
+}
+
+.hy-nav-link:focus-visible {
+  outline: 2px solid var(--color-black);
+  outline-offset: 2px;
+}
+
+.hy-nav-cta {
+  display: none;
+}
+
+.hy-nav-cta-button {
+  background: transparent;
+  border: 2px solid var(--sport-primary);
+  color: var(--color-white);
+  padding: 11px 13px;
+  font-size: var(--font-size-link);
+  font-weight: var(--font-weight-bold);
+  border-radius: var(--radius-sharp);
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.hy-nav-cta-button:hover {
+  background: var(--color-button-hover);
+  border-color: var(--color-button-hover);
+  color: var(--color-white);
+}
+
+.hy-nav-mobile {
+  display: flex;
+}
+
+.hy-nav-link-mobile {
+  font-size: 1rem;
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  color: var(--color-white);
+  text-decoration: none;
+  padding: 8px 0;
+  display: block;
+  transition: color 150ms ease;
+}
+
+.hy-nav-link-mobile:hover {
+  color: var(--color-link-hover);
+}
+
+/* SheetContent overlay for mobile nav */
+.hy-nav-overlay {
+  background-color: var(--color-black) !important;
+  color: var(--color-white);
+  border-left: 1px solid var(--color-gray-border);
+}
+
+/* === Footer === */
+.hy-footer {
+  background-color: var(--color-black);
+  border-top: 1px solid var(--color-gray-border);
+  padding-top: var(--space-xl);
+  padding-bottom: var(--space-xl);
+}
+
+.hy-footer-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-lg);
+}
+
+.hy-footer h4 {
+  font-family: var(--font-display);
+  font-size: var(--font-size-link);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-white);
+  margin-bottom: var(--space-xs);
+}
+
+.hy-footer a {
+  color: var(--color-gray-500);
+  text-decoration: none;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.hy-footer a:hover {
+  color: var(--color-link-hover);
+}
+
+/* === Section padding scale === */
+.hy-section {
+  padding-top: var(--space-2xl);
+  padding-bottom: var(--space-2xl);
+}
+
+.hy-section-hero {
+  padding-top: var(--space-3xl);
+  padding-bottom: var(--space-3xl);
+}
+
+/* === Responsive breakpoints === */
+
+/* > 1350px — Large desktop */
+@media (min-width: 1350px) {
+  .hy-container {
+    padding-left: var(--space-lg);
+    padding-right: var(--space-lg);
+  }
+}
+
+/* 1024px–1350px — Desktop: show full nav */
+@media (min-width: 1024px) {
+  .hy-nav-links {
+    display: flex;
+    gap: var(--space-lg);
+  }
+
+  .hy-nav-cta {
+    display: flex;
+  }
+
+  .hy-nav-mobile {
+    display: none;
+  }
+}
+
+/* 768px–1024px — Tablet: full card grids, 2-col footer */
+@media (max-width: 1024px) {
+  .hy-section {
+    padding-top: var(--space-xl);
+    padding-bottom: var(--space-xl);
+  }
+
+  .hy-section-hero {
+    padding-top: var(--space-2xl);
+    padding-bottom: var(--space-2xl);
+  }
+
+  .hy-footer-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* 600px–768px — Tablet small: 2-col grids */
+@media (max-width: 768px) {
+  .hy-footer-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 375px–600px — Mobile */
+@media (max-width: 600px) {
+  .hy-section {
+    padding-top: var(--space-md);
+    padding-bottom: var(--space-md);
+  }
+
+  .hy-section-hero {
+    padding-top: var(--space-xl);
+    padding-bottom: var(--space-xl);
+  }
+}
+
+/* < 375px — Mobile small: compact */
+@media (max-width: 375px) {
+  .hy-container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .hy-section {
+    padding-top: var(--space-sm);
+    padding-bottom: var(--space-sm);
+  }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+}
 
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
+/* === Hero section === */
+.hy-hero {
+  background-color: var(--color-black);
+  color: var(--color-white);
+  text-align: center;
+}
 
-  .sr-only:focus {
-    position: static;
-    width: auto;
-    height: auto;
-    padding: inherit;
-    margin: inherit;
-    overflow: visible;
-    clip: auto;
-    white-space: normal;
-  }
+.hy-hero-gradient {
+  background-image: linear-gradient(135deg, var(--color-black) 60%, #1a3a00 100%);
+}
 
-  /* Focus indicators for accessibility - WCAG 2.1 AA */
-  *:focus-visible {
-    outline: 2px solid hsl(var(--primary));
-    outline-offset: 2px;
-    border-radius: 2px;
-  }
+.hy-hero h1 {
+  color: var(--color-white);
+}
 
-  /* High contrast focus for buttons and interactive elements */
-  button:focus-visible,
-  a:focus-visible,
-  [role="button"]:focus-visible,
-  input:focus-visible,
-  select:focus-visible,
-  textarea:focus-visible {
-    outline: 2px solid hsl(var(--primary));
-    outline-offset: 2px;
-    border-radius: 4px;
-  }
+.hy-hero h1 span {
+  color: var(--sport-primary);
+}
 
-  /* Skip link styling */
-  .skip-link:focus {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 50;
-    padding: 0.5rem 1rem;
-    background: hsl(var(--primary));
-    color: hsl(var(--primary-foreground));
-    text-decoration: none;
-    font-weight: 500;
+/* === Product card === */
+.hy-product-card {
+  background-color: var(--color-white);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-standard);
+  overflow: hidden;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+  border: none;
+}
+
+.hy-dark-section .hy-product-card,
+.hy-near-black-section .hy-product-card {
+  background-color: var(--color-near-black);
+}
+
+.hy-product-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.hy-product-card-inner {
+  display: block;
+  padding: var(--space-sm);
+  text-decoration: none;
+  color: inherit;
+  height: 100%;
+}
+
+.hy-product-card-brand {
+  font-family: var(--font-body);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--data-green);
+  margin-bottom: 4px;
+}
+
+.hy-product-card-title {
+  font-family: var(--font-display);
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1.3;
+  color: var(--color-near-black);
+  border-bottom: 2px solid var(--data-green);
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+}
+
+.hy-dark-section .hy-product-card-title,
+.hy-near-black-section .hy-product-card-title {
+  color: var(--color-white);
+}
+
+.hy-product-card-body {
+  font-family: var(--font-body);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+  color: var(--color-gray-500);
+}
+
+.hy-product-card-price {
+  font-family: var(--font-data);
+  font-size: 1.125rem;
+  font-weight: var(--font-weight-bold);
+  color: var(--data-green);
+  margin-top: 8px;
+}
+
+.hy-product-card-price span {
+  font-size: var(--font-size-link);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-500);
+}
+
+/* Skill level badge */
+.hy-skill-badge {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: normal;
+  color: var(--data-green);
+  background-color: var(--color-near-black);
+  border-radius: 1px;
+  padding: 2px 6px;
+  margin-top: 4px;
+}
+
+/* Stock status */
+.hy-stock-in {
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-green-500);
+  margin-top: 4px;
+}
+
+.hy-stock-out {
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-500);
+  margin-top: 4px;
+}
+
+/* Specs row */
+.hy-specs-row {
+  font-family: var(--font-data);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-400);
+  margin-top: 4px;
+}
+
+/* === Catalog grid === */
+.hy-catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-card-gap);
+  min-height: 800px;
+}
+
+@media (max-width: 1024px) {
+  .hy-catalog-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@layer utilities {
-  /* Motion system - respects prefers-reduced-motion */
-  @media (prefers-reduced-motion: no-preference) {
-    .animate-in {
-      animation: fade-in 0.3s ease-out;
-    }
-
-    .animate-in-slide-up {
-      animation: slide-up 0.3s ease-out;
-    }
-
-    .animate-in-scale {
-      animation: scale-in 0.2s ease-out;
-    }
-
-    .transition-transform {
-      transition-property: transform;
-      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-      transition-duration: 200ms;
-    }
-
-    .hover\:lift:hover {
-      transform: translateY(-4px);
-    }
+@media (max-width: 600px) {
+  .hy-catalog-grid {
+    grid-template-columns: 1fr;
   }
 }
 
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+/* === Catalog page header === */
+.hy-catalog-header {
+  padding-top: var(--space-lg);
+  padding-bottom: var(--space-lg);
 }
 
-@keyframes slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.hy-breadcrumb {
+  font-family: var(--font-body);
+  font-size: var(--font-size-link);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-gray-500);
+  margin-bottom: var(--space-xs);
 }
 
-@keyframes scale-in {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+.hy-breadcrumb a {
+  color: var(--color-gray-500);
+  text-decoration: none;
 }
 
-@keyframes message-enter {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.hy-breadcrumb a:hover {
+  color: var(--color-link-hover);
 }
 
-.message-enter {
-  animation: message-enter 0.25s ease-out;
+/* === Card component base === */
+.hy-card {
+  background-color: var(--color-white);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-standard);
+  border: none;
+  overflow: hidden;
 }
+
+.hy-dark-section .hy-card,
+.hy-near-black-section .hy-card {
+  background-color: var(--color-near-black);
+  color: var(--color-white);
+}
+
+.hy-card:hover {
+  box-shadow: var(--shadow-hover);
+}
+
+.hy-card-header {
+  padding: var(--space-sm) var(--space-sm) 8px var(--space-sm);
+}
+
+.hy-card-title-text {
+  font-family: var(--font-display);
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-snug);
+  border-bottom: 2px solid var(--data-green);
+  padding-bottom: 4px;
+  display: inline-block;
+}
+
+.hy-card-content {
+  padding: 0 var(--space-sm) var(--space-sm) var(--space-sm);
+}
+
+.hy-card-footer {
+  padding: 0 var(--space-sm) var(--space-sm) var(--space-sm);
+  display: flex;
+  align-items: center;
+}
+
+.hy-card-description {
+  font-family: var(--font-body);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+  color: var(--color-gray-500);
+}
+
+/* === Skeleton cards === */
+.hy-skeleton-card {
+  background-color: var(--color-near-black);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-standard);
+  overflow: hidden;
+  padding: var(--space-sm);
+  min-height: 280px;
+}
+
+.hy-skeleton-line {
+  background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
+  background-size: 200% 100%;
+  animation: hy-skeleton-shimmer 1.5s infinite;
+  border-radius: var(--radius-sharp);
+  height: 16px;
+  margin-bottom: 8px;
+}
+
+.hy-skeleton-line-title {
+  height: 24px;
+  width: 70%;
+  margin-bottom: 12px;
+}
+
+.hy-skeleton-image {
+  height: 192px;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+@keyframes hy-skeleton-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* === Buttons === */
+.hy-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 13px;
+  font-family: var(--font-body);
+  font-size: var(--font-size-link);
+  font-weight: var(--font-weight-bold);
+  border-radius: var(--radius-sharp);
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+  text-decoration: none;
+}
+
+.hy-button-primary {
+  background: transparent;
+  border: 2px solid var(--sport-primary);
+  color: var(--color-white);
+}
+
+.hy-button-primary:hover {
+  background: var(--color-button-hover);
+  border-color: var(--color-button-hover);
+  color: var(--color-white);
+}
+
+.hy-button-secondary {
+  background: transparent;
+  border: 1px solid var(--sport-primary);
+  color: var(--color-white);
+}
+
+.hy-button-cta {
+  background: var(--sport-primary);
+  border: none;
+  color: var(--color-near-black);
+}
+
+.hy-button-cta:hover {
+  background: var(--sport-secondary);
+}
+
+/* === Quiz cards === */
+.hy-quiz-card {
+  background-color: var(--color-near-black);
+  border: 2px solid var(--color-gray-border);
+  border-radius: var(--radius-card);
+  padding: var(--space-md);
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
+}
+
+.hy-quiz-card:hover {
+  border-color: var(--sport-primary);
+}
+
+.hy-quiz-card-selected,
+.hy-quiz-card.selected {
+  border-color: var(--sport-primary);
+  background: rgba(132, 204, 22, 0.1);
+  box-shadow: 0 0 0 2px var(--sport-primary), 0 0 0 4px rgba(132, 204, 22, 0.2);
+}
+
+.hy-quiz-card-title {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: 8px;
+}
+
+.hy-quiz-card-desc {
+  font-family: var(--font-body);
+  font-size: var(--font-size-body);
+  color: var(--color-gray-500);
+}
+
+/* === Comparison table === */
+.hy-comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--color-white);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: var(--shadow-standard);
+}
+
+.hy-comparison-table th {
+  background-color: var(--color-near-black);
+  color: var(--color-white);
+  padding: var(--space-sm);
+  text-align: left;
+  font-family: var(--font-display);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+}
+
+.hy-comparison-table th:first-child {
+  background-color: var(--color-black);
+}
+
+.hy-comparison-table td {
+  padding: var(--space-sm);
+  border-bottom: 1px solid var(--color-gray-border);
+  font-family: var(--font-data);
+  font-size: var(--font-size-link);
+}
+
+.hy-comparison-table tr:last-child td {
+  border-bottom: none;
+}
+
+.hy-comparison-table .hy-highlight {
+  background: rgba(118, 185, 0, 0.1);
+}
+
+.hy-comparison-table .hy-best {
+  color: var(--data-green);
+  font-weight: var(--font-weight-bold);
+}
+
+/* === Chat widget === */
+.hy-chat-container {
+  max-width: 600px;
+  margin: var(--space-lg) auto 0;
+  background-color: var(--color-near-black);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+}
+
+.hy-chat-messages {
+  padding: var(--space-md);
+  min-height: 300px;
+}
+
+.hy-chat-message {
+  margin-bottom: var(--space-xs);
+}
+
+.hy-chat-message-ai {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.hy-chat-avatar {
+  width: 32px;
+  height: 32px;
+  background-color: var(--sport-primary);
+  border-radius: var(--radius-circle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-near-black);
+  flex-shrink: 0;
+}
+
+.hy-chat-bubble {
+  background-color: var(--color-near-black);
+  border: 1px solid var(--color-gray-border);
+  border-radius: var(--radius-card);
+  padding: 12px var(--space-sm);
+  color: var(--color-white);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-normal);
+}
+
+.hy-chat-message-user {
+  text-align: right;
+}
+
+.hy-chat-message-user .hy-chat-bubble {
+  background-color: var(--sport-primary);
+  color: var(--color-near-black);
+  display: inline-block;
+}
+
+.hy-chat-input-container {
+  padding: var(--space-xs);
+  border-top: 1px solid var(--color-gray-border);
+  display: flex;
+  gap: 12px;
+}
+
+.hy-chat-input {
+  flex: 1;
+  background-color: var(--color-black);
+  border: 1px solid var(--color-gray-border);
+  border-radius: var(--radius-card);
+  padding: 12px;
+  color: var(--color-white);
+  font-size: var(--font-size-body);
+}
+
+.hy-chat-input::placeholder {
+  color: var(--color-gray-500);
+}
+
+.hy-chat-send {
+  background-color: var(--sport-primary);
+  border: none;
+  color: var(--color-near-black);
+  padding: 12px var(--space-md);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-bold);
+  border-radius: var(--radius-sharp);
+  cursor: pointer;
+}
+
+.hy-chat-send:hover {
+  background-color: var(--sport-secondary);
+}
+
+/* === NVIDIA compatibility aliases === */
+/* Keep old class names working for gradual migration */
+.nv-dark-section { @apply hy-dark-section; }
+.nv-light-section { @apply hy-light-section; }
+.nv-container { @apply hy-container; }
+.nv-section { @apply hy-section; }
+.nv-section-hero { @apply hy-section-hero; }
+.nv-section-label { @apply hy-section-label; }
+.nv-product-card { @apply hy-product-card; }
+.nv-catalog-grid { @apply hy-catalog-grid; }
+.nv-nav { @apply hy-nav; }
+.nv-nav-link { @apply hy-nav-link; }
+.nv-card { @apply hy-card; }
+.nv-skeleton-card { @apply hy-skeleton-card; }

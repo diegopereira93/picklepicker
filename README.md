@@ -39,9 +39,9 @@ PickleIQ resolve ambos os problemas:
 | Camada | Tecnologia |
 |--------|-----------|
 | **Scraping** | Firecrawl API |
-| **Pipeline** | Python + Prefect |
+| **Pipeline** | GitHub Actions (cron) |
 | **Banco Relacional** | PostgreSQL (Supabase em produção) |
-| **Banco Vetorial** | Pinecone (RAG embeddings) |
+| **Banco Vetorial** | pgvector (extensão Supabase) |
 | **LLM** | Claude 3.5 Sonnet (Anthropic API) |
 | **Embeddings** | OpenAI text-embedding-3-small |
 | **Backend API** | Python + FastAPI |
@@ -55,20 +55,40 @@ PickleIQ resolve ambos os problemas:
 
 ## Roadmap de Desenvolvimento
 
-A plataforma é desenvolvida em **8 fases** com duração estimada de **14 semanas** até o lançamento beta:
+A plataforma é desenvolvida em fases organizadas em milestones:
 
-| Fase | Objetivo | Duração | Status |
-|------|----------|---------|--------|
-| **1** | Ambiente dev + primeiro crawler funcional | 2 sem | ✅ Concluído (2026-03-26) |
-| **2** | Pipeline completo + scraping de todos os varejistas | 3 sem | ✅ Concluído (2026-03-26) |
-| **3** | Agente RAG de recomendação com latência < 3s | 2 sem | ✅ Concluído (2026-03-27) |
-| **4** | Frontend: chat, comparador, tracking de afiliados | 2 sem | ✅ Concluído (2026-03-27) |
-| **5** | Autenticação Clerk, SEO, alertas de preço, blog, admin | 2 sem | ✅ Concluído (2026-03-28) |
-| **6** | Deploy produção, beta launch com 50 usuários | 1 sem | ✅ Concluído (2026-03-29) |
-| **7** | E2E testing & validação dos scrapers — 101 testes, 90% cobertura | 1 sem | ✅ Concluído (2026-03-29) |
-| **8** | Navigation UX fixes — catalog cards, hero CTA, header nav | 1 sem | ✅ Concluído (2026-03-29) |
+### v1.3 — Hybrid UI Redesign (2026-04-02)
 
-**Beta launch:** Fases 1-8 concluídas — pronto para Milestone 2
+| Fase | Objetivo | Status |
+|------|----------|--------|
+| **13** | Hybrid Modern Sports Tech design system — typography, colors, components | ✅ Concluído |
+
+### v1.2 — Core Web Vitals Optimization (2026-04-01)
+
+| Fase | Objetivo | Status |
+|------|----------|--------|
+| **11** | Performance optimization — images, fonts, layout stability, accessibility | ✅ Concluído |
+
+### v1.1 — Scraper Validation & E2E Testing (2026-04-01)
+
+| Fase | Objetivo | Status |
+|------|----------|--------|
+| **7** | E2E Testing & Scraper Validation — 101 testes, 94% coverage | ✅ Concluído |
+| **8** | Navigation UX Fixes — /compare 404, quiz gate, mobile nav | ✅ Concluído |
+| **9** | Image Extraction — real product images from Brazil Store | ✅ Concluído |
+
+### v1.0 — MVP (2026-03-28)
+
+| Fase | Objetivo | Status |
+|------|----------|--------|
+| **1** | Ambiente dev + primeiro crawler funcional | ✅ Concluído |
+| **2** | Pipeline completo + scraping de todos os varejistas | ✅ Concluído |
+| **3** | Agente RAG de recomendação com latência < 3s | ✅ Concluído |
+| **4** | Frontend: chat, comparador, tracking de afiliados | ✅ Concluído |
+| **5** | Autenticação Clerk, SEO, alertas de preço, blog, admin | ✅ Concluído |
+| **6** | Deploy produção, beta launch com 50 usuários | ✅ Concluído |
+
+**Status atual:** v1.3 Hybrid UI Redesign completo.
 
 ---
 
@@ -85,14 +105,11 @@ A plataforma é desenvolvida em **8 fases** com duração estimada de **14 seman
 ## Documentação
 
 - **[PickleIQ_PRD_v1.0.md](./PickleIQ_PRD_v1.0.md)** — Produto completo: problema, solução, personas, user stories, requisitos técnicos, roadmap
-- **[.planning/PROJECT.md](./.planning/PROJECT.md)** — Resumo executivo: o que estamos construindo, por que, para quem, decisões
-- **[.planning/milestones/v1.0-REQUIREMENTS.md](./.planning/milestones/v1.0-REQUIREMENTS.md)** — Requisitos técnicos detalhados por fase (v1.0, 8 fases)
-- **[.planning/ROADMAP.md](./.planning/ROADMAP.md)** — Roadmap executivo com timeline, KPIs e backlog
-- **[.planning/STATE.md](./.planning/STATE.md)** — Estado atual do projeto, decisões de pesquisa, questões abertas
 - **[TODOS.md](./TODOS.md)** — 7 itens deferred do eng review (T1-T7): infraestrutura, monitoring, legal, testes
-- **[CLAUDE.md](./CLAUDE.md)** — Configuração Claude Code: skills gstack disponíveis
+- **[CLAUDE.md](./CLAUDE.md)** — Configuração AI assistant: workflow, skills, design system
 - **[CONTRIBUTING.md](./CONTRIBUTING.md)** — Setup de desenvolvimento, CI/CD, workflow de contribuição
 - **[DESIGN.md](./DESIGN.md)** — Design system e diretrizes visuais do projeto
+- **[CHANGELOG.md](./CHANGELOG.md)** — Histórico de versões e mudanças
 
 ---
 
@@ -100,48 +117,116 @@ A plataforma é desenvolvida em **8 fases** com duração estimada de **14 seman
 
 ### Pré-requisitos
 - Docker & Docker Compose
-- Python 3.11+
+- Python 3.12+
 - Node.js 18+
-- PostgreSQL 16 (via Docker Compose)
+- curl (para health checks)
 
-### Setup Desenvolvimento
+### Setup Rápido
 ```bash
-# Clone e prepare o ambiente
 git clone <repo>
 cd picklepicker
 
-# Setup backend
-cd backend
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install -r requirements.txt
+# Instala todas as dependências (backend + frontend)
+make setup
 
-# Setup frontend
-cd ../frontend
-npm install
-
-# Setup Docker Compose (PostgreSQL)
-cd ..
-docker-compose up -d
-
-# Copie .env.example para .env e preencha credenciais
+# Crie o arquivo de ambiente
 cp backend/.env.example backend/.env
-cp frontend/.env.example frontend/.env
+# Edite backend/.env com suas credenciais:
+#   DATABASE_URL, GROQ_API_KEY, FIRECRAWL_API_KEY, etc.
+
+# Inicia tudo (DB + backend + frontend)
+make dev
 ```
 
-### Rodar Localmente
-```bash
-# Terminal 1: Backend
-cd backend
-uvicorn main:app --reload
-
-# Terminal 2: Frontend
-cd frontend
-npm run dev
-```
-
-Backend: http://localhost:8000
+Backend: http://localhost:8000 | API Docs: http://localhost:8000/docs
 Frontend: http://localhost:3000
+
+### Usando o Makefile
+
+O Makefile é a forma recomendada de interagir com o projeto. Todos os comandos incluem validação de ambiente e health checks automáticos.
+
+```bash
+make help          # Lista todos os comandos disponíveis
+make help-full     # Ajuda completa com categorias
+```
+
+#### Ambiente
+
+| Comando | O que faz |
+|---------|-----------|
+| `make setup` | Instala dependências do backend (pip) + frontend (npm) |
+| `make setup-backend` | Instala apenas dependências do backend |
+| `make setup-frontend` | Instala apenas dependências do frontend |
+| `make env-check` | Verifica pré-requisitos (Docker, DATABASE_URL, GROQ_API_KEY) |
+
+#### Desenvolvimento
+
+| Comando | O que faz |
+|---------|-----------|
+| `make dev` | Sobe DB + backend + frontend em paralelo (hot-reload) |
+| `make dev-backend` | Sobe apenas o backend (requer DB) |
+| `make dev-frontend` | Sobe apenas o frontend |
+
+#### Banco de Dados
+
+| Comando | O que faz |
+|---------|-----------|
+| `make db-up` | Inicia PostgreSQL (pgvector) via Docker com health check |
+| `make db-down` | Para o PostgreSQL |
+| `make db-logs` | Mostra logs do PostgreSQL em tempo real |
+| `make db-shell` | Abre shell psql |
+| `make db-clean` | Para e remove todos os dados (destructive!) |
+
+#### Testes
+
+| Comando | O que faz |
+|---------|-----------|
+| `make test` | Roda todos os testes (backend + frontend) |
+| `make test-backend` | Roda testes do backend com pytest |
+| `make test-backend-cov` | Roda testes com relatório de cobertura HTML |
+| `make test-frontend` | Roda testes do frontend com vitest |
+| `make test-e2e` | Roda testes E2E dos crawlers (requer DB) |
+
+#### Controle
+
+| Comando | O que faz |
+|---------|-----------|
+| `make stop` | Para todos os serviços (DB + backend + frontend) |
+| `make clean` | Remove tudo (venvs, node_modules, dados do DB) |
+
+#### Fluxo de trabalho típico
+
+```bash
+# Primeira vez no projeto
+make setup
+cp backend/.env.example backend/.env  # preencha suas credenciais
+make dev
+
+# Dia a dia
+make dev              # inicia tudo
+make stop             # para tudo
+
+# Antes de abrir PR
+make test             # verifica se tudo passa
+```
+
+### Variáveis de Ambiente
+
+Crie `backend/.env` com as variáveis necessárias:
+
+```bash
+# Obrigatórias
+DATABASE_URL=postgresql://pickleiq:changeme@localhost:5432/pickleiq
+GROQ_API_KEY=your_groq_api_key
+
+# Opcionais (para crawlers)
+FIRECRAWL_API_KEY=your_firecrawl_key
+MERCADO_LIVRE_API_KEY=your_ml_key
+TELEGRAM_BOT_TOKEN=your_telegram_token
+TELEGRAM_CHAT_ID=your_chat_id
+```
+
+O `make env-check` valida as variáveis obrigatórias automaticamente antes de iniciar qualquer serviço.
 
 ---
 
@@ -149,31 +234,34 @@ Frontend: http://localhost:3000
 
 ```
 picklepicker/
-├── backend/              # FastAPI + pipeline
+├── backend/              # FastAPI + RAG agent
 │   ├── app/
 │   │   ├── main.py
 │   │   ├── api/
-│   │   └── models/
-│   ├── pipeline/        # Scripts de scraping e processamento
-│   ├── evals/           # Resultados de eval gate + testes de carga
-│   └── requirements.txt
-├── frontend/             # Next.js
-│   ├── app/
-│   ├── components/
-│   └── public/
-├── .github/workflows/    # GitHub Actions (scraping schedule)
-├── .planning/            # Artefatos de planejamento GSD
-│   ├── PROJECT.md
-│   ├── REQUIREMENTS.md
-│   ├── ROADMAP.md
-│   └── STATE.md
+│   │   └── agents/
+│   ├── pipeline/         # Crawlers, embeddings, dedup, alerts
+│   ├── tests/
+│   └── pyproject.toml
+├── frontend/             # Next.js 14 (App Router)
+│   ├── src/
+│   │   ├── app/
+│   │   ├── components/
+│   │   ├── lib/
+│   │   └── types/
+│   └── package.json
+├── pipeline/             # Standalone scraping pipeline
+│   ├── crawlers/
+│   ├── embeddings/
+│   ├── dedup/
+│   └── alerts/
+├── .github/workflows/    # CI/CD + scheduled scraping
+├── prisma/               # Database migrations
+├── scripts/              # Utility scripts
 ├── docker-compose.yml
-├── .gitignore
-├── CHANGELOG.md
 ├── CLAUDE.md
 ├── CONTRIBUTING.md
 ├── DESIGN.md
-├── PickleIQ_PRD_v1.0.md
+├── CHANGELOG.md
 ├── TODOS.md
 └── VERSION
 ```
@@ -182,17 +270,16 @@ picklepicker/
 
 ## Próximas Ações
 
-Fases 1-8 concluídas — projeto em Milestone 2 (v1.1).
-Veja [.planning/ROADMAP.md](./.planning/ROADMAP.md) para o roadmap completo.
+v1.3 Hybrid UI Redesign completo. Planejando v1.4.
 
 ---
 
 ## Contato & Suporte
 
-- **Documentação interna:** Veja [CLAUDE.md](./CLAUDE.md) para skills gstack disponíveis
+- **Workflow:** Type `ultrawork` para AI-assisted development
 - **Deferred work:** Veja [TODOS.md](./TODOS.md) para 7 itens do eng review
 
 ---
 
-**Status do Projeto:** v0.2.4.0 — Fases 1-8 concluídas, Milestone 2 em progresso
-**Última atualização:** 2026-03-29
+**Status do Projeto:** v1.3.0.1 — 4 milestones entregues
+**Última atualização:** 2026-04-03

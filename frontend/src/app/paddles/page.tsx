@@ -30,55 +30,61 @@ export default async function PaddlesPage() {
   console.log('[PaddlesPage] paddles count:', paddles.length)
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 min-h-[600px]">
-      <nav aria-label="Breadcrumb" className="text-sm text-gray-500 mb-4">
+    <div className="hy-dark-section">
+      <div className="hy-container hy-catalog-header">
+      <nav aria-label="Breadcrumb" className="hy-breadcrumb">
         <ol className="flex gap-1">
           <li><a href="/">Home</a></li>
           <li aria-hidden>/</li>
           <li aria-current="page">Raquetes</li>
         </ol>
       </nav>
-      <h1 className="text-3xl font-bold mb-8">Catálogo de Raquetes</h1>
+      <p className="hy-section-label">CATÁLOGO</p>
+      <h1 className="hy-section-heading mb-8">Catálogo de Raquetes</h1>
       <Suspense fallback={<PaddleGridSkeleton count={6} />}>
       {paddles.length === 0 ? (
-        <p className="text-gray-500">Nenhuma raquete encontrada.</p>
+        <p className="hy-body">Nenhuma raquete encontrada.</p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 min-h-[800px]">
+        <div className="hy-catalog-grid">
           {paddles.map((paddle) => (
             <article
               key={paddle.id}
-              className="border rounded-lg overflow-hidden hover:shadow-md transition-shadow"
+              className="hy-product-card"
             >
               <a
                 href={`/paddles/${encodeURIComponent(paddle.brand?.toLowerCase() ?? '')}/${encodeURIComponent(paddle.model_slug ?? String(paddle.id))}`}
-                className="block p-4"
+                className="hy-product-card-inner"
                 data-testid="paddle-card-link"
               >
-                {paddle.image_url && (
+                {paddle.image_url ? (
                   <Image
                     src={paddle.image_url}
                     alt={`${paddle.brand} ${paddle.name} paddle`}
                     width={320}
                     height={192}
-                    className="w-full h-48 object-contain mb-3"
+                    className="w-full h-48 object-contain mb-3 hy-product-image"
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                   />
+                ) : (
+                  <div className="w-full h-48 bg-muted/50 rounded-lg flex items-center justify-center text-muted-foreground text-xs mb-3" aria-label={`${paddle.brand} ${paddle.name} — imagem indisponível`}>
+                    Foto
+                  </div>
                 )}
-                <h2 className="font-semibold text-lg hover:text-blue-600">
+                <h2 className="hy-product-card-title">
                   {paddle.name}
                 </h2>
-                <p className="text-sm text-gray-500">{paddle.brand}</p>
+                <p className="hy-product-card-brand">{paddle.brand}</p>
 
                 {/* Skill level badge */}
                 {paddle.skill_level && (
-                  <span className="inline-block text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 mt-1">
+                  <span className="hy-skill-badge">
                     {paddle.skill_level === 'beginner' ? 'Iniciante' : paddle.skill_level === 'intermediate' ? 'Intermediário' : paddle.skill_level === 'advanced' ? 'Avançado' : paddle.skill_level}
                   </span>
                 )}
 
                 {/* Specs row */}
                 {(paddle.specs?.swingweight || paddle.specs?.core_thickness_mm) && (
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="hy-specs-row">
                     {paddle.specs?.swingweight && <span>SW: {paddle.specs.swingweight}</span>}
                     {paddle.specs?.swingweight && paddle.specs?.core_thickness_mm && <span> · </span>}
                     {paddle.specs?.core_thickness_mm && <span>Core: {paddle.specs.core_thickness_mm}mm</span>}
@@ -87,13 +93,13 @@ export default async function PaddlesPage() {
 
                 {/* Stock badge */}
                 {paddle.in_stock != null && (
-                  <span className={`inline-block text-xs mt-1 ${paddle.in_stock ? 'text-green-600' : 'text-gray-400'}`}>
+                  <span className={paddle.in_stock ? 'hy-stock-in' : 'hy-stock-out'}>
                     {paddle.in_stock ? 'Em estoque' : 'Fora de estoque'}
                   </span>
                 )}
 
                 {(paddle.price_brl != null || paddle.price_min_brl != null) && (
-                  <p className="text-green-700 font-bold mt-1">
+                  <p className="hy-product-card-price">
                     R${' '}
                     {(paddle.price_brl ?? paddle.price_min_brl ?? 0).toFixed(2)}
                   </p>
@@ -104,6 +110,7 @@ export default async function PaddlesPage() {
         </div>
       )}
       </Suspense>
+      </div>
     </div>
   )
 }

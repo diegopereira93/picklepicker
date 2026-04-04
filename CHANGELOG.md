@@ -2,7 +2,73 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.3.0.0] - 2026-04-01
+## [1.3.0.2] - 2026-04-04
+
+### Fixed
+- **Paddle Detail Page 404** — `fetchProductData` now handles `{items:[...]}` response shape from the backend API, not just `{data:[...]}` and `{paddles:[...]}`.
+- **Chat 422 Unprocessable Entity** — Frontend proxy now sanitizes `skill_level` against valid values (`beginner`, `intermediate`, `advanced`) before forwarding to FastAPI, preventing validation errors from malformed profiles.
+- **Chat 503 Error Masking** — Proxy now forwards the actual FastAPI status code and error body instead of returning a generic 503, making backend errors debuggable from the frontend.
+- **Broken Paddle Images** — Catalog and detail pages now show a "Foto" placeholder when `image_url` is missing, instead of rendering nothing.
+- **psycopg_pool Deprecation Warning** — Added `open=False` to `AsyncConnectionPool` constructor to prevent auto-open before explicit `await pool.open()`.
+
+## [1.3.0.1] - 2026-04-03
+
+### Changed
+- **Workflow Migration** — Migrated from GSD/gstack to native oh-my-openagent (omo) workflow. Updated CLAUDE.md with omo agent delegation, categories, and subagent configuration.
+- **CLAUDE.md Rewritten** — Replaced all gstack/GSD references with omo-native workflow: project overview, agent delegation table, subagent descriptions, command table, design system section.
+
+### Removed
+- **GSD Planning Artifacts** — Deleted entire `.planning/` directory (100+ files across milestones, phases, research, archives, quick tasks, memory backups, optimization plans).
+- **Old Tooling Directories** — Removed `.gstack/`, `.claire/`, `.clone/` directories.
+- **Debug/Temp Files** — Removed `debug-catalog.mjs`, `debug-catalog.playwright.ts`, `debug-paddles.png`, `test_firecrawl.py`, `run-e2e-test.sh`, `conftest.py`, UAT screenshots.
+- **Cache/Build Artifacts** — Removed `playwright_chromiumdev_profile-*`, `playwright-artifacts-*`, `tsx-1000/`, `v8-compile-cache-1000/`, `node-jiti/`, `__pycache__/`, `pickleiq_pipeline.egg-info/`, `test-results/`.
+- **Orphan Playwright Configs** — Removed root-level and frontend-level debug `playwright.config.ts`.
+
+### Fixed
+- **`.gitignore` Rewritten** — Comprehensive patterns for Python, Node, testing, Playwright, build artifacts, GSD/planning, Claude/Omo configs, OS files, debug files.
+
+---
+
+## [1.3.0.0] - 2026-04-02
+
+### Added
+- **Phase 13: Hybrid UI Redesign** — Modern sports tech design system with lime accent, data credibility styling
+- **Hybrid Design System** — Instrument Sans (display), Inter (body), JetBrains Mono (data/specs), 2px border radius, dark/light section alternation
+- **Color System** — Lime (#84CC16) for primary actions on dark, Green (#76b900) for data elements, semantic colors
+- **Typography via Google Fonts CDN** — Preconnect hints for performance, proper font stack cascade
+- **Component Restyling** — Button variants with lime borders, card components with hy-* classes, navigation with lime "IQ" accent
+- **Class Migration** — Complete nv-* → hy-* prefix migration with CSS aliases for backwards compatibility
+
+### Changed
+- **Button Borders** — Primary action borders now use lime (#84CC16) instead of data-green (#76b900)
+- **Navigation Logo** — "PickleIQ" with lime accent on "IQ" portion
+- **Typography Loading** — Google Fonts CDN replaces inline NVIDIA-EMEA font override
+- **CSS Architecture** — hy-* class prefix throughout, nv-* aliases maintained for migration period
+- **Lighthouse CI Configuration** — Added `startServerCommand` to properly start Next.js production server before audits
+- **SSG Error Handling** — Added graceful fallbacks when backend is unavailable during static generation
+
+### Fixed
+- **HY-01** — Google Fonts loaded for Hybrid typography (Instrument Sans, Inter, JetBrains Mono)
+- **HY-04** — Button borders use sport-primary lime, not data-green
+- **HY-06** — Navigation logo has lime accent on "IQ" portion
+- **HY-11** — All components use hy-* class prefix
+- Lighthouse CI failing with CHROME_INTERSTITIAL_ERROR due to missing dev server startup
+- SSG build failures when backend services are unavailable
+
+---
+
+## [1.2.0.0] - 2026-04-01
+
+### Added
+- **Phase 11: Core Web Vitals Optimization** — Performance and accessibility compliance
+- **Image Optimization** — All images migrated to next/Image with responsive sizes, priority loading, WebP/AVIF
+- **Font & Script Optimization** — Font loading optimized with display swap and adjustFontFallback
+- **Layout Stability** — Skeleton placeholders with Suspense, min-height containers prevent CLS
+- **RUM & A11Y** — Vercel Speed Insights with dynamic import, Lighthouse CI with strict budgets, WCAG 2.1 AA compliance
+
+---
+
+## [1.1.0.0] - 2026-04-01
 
 ### Added
 - **Phase 12: Data Pipeline Quality** — Comprehensive data quality infrastructure for the paddle catalog pipeline
@@ -10,15 +76,6 @@ All notable changes to this project will be documented in this file.
 - **Dead Letter Queue (DLQ)** — Failed extraction handling with retry logic, exponential backoff, and comprehensive logging
 - **Data Freshness Monitoring** — Automated freshness checks, configurable TTL per store, alerting for stale data
 - **Pipeline Observability** — Structured logging, performance metrics, and extraction telemetry
-- **CI/CD Improvements** — Lighthouse CI server startup configuration, SSG error handling, Clerk environment setup
-
-### Changed
-- **Lighthouse CI Configuration** — Added `startServerCommand` to properly start Next.js production server before audits
-- **SSG Error Handling** — Added graceful fallbacks when backend is unavailable during static generation
-
-### Fixed
-- Lighthouse CI failing with CHROME_INTERSTITIAL_ERROR due to missing dev server startup
-- SSG build failures when backend services are unavailable
 
 ## [1.1.0.0] - 2026-04-01
 
