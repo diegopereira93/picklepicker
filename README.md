@@ -117,48 +117,116 @@ A plataforma é desenvolvida em fases organizadas em milestones:
 
 ### Pré-requisitos
 - Docker & Docker Compose
-- Python 3.11+
+- Python 3.12+
 - Node.js 18+
-- PostgreSQL 16 (via Docker Compose)
+- curl (para health checks)
 
-### Setup Desenvolvimento
+### Setup Rápido
 ```bash
-# Clone e prepare o ambiente
 git clone <repo>
 cd picklepicker
 
-# Setup backend
-cd backend
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install -r requirements.txt
+# Instala todas as dependências (backend + frontend)
+make setup
 
-# Setup frontend
-cd ../frontend
-npm install
-
-# Setup Docker Compose (PostgreSQL)
-cd ..
-docker-compose up -d
-
-# Copie .env.example para .env e preencha credenciais
+# Crie o arquivo de ambiente
 cp backend/.env.example backend/.env
-cp frontend/.env.example frontend/.env
+# Edite backend/.env com suas credenciais:
+#   DATABASE_URL, GROQ_API_KEY, FIRECRAWL_API_KEY, etc.
+
+# Inicia tudo (DB + backend + frontend)
+make dev
 ```
 
-### Rodar Localmente
-```bash
-# Terminal 1: Backend
-cd backend
-uvicorn main:app --reload
-
-# Terminal 2: Frontend
-cd frontend
-npm run dev
-```
-
-Backend: http://localhost:8000
+Backend: http://localhost:8000 | API Docs: http://localhost:8000/docs
 Frontend: http://localhost:3000
+
+### Usando o Makefile
+
+O Makefile é a forma recomendada de interagir com o projeto. Todos os comandos incluem validação de ambiente e health checks automáticos.
+
+```bash
+make help          # Lista todos os comandos disponíveis
+make help-full     # Ajuda completa com categorias
+```
+
+#### Ambiente
+
+| Comando | O que faz |
+|---------|-----------|
+| `make setup` | Instala dependências do backend (pip) + frontend (npm) |
+| `make setup-backend` | Instala apenas dependências do backend |
+| `make setup-frontend` | Instala apenas dependências do frontend |
+| `make env-check` | Verifica pré-requisitos (Docker, DATABASE_URL, GROQ_API_KEY) |
+
+#### Desenvolvimento
+
+| Comando | O que faz |
+|---------|-----------|
+| `make dev` | Sobe DB + backend + frontend em paralelo (hot-reload) |
+| `make dev-backend` | Sobe apenas o backend (requer DB) |
+| `make dev-frontend` | Sobe apenas o frontend |
+
+#### Banco de Dados
+
+| Comando | O que faz |
+|---------|-----------|
+| `make db-up` | Inicia PostgreSQL (pgvector) via Docker com health check |
+| `make db-down` | Para o PostgreSQL |
+| `make db-logs` | Mostra logs do PostgreSQL em tempo real |
+| `make db-shell` | Abre shell psql |
+| `make db-clean` | Para e remove todos os dados (destructive!) |
+
+#### Testes
+
+| Comando | O que faz |
+|---------|-----------|
+| `make test` | Roda todos os testes (backend + frontend) |
+| `make test-backend` | Roda testes do backend com pytest |
+| `make test-backend-cov` | Roda testes com relatório de cobertura HTML |
+| `make test-frontend` | Roda testes do frontend com vitest |
+| `make test-e2e` | Roda testes E2E dos crawlers (requer DB) |
+
+#### Controle
+
+| Comando | O que faz |
+|---------|-----------|
+| `make stop` | Para todos os serviços (DB + backend + frontend) |
+| `make clean` | Remove tudo (venvs, node_modules, dados do DB) |
+
+#### Fluxo de trabalho típico
+
+```bash
+# Primeira vez no projeto
+make setup
+cp backend/.env.example backend/.env  # preencha suas credenciais
+make dev
+
+# Dia a dia
+make dev              # inicia tudo
+make stop             # para tudo
+
+# Antes de abrir PR
+make test             # verifica se tudo passa
+```
+
+### Variáveis de Ambiente
+
+Crie `backend/.env` com as variáveis necessárias:
+
+```bash
+# Obrigatórias
+DATABASE_URL=postgresql://pickleiq:changeme@localhost:5432/pickleiq
+GROQ_API_KEY=your_groq_api_key
+
+# Opcionais (para crawlers)
+FIRECRAWL_API_KEY=your_firecrawl_key
+MERCADO_LIVRE_API_KEY=your_ml_key
+TELEGRAM_BOT_TOKEN=your_telegram_token
+TELEGRAM_CHAT_ID=your_chat_id
+```
+
+O `make env-check` valida as variáveis obrigatórias automaticamente antes de iniciar qualquer serviço.
 
 ---
 

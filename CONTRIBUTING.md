@@ -6,14 +6,26 @@
    ```bash
    git clone https://github.com/diegopereira93/picklepicker.git
    cd picklepicker
-   pip install -e ./backend[dev]
-   npm install
+   make setup
    ```
 
-2. Run tests locally before pushing:
+2. Configure environment:
    ```bash
-   cd backend
-   pytest --cov=app --cov-report=term
+   cp backend/.env.example backend/.env
+   # Edit backend/.env with your credentials
+   ```
+
+3. Verify environment:
+   ```bash
+   make env-check
+   ```
+
+4. Start developing:
+   ```bash
+   make dev
+   # Backend: http://localhost:8000
+   # Frontend: http://localhost:3000
+   # API Docs: http://localhost:8000/docs
    ```
 
 ## CI/CD Pipeline
@@ -82,51 +94,41 @@ The `master` branch requires:
 
 ## Testing Locally
 
+Use the Makefile for all testing — it handles venv activation and environment setup automatically.
+
+### Run all tests
+```bash
+make test
+```
+
 ### Backend (Python)
 
 ```bash
-cd backend
-
-# Install dev dependencies
-pip install -e .[dev]
-
-# Run tests
-pytest -v
-
-# Run with coverage report
-pytest --cov=app --cov-report=html
-# Open htmlcov/index.html in browser
-
-# Run specific test file
-pytest tests/test_paddles.py -v
-
-# Run specific test
-pytest tests/test_paddles.py::test_paddle_search -v
+make test-backend         # pytest -v
+make test-backend-cov     # pytest with HTML coverage report
 ```
 
 ### Frontend (Next.js)
 
 ```bash
-# Install dependencies
-npm install
+make test-frontend        # vitest run
+```
 
-# Run dev server
-npm run dev
+### E2E / Scraper tests
 
-# Run tests
-npm run test
-
-# Build for production
-npm run build
+```bash
+make test-e2e             # Requires DB running (starts it automatically)
 ```
 
 ## Environment Variables
 
-Copy `.env.example` to `.env.local` and fill in values:
+Copy `.env.example` to `backend/.env` and fill in values:
 
 ```bash
-cp .env.example .env.local
+cp backend/.env.example backend/.env
 ```
+
+Run `make env-check` to verify your setup. It validates Docker, DATABASE_URL, and API keys automatically.
 
 **For production**, environment variables are set in:
 - **Vercel**: Dashboard → Settings → Environment Variables
