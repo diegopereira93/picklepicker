@@ -8,17 +8,17 @@ import logging
 import os
 from typing import Optional
 
-from openai import AsyncOpenAI
 from pydantic import BaseModel
 
 from app.db import get_connection
+from app.services.embedding import EmbeddingManager
 
 logger = logging.getLogger(__name__)
 
+EMBEDDING_DIMENSIONS = 768
+
 
 class RecommendationResult(BaseModel):
-    """A single paddle recommendation."""
-
     paddle_id: int
     name: str
     brand: str
@@ -29,135 +29,46 @@ class RecommendationResult(BaseModel):
 
 
 class UserProfile(BaseModel):
-    """User profile for filtering recommendations."""
-
-    skill_level: str  # "beginner", "intermediate", "advanced"
+    skill_level: str
     budget_max_brl: float
-    style: Optional[str] = None  # "control", "power", "balanced"
+    style: Optional[str] = None
     in_stock_only: bool = True
 
 
 async def generate_query_embedding(query_text: str) -> list[float]:
-    """Generate embedding using FREE cloud providers only.
-    
-    Priority:
-    1. Jina AI (FREE: 1M tokens/day) - jina-embeddings-v2 (768 dims)
-    2. Hugging Face (FREE: 30k calls/month) - all-MiniLM-L6-v2 (384 dims)
-    3. Zero vector fallback
-    
-    Args:
-        query_text: User's natural language query
-        
-    Returns:
-        1536-dimensional embedding vector (padded if necessary)
+    """Generate embedding using EmbeddingManager with free providers.
+
+    Uses Gemini → Jina AI → Hugging Face → zero vector fallback chain.
     """
-    import httpx
-    
-    # Provider 1: Jina AI (FREE tier: 1M tokens/day, no API key required!)
-    # Sign up at https://jina.ai/embeddings to get API key (optional but recommended)
-    try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            headers = {"Content-Type": "application/json"}
-            jina_key = os.environ.get("JINA_API_KEY")
-            if jina_key:
-                headers["Authorization"] = f"Bearer {jina_key}"
-            
-            response = await client.post(
-                "https://api.jina.ai/v1/embeddings",
-                json={
-                    "model": "jina-embeddings-v2-base-en",
-                    "input": [query_text]
-                },
-                headers=headers
-            )
-            if response.status_code == 200:
-                data = response.json()
-                if "data" in data and len(data["data"]) > 0:
-                    embedding_768 = data["data"][0]["embedding"]
-                    # Pad from 768 to 1536 dimensions for pgvector compatibility
-                    embedding_1536 = embedding_768 + [0.0] * (1536 - 768)
-                    logger.info("Generated embedding via Jina AI (free)")
-                    return embedding_1536
-            else:
-                logger.warning(f"Jina AI API returned {response.status_code}: {response.text}")
-    except Exception as e:
-        logger.warning(f"Jina AI embedding failed: {e}, trying Hugging Face...")
-    
-    # Provider 2: Hugging Face Inference API (FREE tier: 30k calls/month)
-    try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            headers = {}
-            hf_key = os.environ.get("HUGGINGFACE_API_KEY")
-            if hf_key:
-                headers["Authorization"] = f"Bearer {hf_key}"
-            
-            response = await client.post(
-                "https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2",
-                json={"inputs": query_text},
-                headers=headers
-            )
-            if response.status_code == 200:
-                embeddings = response.json()
-                if isinstance(embeddings, list) and len(embeddings) > 0:
-                    embedding_384 = embeddings[0] if isinstance(embeddings[0], list) else embeddings
-                    if len(embedding_384) == 384:
-                        embedding_1536 = embedding_384 + [0.0] * (1536 - 384)
-                        logger.info("Generated embedding via Hugging Face (free)")
-                        return embedding_1536
-                    return embedding_384
-            else:
-                logger.warning(f"Hugging Face API returned {response.status_code}: {response.text}")
-    except Exception as e:
-        logger.error(f"Hugging Face embedding failed: {e}")
-    
-    # Fallback: zero vector
-    logger.warning("All free embedding providers failed, returning zero vector")
-    return [0.0] * 1536
+    manager = EmbeddingManager()
+    return await manager.get_embedding(query_text)
 
 
 class RAGAgent:
     """RAG Agent for paddle recommendations via pgvector search."""
 
-    def __init__(self, model_name: str = "claude-3-5-sonnet-20241022"):
-        """Initialize RAG Agent.
+    def __init__(self):
+        self._embedding_manager = EmbeddingManager()
+        self._use_real_db = bool(os.environ.get("DATABASE_URL"))
 
-        Args:
-            model_name: LLM model to use
-        """
-        self.model_name = model_name
-        self._use_real_db = os.environ.get("OPENAI_API_KEY") is not None
-        
     async def _get_similar_paddle_ids(
-        self, 
-        query_embedding: list[float], 
+        self,
+        query_embedding: list[float],
         top_k: int = 5,
-        threshold: float = 0.65
+        threshold: float = 0.2,
     ) -> list[int]:
-        """Find similar paddles using pgvector.
-        
-        Args:
-            query_embedding: Query embedding vector
-            top_k: Number of results to return
-            threshold: Similarity threshold
-            
-        Returns:
-            List of paddle IDs
-        """
         try:
             async with get_connection() as conn:
-                # Query using pgvector cosine distance operator
-                # cosine distance = 1 - cosine similarity
                 query = """
-                SELECT paddle_id, (embedding <-> $1::vector) AS distance
-                FROM paddle_embeddings
-                WHERE (embedding <-> $1::vector) <= (1 - $2)
+                SELECT pe.paddle_id, (pe.embedding <-> %s::vector) AS distance
+                FROM paddle_embeddings pe
+                INNER JOIN latest_prices lp ON pe.paddle_id = lp.paddle_id
+                WHERE (pe.embedding <-> %s::vector) <= (1 - %s)
                 ORDER BY distance
-                LIMIT $3
+                LIMIT %s
                 """
-                
-                result = await conn.execute(query, [query_embedding, threshold, top_k])
+                result = await conn.execute(query, (query_embedding, query_embedding, threshold, top_k))
                 rows = await result.fetchall()
-                
                 paddle_ids = [row[0] for row in rows] if rows else []
                 logger.info(f"Found {len(paddle_ids)} similar paddles")
                 return paddle_ids
@@ -166,28 +77,18 @@ class RAGAgent:
             return []
 
     async def _get_paddle_details(
-        self, 
+        self,
         paddle_ids: list[int],
         budget_max: float,
-        in_stock_only: bool = True
+        in_stock_only: bool = True,
     ) -> list[dict]:
-        """Get paddle details from database.
-        
-        Args:
-            paddle_ids: List of paddle IDs
-            budget_max: Maximum budget filter
-            in_stock_only: Only return in-stock items
-            
-        Returns:
-            List of paddle dictionaries
-        """
         if not paddle_ids:
             return []
-            
+
         try:
             async with get_connection() as conn:
                 query = """
-                SELECT 
+                SELECT
                     p.id,
                     p.name,
                     p.brand,
@@ -196,15 +97,14 @@ class RAGAgent:
                     lp.in_stock
                 FROM paddles p
                 JOIN latest_prices lp ON p.id = lp.paddle_id
-                WHERE p.id = ANY($1)
-                  AND lp.price_brl <= $2
-                  AND ($3 = FALSE OR lp.in_stock = TRUE)
+                WHERE p.id = ANY(%s)
+                  AND lp.price_brl <= %s
+                  AND (%s = FALSE OR lp.in_stock = TRUE)
                 ORDER BY lp.price_brl DESC
                 """
-                
-                result = await conn.execute(query, [paddle_ids, budget_max, in_stock_only])
+                result = await conn.execute(query, (paddle_ids, budget_max, in_stock_only))
                 rows = await result.fetchall()
-                
+
                 paddles = []
                 for row in rows:
                     paddles.append({
@@ -226,42 +126,25 @@ class RAGAgent:
         user_message: str = "",
         limit: int = 3,
     ) -> list[RecommendationResult]:
-        """Search for paddle recommendations by user profile.
-
-        Performs semantic search via pgvector with profile-based filtering.
-
-        Args:
-            profile: User profile with skill level, budget, style preferences
-            user_message: User's natural language query
-            limit: Number of recommendations to return (default 3)
-
-        Returns:
-            List of RecommendationResult ordered by relevance (top-3)
-        """
         if not self._use_real_db:
-            # Fallback to mock data if OpenAI key not available
-            logger.warning("OPENAI_API_KEY not set, using mock data")
+            logger.warning("DATABASE_URL not set, using mock data")
             return await self._search_mock(profile, limit)
-        
+
         try:
-            # Generate query embedding from user message + profile
             query_text = f"{user_message} {profile.skill_level} player budget {profile.budget_max_brl} BRL"
-            query_embedding = await generate_query_embedding(query_text)
-            
-            # Find similar paddles
+            query_embedding = await self._embedding_manager.get_embedding(query_text)
+
             similar_ids = await self._get_similar_paddle_ids(
-                query_embedding, 
-                top_k=limit * 2  # Get extra for filtering
+                query_embedding,
+                top_k=limit * 2,
             )
-            
-            # Get paddle details with filters
+
             paddles = await self._get_paddle_details(
                 similar_ids,
                 profile.budget_max_brl,
-                profile.in_stock_only
+                profile.in_stock_only,
             )
-            
-            # Build recommendations
+
             recommendations = []
             for paddle in paddles[:limit]:
                 recommendation = RecommendationResult(
@@ -271,15 +154,14 @@ class RAGAgent:
                     reasoning=f"Recommended for {profile.skill_level} players with excellent value at R${paddle['price']:.0f}.",
                     price_min_brl=paddle["price"],
                     affiliate_url=paddle["affiliate_url"],
-                    similarity_score=None,  # Could calculate from distance
+                    similarity_score=None,
                 )
                 recommendations.append(recommendation)
-            
+
             return recommendations
-            
+
         except Exception as e:
             logger.error(f"RAG search failed: {e}")
-            # Fallback to mock data on error
             return await self._search_mock(profile, limit)
 
     async def _search_mock(
@@ -287,47 +169,19 @@ class RAGAgent:
         profile: UserProfile,
         limit: int = 3,
     ) -> list[RecommendationResult]:
-        """Mock search for fallback/testing."""
         mock_paddles = [
-            {
-                "id": 1,
-                "name": "Control Pro",
-                "brand": "Selkirk",
-                "price": 450.0,
-                "in_stock": True,
-                "skill_level": "beginner",
-                "similarity": 0.85,
-                "affiliate_url": "https://example.com/control-pro",
-            },
-            {
-                "id": 2,
-                "name": "Power Plus",
-                "brand": "Selkirk",
-                "price": 650.0,
-                "in_stock": True,
-                "skill_level": "intermediate",
-                "similarity": 0.78,
-                "affiliate_url": "https://example.com/power-plus",
-            },
-            {
-                "id": 3,
-                "name": "Pro Tour",
-                "brand": "Selkirk",
-                "price": 950.0,
-                "in_stock": True,
-                "skill_level": "advanced",
-                "similarity": 0.72,
-                "affiliate_url": "https://example.com/pro-tour",
-            },
+            {"id": 1, "name": "Control Pro", "brand": "Selkirk", "price": 450.0, "in_stock": True, "similarity": 0.85, "affiliate_url": "https://example.com/control-pro"},
+            {"id": 2, "name": "Power Plus", "brand": "Selkirk", "price": 650.0, "in_stock": True, "similarity": 0.78, "affiliate_url": "https://example.com/power-plus"},
+            {"id": 3, "name": "Pro Tour", "brand": "Selkirk", "price": 950.0, "in_stock": True, "similarity": 0.72, "affiliate_url": "https://example.com/pro-tour"},
         ]
-        
+
         recommendations = []
         for paddle in mock_paddles[:limit]:
             if profile.in_stock_only and not paddle["in_stock"]:
                 continue
             if paddle["price"] > profile.budget_max_brl:
                 continue
-                
+
             recommendation = RecommendationResult(
                 paddle_id=paddle["id"],
                 name=paddle["name"],
@@ -338,7 +192,7 @@ class RAGAgent:
                 similarity_score=paddle["similarity"],
             )
             recommendations.append(recommendation)
-        
+
         return recommendations
 
     async def get_top_by_price(
@@ -347,22 +201,10 @@ class RAGAgent:
         limit: int = 3,
         in_stock_only: bool = True,
     ) -> list[RecommendationResult]:
-        """Degraded mode: return top paddles by price proximity without embedding search.
-
-        Used when LLM latency exceeds budget (>8s).
-
-        Args:
-            budget_max_brl: Maximum budget in BRL
-            limit: Number of results to return
-            in_stock_only: Filter to in-stock items only
-
-        Returns:
-            List of RecommendationResult sorted by price proximity to budget
-        """
         try:
             async with get_connection() as conn:
                 query = """
-                SELECT 
+                SELECT
                     p.id,
                     p.name,
                     p.brand,
@@ -370,15 +212,14 @@ class RAGAgent:
                     lp.affiliate_url
                 FROM paddles p
                 JOIN latest_prices lp ON p.id = lp.paddle_id
-                WHERE lp.price_brl <= $1
-                  AND ($2 = FALSE OR lp.in_stock = TRUE)
+                WHERE lp.price_brl <= %s
+                  AND (%s = FALSE OR lp.in_stock = TRUE)
                 ORDER BY lp.price_brl DESC
-                LIMIT $3
+                LIMIT %s
                 """
-                
-                result = await conn.execute(query, [budget_max_brl, in_stock_only, limit])
+                result = await conn.execute(query, (budget_max_brl, in_stock_only, limit))
                 rows = await result.fetchall()
-                
+
                 recommendations = []
                 for row in rows:
                     recommendations.append(
@@ -395,7 +236,6 @@ class RAGAgent:
                 return recommendations
         except Exception as e:
             logger.error(f"Price-based search failed: {e}")
-            # Fallback to mock
             return await self._get_top_by_price_mock(budget_max_brl, limit, in_stock_only)
 
     async def _get_top_by_price_mock(
@@ -404,13 +244,12 @@ class RAGAgent:
         limit: int = 3,
         in_stock_only: bool = True,
     ) -> list[RecommendationResult]:
-        """Mock price-based search for fallback."""
         mock_paddles = [
             {"id": 1, "name": "Budget", "brand": "Generic", "price": 300.0, "in_stock": True},
             {"id": 2, "name": "Mid", "brand": "Selkirk", "price": 650.0, "in_stock": True},
             {"id": 3, "name": "Premium", "brand": "Selkirk", "price": 950.0, "in_stock": True},
         ]
-        
+
         candidates = []
         for paddle in mock_paddles:
             if in_stock_only and not paddle["in_stock"]:
@@ -428,6 +267,6 @@ class RAGAgent:
                     similarity_score=None,
                 )
             )
-        
+
         candidates.sort(key=lambda r: budget_max_brl - r.price_min_brl, reverse=True)
         return candidates[:limit]

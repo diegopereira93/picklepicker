@@ -13,10 +13,8 @@ from pydantic import BaseModel, field_validator
 
 from app.agents.rag_agent import RAGAgent, UserProfile
 
-# Initialize Groq client
-groq_client = AsyncGroq(
-    api_key=os.environ.get("GROQ_API_KEY")
-)
+# Initialize Groq client (lazy initialization)
+groq_client = None
 
 router = APIRouter()
 
@@ -126,8 +124,14 @@ async def chat_stream(request: ChatRequest) -> StreamingResponse:
             # Try LLM reasoning with timeout
             try:
                 # Check if Groq API key is available
-                if not os.environ.get("GROQ_API_KEY"):
+                groq_api_key = os.environ.get("GROQ_API_KEY")
+                if not groq_api_key:
                     raise ValueError("GROQ_API_KEY not set")
+
+                # Initialize Groq client if not already initialized
+                global groq_client
+                if groq_client is None:
+                    groq_client = AsyncGroq(api_key=groq_api_key)
 
                 # Build prompt with context
                 prompt = f"""Você é um especialista em pickleball. 
