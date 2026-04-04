@@ -4,14 +4,21 @@ Implements semantic search via pgvector with profile-based filtering (skill leve
 Includes degraded mode fallback for LLM timeout scenarios.
 """
 
+import logging
+import os
 from typing import Optional
 
 from pydantic import BaseModel
 
+from app.db import get_connection
+from app.services.embedding import EmbeddingManager
+
+logger = logging.getLogger(__name__)
+
+EMBEDDING_DIMENSIONS = 768
+
 
 class RecommendationResult(BaseModel):
-    """A single paddle recommendation."""
-
     paddle_id: int
     name: str
     brand: str
@@ -22,128 +29,171 @@ class RecommendationResult(BaseModel):
 
 
 class UserProfile(BaseModel):
-    """User profile for filtering recommendations."""
-
-    skill_level: str  # "beginner", "intermediate", "advanced"
+    skill_level: str
     budget_max_brl: float
-    style: Optional[str] = None  # "control", "power", "balanced"
+    style: Optional[str] = None
     in_stock_only: bool = True
+
+
+async def generate_query_embedding(query_text: str) -> list[float]:
+    """Generate embedding using EmbeddingManager with free providers.
+
+    Uses Gemini → Jina AI → Hugging Face → zero vector fallback chain.
+    """
+    manager = EmbeddingManager()
+    return await manager.get_embedding(query_text)
 
 
 class RAGAgent:
     """RAG Agent for paddle recommendations via pgvector search."""
 
-    def __init__(self, model_name: str = "mixtral-8x7b-32768"):
-        """Initialize RAG Agent.
+    def __init__(self):
+        self._embedding_manager = EmbeddingManager()
+        self._use_real_db = bool(os.environ.get("DATABASE_URL"))
 
-        Args:
-            model_name: LLM model to use ("mixtral-8x7b-32768" or "claude-3-5-sonnet-20241022")
-        """
-        self.model_name = model_name
-        # In production, this would hold db_pool and other initialized resources
-        self._mock_paddles = self._get_mock_paddles()
+    async def _get_similar_paddle_ids(
+        self,
+        query_embedding: list[float],
+        top_k: int = 5,
+        threshold: float = 0.2,
+    ) -> list[int]:
+        try:
+            async with get_connection() as conn:
+                query = """
+                SELECT pe.paddle_id, (pe.embedding <-> %s::vector) AS distance
+                FROM paddle_embeddings pe
+                INNER JOIN latest_prices lp ON pe.paddle_id = lp.paddle_id
+                WHERE (pe.embedding <-> %s::vector) <= (1 - %s)
+                ORDER BY distance
+                LIMIT %s
+                """
+                result = await conn.execute(query, (query_embedding, query_embedding, threshold, top_k))
+                rows = await result.fetchall()
+                paddle_ids = [row[0] for row in rows] if rows else []
+                logger.info(f"Found {len(paddle_ids)} similar paddles")
+                return paddle_ids
+        except Exception as e:
+            logger.error(f"Similarity search failed: {e}")
+            return []
 
-    @staticmethod
-    def _get_mock_paddles() -> list[dict]:
-        """Return mock paddle data for testing."""
-        return [
-            {
-                "id": 1,
-                "name": "Control Pro",
-                "brand": "Selkirk",
-                "price": 450.0,
-                "in_stock": True,
-                "skill_level": "beginner",
-                "similarity": 0.85,
-                "affiliate_url": "https://affiliate.selkirk.com/control-pro?session=abc123",
-            },
-            {
-                "id": 2,
-                "name": "Power Plus",
-                "brand": "Selkirk",
-                "price": 650.0,
-                "in_stock": True,
-                "skill_level": "intermediate",
-                "similarity": 0.78,
-                "affiliate_url": "https://affiliate.selkirk.com/power-plus?session=abc123",
-            },
-            {
-                "id": 3,
-                "name": "Pro Tour",
-                "brand": "Selkirk",
-                "price": 950.0,
-                "in_stock": True,
-                "skill_level": "advanced",
-                "similarity": 0.72,
-                "affiliate_url": "https://affiliate.selkirk.com/pro-tour?session=abc123",
-            },
-            {
-                "id": 4,
-                "name": "Budget Friendly",
-                "brand": "Generic",
-                "price": 300.0,
-                "in_stock": True,
-                "skill_level": "beginner",
-                "similarity": 0.68,
-                "affiliate_url": "https://affiliate.generic.com/budget?session=abc123",
-            },
-            {
-                "id": 5,
-                "name": "Out of Stock",
-                "brand": "Premium",
-                "price": 800.0,
-                "in_stock": False,
-                "skill_level": "advanced",
-                "similarity": 0.65,
-                "affiliate_url": "https://affiliate.premium.com/out-of-stock?session=abc123",
-            },
-        ]
+    async def _get_paddle_details(
+        self,
+        paddle_ids: list[int],
+        budget_max: float,
+        in_stock_only: bool = True,
+    ) -> list[dict]:
+        if not paddle_ids:
+            return []
+
+        try:
+            async with get_connection() as conn:
+                query = """
+                SELECT
+                    p.id,
+                    p.name,
+                    p.brand,
+                    lp.price_brl,
+                    lp.affiliate_url,
+                    lp.in_stock
+                FROM paddles p
+                JOIN latest_prices lp ON p.id = lp.paddle_id
+                WHERE p.id = ANY(%s)
+                  AND lp.price_brl <= %s
+                  AND (%s = FALSE OR lp.in_stock = TRUE)
+                ORDER BY lp.price_brl DESC
+                """
+                result = await conn.execute(query, (paddle_ids, budget_max, in_stock_only))
+                rows = await result.fetchall()
+
+                paddles = []
+                for row in rows:
+                    paddles.append({
+                        "id": row[0],
+                        "name": row[1],
+                        "brand": row[2],
+                        "price": float(row[3]),
+                        "affiliate_url": row[4],
+                        "in_stock": row[5],
+                    })
+                return paddles
+        except Exception as e:
+            logger.error(f"Failed to fetch paddle details: {e}")
+            return []
 
     async def search_by_profile(
         self,
         profile: UserProfile,
+        user_message: str = "",
         limit: int = 3,
     ) -> list[RecommendationResult]:
-        """Search for paddle recommendations by user profile.
+        if not self._use_real_db:
+            logger.warning("DATABASE_URL not set, using mock data")
+            return await self._search_mock(profile, limit)
 
-        Performs semantic search via pgvector with profile-based filtering.
+        try:
+            query_text = f"{user_message} {profile.skill_level} player budget {profile.budget_max_brl} BRL"
+            query_embedding = await self._embedding_manager.get_embedding(query_text)
 
-        Args:
-            profile: User profile with skill level, budget, style preferences
-            limit: Number of recommendations to return (default 3)
+            similar_ids = await self._get_similar_paddle_ids(
+                query_embedding,
+                top_k=limit * 2,
+            )
 
-        Returns:
-            List of RecommendationResult ordered by relevance (top-3)
-        """
+            paddles = await self._get_paddle_details(
+                similar_ids,
+                profile.budget_max_brl,
+                profile.in_stock_only,
+            )
+
+            recommendations = []
+            for paddle in paddles[:limit]:
+                recommendation = RecommendationResult(
+                    paddle_id=paddle["id"],
+                    name=paddle["name"],
+                    brand=paddle["brand"],
+                    reasoning=f"Recommended for {profile.skill_level} players with excellent value at R${paddle['price']:.0f}.",
+                    price_min_brl=paddle["price"],
+                    affiliate_url=paddle["affiliate_url"],
+                    similarity_score=None,
+                )
+                recommendations.append(recommendation)
+
+            return recommendations
+
+        except Exception as e:
+            logger.error(f"RAG search failed: {e}")
+            return await self._search_mock(profile, limit)
+
+    async def _search_mock(
+        self,
+        profile: UserProfile,
+        limit: int = 3,
+    ) -> list[RecommendationResult]:
+        mock_paddles = [
+            {"id": 1, "name": "Control Pro", "brand": "Selkirk", "price": 450.0, "in_stock": True, "similarity": 0.85, "affiliate_url": "https://example.com/control-pro"},
+            {"id": 2, "name": "Power Plus", "brand": "Selkirk", "price": 650.0, "in_stock": True, "similarity": 0.78, "affiliate_url": "https://example.com/power-plus"},
+            {"id": 3, "name": "Pro Tour", "brand": "Selkirk", "price": 950.0, "in_stock": True, "similarity": 0.72, "affiliate_url": "https://example.com/pro-tour"},
+        ]
+
         recommendations = []
-
-        for paddle in self._mock_paddles:
-            # Filter 1: Stock constraint
+        for paddle in mock_paddles[:limit]:
             if profile.in_stock_only and not paddle["in_stock"]:
                 continue
-
-            # Filter 2: Budget constraint
             if paddle["price"] > profile.budget_max_brl:
-                continue
-
-            # Filter 3: Similarity threshold (0.65 minimum)
-            if paddle["similarity"] < 0.65:
                 continue
 
             recommendation = RecommendationResult(
                 paddle_id=paddle["id"],
                 name=paddle["name"],
                 brand=paddle["brand"],
-                reasoning=f"Recommended for {profile.skill_level} players with {paddle['similarity']:.0%} relevance match.",
+                reasoning=f"Recommended for {profile.skill_level} players.",
                 price_min_brl=paddle["price"],
                 affiliate_url=paddle["affiliate_url"],
                 similarity_score=paddle["similarity"],
             )
             recommendations.append(recommendation)
 
-        # Sort by similarity score (descending) and return top-N
-        recommendations.sort(key=lambda r: r.similarity_score or 0, reverse=True)
-        return recommendations[:limit]
+        return recommendations
 
     async def get_top_by_price(
         self,
@@ -151,42 +201,72 @@ class RAGAgent:
         limit: int = 3,
         in_stock_only: bool = True,
     ) -> list[RecommendationResult]:
-        """Degraded mode: return top paddles by price proximity without embedding search.
+        try:
+            async with get_connection() as conn:
+                query = """
+                SELECT
+                    p.id,
+                    p.name,
+                    p.brand,
+                    lp.price_brl,
+                    lp.affiliate_url
+                FROM paddles p
+                JOIN latest_prices lp ON p.id = lp.paddle_id
+                WHERE lp.price_brl <= %s
+                  AND (%s = FALSE OR lp.in_stock = TRUE)
+                ORDER BY lp.price_brl DESC
+                LIMIT %s
+                """
+                result = await conn.execute(query, (budget_max_brl, in_stock_only, limit))
+                rows = await result.fetchall()
 
-        Used when LLM latency exceeds budget (>8s).
+                recommendations = []
+                for row in rows:
+                    recommendations.append(
+                        RecommendationResult(
+                            paddle_id=row[0],
+                            name=row[1],
+                            brand=row[2],
+                            reasoning=f"Top option by price (R${float(row[3]):.0f})",
+                            price_min_brl=float(row[3]),
+                            affiliate_url=row[4],
+                            similarity_score=None,
+                        )
+                    )
+                return recommendations
+        except Exception as e:
+            logger.error(f"Price-based search failed: {e}")
+            return await self._get_top_by_price_mock(budget_max_brl, limit, in_stock_only)
 
-        Args:
-            budget_max_brl: Maximum budget in BRL
-            limit: Number of results to return
-            in_stock_only: Filter to in-stock items only
+    async def _get_top_by_price_mock(
+        self,
+        budget_max_brl: float,
+        limit: int = 3,
+        in_stock_only: bool = True,
+    ) -> list[RecommendationResult]:
+        mock_paddles = [
+            {"id": 1, "name": "Budget", "brand": "Generic", "price": 300.0, "in_stock": True},
+            {"id": 2, "name": "Mid", "brand": "Selkirk", "price": 650.0, "in_stock": True},
+            {"id": 3, "name": "Premium", "brand": "Selkirk", "price": 950.0, "in_stock": True},
+        ]
 
-        Returns:
-            List of RecommendationResult sorted by price proximity to budget
-        """
         candidates = []
-
-        for paddle in self._mock_paddles:
+        for paddle in mock_paddles:
             if in_stock_only and not paddle["in_stock"]:
                 continue
-
             if paddle["price"] > budget_max_brl:
                 continue
-
-            # Score by proximity to budget (closer to budget = higher score)
-            price_proximity = budget_max_brl - paddle["price"]
-
             candidates.append(
                 RecommendationResult(
                     paddle_id=paddle["id"],
                     name=paddle["name"],
                     brand=paddle["brand"],
-                    reasoning=f"Top option by price (R${paddle['price']:.0f}, proximity to budget: R${price_proximity:.0f})",
+                    reasoning=f"Top option by price (R${paddle['price']:.0f})",
                     price_min_brl=paddle["price"],
-                    affiliate_url=paddle["affiliate_url"],
+                    affiliate_url="https://example.com",
                     similarity_score=None,
                 )
             )
 
-        # Sort by price proximity (descending) - closest to budget first
         candidates.sort(key=lambda r: budget_max_brl - r.price_min_brl, reverse=True)
         return candidates[:limit]

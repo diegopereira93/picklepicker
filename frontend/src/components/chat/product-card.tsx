@@ -5,6 +5,7 @@ import type { ChatRecommendation } from '@/types/paddle'
 interface ProductCardProps extends ChatRecommendation {
   in_stock?: boolean
   stock_level?: 'available' | 'low' | 'unavailable'
+  reason?: string
 }
 
 function formatPrice(price: number): string {
@@ -35,37 +36,48 @@ export function ProductCard({
   similarity_score,
   in_stock,
   stock_level,
+  reason,
 }: ProductCardProps) {
   const effectiveStockLevel: 'available' | 'low' | 'unavailable' =
     stock_level ?? (in_stock === false ? 'unavailable' : 'available')
 
+  // Fallback reason per DESIGN.md
+  const displayReason = reason || 'Recomendada para o seu perfil de jogo.'
+
   return (
     <article
-      className="border rounded-xl p-4 bg-card shadow-sm flex flex-col gap-3 transition-transform hover:lift"
+      className="relative border rounded-lg p-4 bg-card shadow-sm flex flex-col gap-3 transition-transform hover:lift"
       data-testid={`product-card-${paddle_id}`}
       aria-labelledby={`product-title-${paddle_id}`}
     >
-      {/* Placeholder image with proper accessibility */}
+      {similarity_score > 0.8 && (
+        <div 
+          className="absolute top-2 right-2 bg-primary text-primary-foreground text-[10px] font-bold px-2 py-0.5 rounded-sm"
+          data-testid="recommended-badge"
+        >
+          Recomendado
+        </div>
+      )}
+
+      {/* Image placeholder - 80x80 per DESIGN.md */}
       <div
-        className="w-full h-32 bg-muted rounded-lg flex items-center justify-center text-muted-foreground text-sm"
+        className="w-20 h-20 bg-muted rounded-lg flex items-center justify-center text-muted-foreground text-xs shrink-0"
         role="img"
         aria-label={`Imagem da raquete ${brand} ${name}`}
       >
-        Foto em breve
+        Foto
       </div>
 
       <div className="flex-1 space-y-1">
+        <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{brand}</div>
         <h3 id={`product-title-${paddle_id}`} className="font-semibold text-base leading-tight">{name}</h3>
-        <div className="text-sm text-muted-foreground">{brand}</div>
+        <div className="text-lg font-bold">{formatPrice(price_min_brl)}</div>
       </div>
 
-      <div className="flex items-center justify-between">
-        <span className="text-lg font-bold">{formatPrice(price_min_brl)}</span>
-        {similarity_score > 0.8 && (
-          <span className="text-xs bg-primary/10 text-primary rounded-full px-2 py-0.5 font-medium">
-            Recomendado
-          </span>
-        )}
+      {/* "Por que essa raquete?" section per DESIGN.md */}
+      <div className="space-y-1">
+        <div className="text-xs font-medium text-muted-foreground">Por que essa raquete?</div>
+        <div className="text-sm text-foreground">{displayReason}</div>
       </div>
 
       <StockIndicator level={effectiveStockLevel} />
@@ -75,9 +87,9 @@ export function ProductCard({
         target="_blank"
         rel="noopener noreferrer"
         className="block w-full text-center bg-primary text-primary-foreground rounded-lg py-2 text-sm font-semibold hover:bg-primary/90 transition-colors"
-        aria-label={`Comprar ${name}`}
+        aria-label={`Ver ${name} no site`}
       >
-        Comprar
+        VER NO SITE →
       </a>
     </article>
   )

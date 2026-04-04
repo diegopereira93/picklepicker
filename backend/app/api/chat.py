@@ -2,19 +2,26 @@
 
 import asyncio
 import json
+import os
 import time
 from typing import Optional
+
+from groq import AsyncGroq
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, field_validator
+
 from app.agents.rag_agent import RAGAgent, UserProfile
 
+# Initialize Groq client (lazy initialization)
+groq_client = None
 
 router = APIRouter()
 
 
 class ChatRequest(BaseModel):
     """Chat request with user profile."""
+
     message: str
     skill_level: str
     budget_brl: float
@@ -46,6 +53,14 @@ class ChatRequest(BaseModel):
         return v.strip()
 
 
+def format_paddles_for_prompt(recommendations) -> str:
+    """Format paddle recommendations for LLM prompt."""
+    text = ""
+    for r in recommendations:
+        text += f"- {r.brand} {r.name}: R${r.price_min_brl:.0f}\n"
+    return text
+
+
 @router.post("/chat")
 async def chat_stream(request: ChatRequest) -> StreamingResponse:
     """
@@ -58,25 +73,30 @@ async def chat_stream(request: ChatRequest) -> StreamingResponse:
 
     On timeout (>8s), sends "degraded" event and returns by-price fallback.
     """
+
     async def event_generator():
         start_time = time.time()
+        input_tokens = 0
+        output_tokens = 0
+        model_used = "degraded"
 
         try:
-            # Initialize RAG agent (mock for now, production uses DB)
+            # Initialize RAG agent
             agent = RAGAgent()
 
             # Create user profile
             profile = UserProfile(
                 skill_level=request.skill_level,
                 budget_max_brl=request.budget_brl,
-                style=request.style
+                style=request.style,
             )
 
             # Fetch recommendations by profile
-            recommendations = await agent.search_by_profile(profile)
+            recommendations = await agent.search_by_profile(
+                profile, user_message=request.message
+            )
 
-            # Per-paddle reason templates — "Por que essa raquete?" trust element
-            # V1: template-based; V2 goal: LLM-generated per-paddle reason in reasoning event
+            # Per-paddle reason templates
             def _paddle_reason(rank: int, skill: str, price: float) -> str:
                 if rank == 0:
                     return f"Melhor opção para {skill} com ótimo custo-benefício (R${price:.0f})"
@@ -103,38 +123,73 @@ async def chat_stream(request: ChatRequest) -> StreamingResponse:
 
             # Try LLM reasoning with timeout
             try:
-                # Mock LLM response (production integrates Groq/Claude)
-                reasoning = f"Com base no seu perfil de {request.skill_level} jogador com orçamento de R${request.budget_brl:.0f}, recomendo estas raquetes que equilibram qualidade e preço."
+                # Check if Groq API key is available
+                groq_api_key = os.environ.get("GROQ_API_KEY")
+                if not groq_api_key:
+                    raise ValueError("GROQ_API_KEY not set")
 
-                # Simulate timeout check (production: asyncio.wait_for(..., timeout=8.0))
-                await asyncio.sleep(0.1)
+                # Initialize Groq client if not already initialized
+                global groq_client
+                if groq_client is None:
+                    groq_client = AsyncGroq(api_key=groq_api_key)
 
-                yield f"event: reasoning\ndata: {json.dumps({'text': reasoning})}\n\n"
+                # Build prompt with context
+                prompt = f"""Você é um especialista em pickleball. 
 
-            except asyncio.TimeoutError:
-                # Degraded mode: use fallback rankings
-                fallback = await agent.get_top_by_price(request.budget_brl, limit=3)
-                fallback_data = {
-                    "paddles": [
-                        {
-                            "paddle_id": r.paddle_id,
-                            "name": r.name,
-                            "brand": r.brand,
-                            "price_min_brl": r.price_min_brl,
-                            "affiliate_url": r.affiliate_url,
-                        }
-                        for r in fallback
-                    ]
-                }
-                yield f"event: degraded\ndata: {json.dumps(fallback_data)}\n\n"
+Perfil do usuário:
+- Nível: {request.skill_level}
+- Orçamento: R${request.budget_brl:.0f}
+- Estilo: {request.style or 'não especificado'}
+
+Raquetes recomendadas:
+{format_paddles_for_prompt(recommendations)}
+
+Pergunta do usuário: {request.message}
+
+Forneça uma explicação em português de por que estas raquetes são adequadas, em 2-3 frases."""
+
+                response = await asyncio.wait_for(
+                    groq_client.chat.completions.create(
+                        model="mixtral-8x7b-32768",
+                        messages=[{"role": "user", "content": prompt}],
+                        max_tokens=1024,
+                        stream=True,
+                    ),
+                    timeout=8.0,
+                )
+
+                reasoning_text = ""
+                async for chunk in response:
+                    if chunk.choices[0].delta.content:
+                        reasoning_text += chunk.choices[0].delta.content
+
+                reasoning = reasoning_text
+                model_used = "mixtral-8x7b-32768"
+
+                # Get token counts if available
+                if hasattr(response, "usage") and response.usage:
+                    input_tokens = response.usage.prompt_tokens
+                    output_tokens = response.usage.completion_tokens
+
+            except (asyncio.TimeoutError, Exception) as e:
+                # Degraded mode: use template response
+                if isinstance(e, asyncio.TimeoutError):
+                    reasoning = f"Com base no seu perfil de {request.skill_level} jogador com orçamento de R${request.budget_brl:.0f}, recomendo estas raquetes que equilibram qualidade e preço. (Resposta rápida devido a timeout)"
+                else:
+                    reasoning = f"Com base no seu perfil de {request.skill_level} jogador com orçamento de R${request.budget_brl:.0f}, recomendo estas raquetes que equilibram qualidade e preço."
+                model_used = "degraded"
+                input_tokens = 0
+                output_tokens = 0
+
+            yield f"event: reasoning\ndata: {json.dumps({'text': reasoning})}\n\n"
 
             # Send done event with metadata
             latency_ms = (time.time() - start_time) * 1000
             done_data = {
-                "tokens": 145,
+                "tokens": input_tokens + output_tokens,
                 "latency_ms": latency_ms,
-                "model": "groq",
-                "cache_hit": False
+                "model": model_used,
+                "cache_hit": False,
             }
             yield f"event: done\ndata: {json.dumps(done_data)}\n\n"
 
@@ -147,6 +202,6 @@ async def chat_stream(request: ChatRequest) -> StreamingResponse:
         media_type="text/event-stream",
         headers={
             "Cache-Control": "no-cache",
-            "X-Accel-Buffering": "no"
-        }
+            "X-Accel-Buffering": "no",
+        },
     )

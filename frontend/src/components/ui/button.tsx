@@ -5,25 +5,32 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center whitespace-nowrap font-bold rounded-[2px] transition-colors disabled:pointer-events-none disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#000000] focus-visible:outline-offset-2",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        default:
+          "bg-transparent border-[2px] border-[#84CC16] text-white hover:bg-[#1eaedb] hover:text-white active:bg-[#007fff] active:border-[#003eff] active:border rounded-[2px] focus-visible:bg-[#1eaedb] focus-visible:opacity-90",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+          "bg-transparent border border-[#84CC16] text-white hover:bg-[#1eaedb] hover:text-white active:bg-[#007fff] active:border-[#003eff] rounded-[2px] focus-visible:bg-[#1eaedb] focus-visible:opacity-90",
+        light:
+          "bg-transparent border-[2px] border-[#84CC16] text-black hover:bg-[#76b900] hover:text-black active:bg-[#5a9100] active:border-[#5a9100] rounded-[2px] focus-visible:bg-[#76b900] focus-visible:opacity-90",
+        compact:
+          "bg-transparent border border-[#84CC16] text-white hover:bg-[#1eaedb] hover:text-white rounded-[2px] tracking-[0.144px] leading-none",
+        outline:
+          "bg-transparent border border-[#84CC16] text-white hover:bg-[#1eaedb] hover:text-white rounded-[2px]",
+        ghost:
+          "bg-transparent text-white hover:bg-[#1a1a1a] hover:text-white rounded-[2px]",
+        destructive:
+          "bg-[#e52020] text-white border-0 hover:bg-[#c01818] rounded-[2px]",
+        link: "bg-transparent text-[#76b900] underline hover:text-[#3860be] p-0 h-auto",
       },
       size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md px-3",
-        lg: "h-11 rounded-md px-8",
-        icon: "h-10 w-10",
+        default: "py-[11px] px-[13px] text-[16px] font-bold leading-[1.25]",
+        sm: "py-[11px] px-[13px] text-[14px] font-bold leading-[1.25]",
+        lg: "py-[11px] px-[13px] text-[16px] font-bold leading-[1.25]",
+        icon: "h-10 w-10 p-0",
+        compact: "py-[11px] px-[13px] text-[16px] font-bold leading-none tracking-[0.144px]",
       },
     },
     defaultVariants: {

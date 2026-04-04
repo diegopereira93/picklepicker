@@ -4,6 +4,22 @@ Items capturados durante /plan-eng-review (2026-03-26). Deferred work que não b
 
 ---
 
+## Status Pós-MVP Launch Fixes (2026-04-03)
+
+| TODO | Status | Notas |
+|------|--------|-------|
+| T1 | ⏳ Pendente | Infra ainda não provisionada em produção |
+| T2 | ⏳ Pendente | Eval gate ainda retorna scores mockados |
+| T3 | ⏳ Pendente | Avaliação legal não realizada |
+| T4 | ⏳ Pendente | Monitoramento review_queue não implementado |
+| T5 | ⏳ Pendente | Load test /chat não realizado |
+| T6 | ⏳ Pendente | Alerta zero-paddle não implementado |
+| T7 | ⏳ Pendente | Runbook Firecrawl self-hosted não escrito |
+
+**Nota:** P0 fixes concluídos (RAG pgvector, Claude LLM, Tests). P1/TODOs ainda pendentes.
+
+---
+
 ## T1 — Provisionar infra desde Phase 1 (não Phase 6)
 
 **What:** Criar projeto Supabase no início da Phase 1 e Railway no início da Phase 2. Rodar migrations contra Supabase desde o começo — não só contra Docker Compose local.

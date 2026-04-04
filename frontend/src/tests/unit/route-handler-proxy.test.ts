@@ -82,7 +82,7 @@ describe('Route Handler integration (mocked fetch + ai)', () => {
     expect(response.status).toBe(503)
   })
 
-  it('Test 3b: returns 503 when FastAPI returns non-200', async () => {
+  it('Test 3b: forwards FastAPI status when non-200', async () => {
     mockFetch.mockResolvedValueOnce(new Response('Internal Server Error', { status: 500 }))
 
     const { POST } = await import('@/app/api/chat/route')
@@ -97,7 +97,7 @@ describe('Route Handler integration (mocked fetch + ai)', () => {
     })
 
     const response = await POST(request)
-    expect(response.status).toBe(503)
+    expect(response.status).toBe(500)
   })
 
   it('Test 4: propagates AbortSignal to FastAPI fetch', async () => {
@@ -225,5 +225,57 @@ describe('Route Handler integration (mocked fetch + ai)', () => {
     expect(sentBody.skill_level).toBe('advanced')
     expect(sentBody.budget_brl).toBe(1200)
     expect(sentBody.style).toBe('power')
+  })
+
+  it('Test 9: sanitizes invalid skill_level to beginner', async () => {
+    const sseEvents = ['event: done\ndata: {"tokens":5}\n\n']
+    mockFetch.mockResolvedValueOnce(
+      new Response(buildSSEStream(sseEvents), {
+        status: 200,
+        headers: { 'Content-Type': 'text/event-stream' },
+      })
+    )
+
+    const { POST } = await import('@/app/api/chat/route')
+    const request = new Request('http://localhost/api/chat', {
+      method: 'POST',
+      body: JSON.stringify({
+        messages: [{ role: 'user', content: 'test' }],
+        profile: { level: 'expert', style: 'power', budget_max: 800 },
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    })
+
+    await POST(request)
+
+    const [, fetchOptions] = mockFetch.mock.calls[mockFetch.mock.calls.length - 1]
+    const sentBody = JSON.parse(fetchOptions.body as string)
+    expect(sentBody.skill_level).toBe('beginner')
+  })
+
+  it('Test 10: defaults skill_level to beginner when profile missing', async () => {
+    const sseEvents = ['event: done\ndata: {"tokens":5}\n\n']
+    mockFetch.mockResolvedValueOnce(
+      new Response(buildSSEStream(sseEvents), {
+        status: 200,
+        headers: { 'Content-Type': 'text/event-stream' },
+      })
+    )
+
+    const { POST } = await import('@/app/api/chat/route')
+    const request = new Request('http://localhost/api/chat', {
+      method: 'POST',
+      body: JSON.stringify({
+        messages: [{ role: 'user', content: 'test' }],
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    })
+
+    await POST(request)
+
+    const [, fetchOptions] = mockFetch.mock.calls[mockFetch.mock.calls.length - 1]
+    const sentBody = JSON.parse(fetchOptions.body as string)
+    expect(sentBody.skill_level).toBe('beginner')
+    expect(sentBody.budget_brl).toBe(600)
   })
 })

@@ -2,7 +2,7 @@
 
 import pytest
 from fastapi.testclient import TestClient
-from backend.app.main import app
+from app.main import app
 
 
 client = TestClient(app)
@@ -10,7 +10,7 @@ client = TestClient(app)
 
 def test_get_paddles__200():
     """Test GET /paddles returns 200 with proper schema."""
-    response = client.get("/paddles")
+    response = client.get("/api/v1/paddles")
     assert response.status_code == 200
     data = response.json()
     assert "items" in data
@@ -23,7 +23,7 @@ def test_get_paddles__200():
 
 def test_get_paddles__pagination_defaults():
     """Test /paddles has correct default pagination."""
-    response = client.get("/paddles")
+    response = client.get("/api/v1/paddles")
     assert response.status_code == 200
     data = response.json()
     assert data["limit"] == 50  # default
@@ -33,7 +33,7 @@ def test_get_paddles__pagination_defaults():
 def test_get_paddles__limit_max():
     """Test /paddles limit cannot exceed 100."""
     # Request with limit > 100 should fail validation
-    response = client.get("/paddles?limit=150")
+    response = client.get("/api/v1/paddles?limit=150")
     assert response.status_code == 422  # Validation error
 
 
