@@ -81,7 +81,7 @@ CREATE TABLE paddle_specs (
 CREATE TABLE paddle_embeddings (
     id              BIGSERIAL PRIMARY KEY,
     paddle_id       BIGINT UNIQUE REFERENCES paddles(id),
-    embedding       vector(1536),
+    embedding       vector(768),
     needs_reembed   BOOLEAN DEFAULT TRUE,
     updated_at      TIMESTAMPTZ DEFAULT NOW()
 );
