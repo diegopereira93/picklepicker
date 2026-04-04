@@ -41,8 +41,8 @@ playwright-artifacts*/
 .v8-compile-cache-*/
 node-jiti/
 
-# GSD / Planning (legacy — not used)
-.planning/
+# GSD / Planning archives (phase directories are ephemeral)
+# .planning/ is tracked for milestone artifacts (PROJECT.md, REQUIREMENTS.md, etc.)
 .gstack/
 
 # Claude / OmO configs (local only)
