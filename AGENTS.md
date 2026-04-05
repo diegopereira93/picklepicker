@@ -3,9 +3,9 @@
  A Pickleball paddle intelligence platform for the Brazilian market. Scrapes prices/specs from BR retailers, runs a RAG AI agent for personalized recommendations, and monetizes via affiliate links.
 
  
-**Generated:** 2026-04-03
-**Version:** 1.3.0.1
-**Stack:** Python 3.12 + FastAPI (backend) | Next.js 14 App Router (frontend) | PostgreSQL + pgvector (DB)
+**Generated:** 2026-04-05
+**Version:** 1.4.0
+**Stack:** Python 3.12 + FastAPI (backend) | Next.js 14 App Router (frontend) | PostgreSQL + pgvector (DB) | Groq (LLM) | Jina AI (embeddings)
 
 ## Structure
 
@@ -117,17 +117,18 @@ Scrapers → paddle_embeddings (pgvector)
  
 - **vercel.json security headers** — Root `vercel.json` has extensive security headers. `frontend/vercel.json` has a minimal subset. Duplicate purpose.
 
-## COMPLETED FIXES (MVP Launch)
+## COMPLETED FIXES (MVP + v1.4 Launch)
 
-- ✅ **RAG Agent** — Integrated with real pgvector (Jina AI embeddings + semantic search, OpenAI REMOVIDO)
+- ✅ **RAG Agent** — Integrated with real pgvector (Jina AI embeddings + semantic search, OpenAI removed)
 - ✅ **Chat LLM** — Integrated with Groq (Mixtral 8x7B, streaming SSE, real responses)
-- ✅ **Backend Tests** — 167/167 passing (5 erros pre-existentes nao relacionados)
-- ✅ **Frontend Tests** — 152/152 passing
+- ✅ **Backend Tests** — 174 passing (2 pre-existing Jina/HF API 401 failures)
+- ✅ **Frontend Tests** — 161/161 passing
 - ✅ **Dropshot Retailer** — Added to schema (id=3)
 - ✅ **Scraper.yml** — Module paths corrected
-- ✅ **Embeddings Gratuitos** — Implementado Jina AI + Hugging Face como fallback (OpenAI removido)
-- ✅ **Schema** — Migrado de vector(1536) para vector(768) para compatibilidade com Jina/HF
-- ✅ **RAG Tests** — Embedding generation, vector search, price filtering validados
+- ✅ **Embeddings** — Jina AI (v2-base, 768d) + Hugging Face fallback (OpenAI removed)
+- ✅ **Schema** — Migrated to vector(768) for Jina/HF compatibility
+- ✅ **RAG Tests** — Embedding generation, vector search, price filtering validated
+- ✅ **Phase 14** — Launch readiness: SafeImage component, model_slug filter, chat proxy edge cases, regression tests
 
 ## COMMANDS
 

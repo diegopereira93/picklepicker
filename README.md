@@ -37,25 +37,30 @@ PickleIQ resolve ambos os problemas:
 ## Stack Tecnológico
 
 | Camada | Tecnologia |
-|--------|-----------|
+|--------|------------|
 | **Scraping** | Firecrawl API |
 | **Pipeline** | GitHub Actions (cron) |
 | **Banco Relacional** | PostgreSQL (Supabase em produção) |
 | **Banco Vetorial** | pgvector (extensão Supabase) |
-| **LLM** | Claude 3.5 Sonnet (Anthropic API) |
-| **Embeddings** | OpenAI text-embedding-3-small |
+| **LLM** | Groq (Mixtral 8x7B — streaming) |
+| **Embeddings** | Jina AI (v2-base, 768d) + Hugging Face (fallback) |
 | **Backend API** | Python + FastAPI |
 | **Frontend** | Next.js 14 (App Router) + Tailwind CSS |
 | **Autenticação** | Clerk (Phase 5+) |
-| **Hospedagem Backend** | Railway (MVP) |
+| **Hospedagem Backend** | Railway |
 | **Hospedagem Frontend** | Vercel |
-| **Observabilidade LLM** | Langfuse |
 
 ---
 
 ## Roadmap de Desenvolvimento
 
 A plataforma é desenvolvida em fases organizadas em milestones:
+
+### v1.4 — Launch Readiness & Bug Fixes (2026-04-04)
+
+| Fase | Objetivo | Status |
+|------|----------|--------|
+| **14** | Fix images, routing, chat bugs + regression tests | ✅ Concluído |
 
 ### v1.3 — Hybrid UI Redesign (2026-04-02)
 
@@ -219,6 +224,10 @@ Crie `backend/.env` com as variáveis necessárias:
 DATABASE_URL=postgresql://pickleiq:changeme@localhost:5432/pickleiq
 GROQ_API_KEY=your_groq_api_key
 
+# Embeddings (Jina AI primário, Hugging Face fallback)
+JINA_API_KEY=your_jina_api_key
+HUGGINGFACE_API_KEY=your_hf_api_key  # opcional, fallback
+
 # Opcionais (para crawlers)
 FIRECRAWL_API_KEY=your_firecrawl_key
 MERCADO_LIVRE_API_KEY=your_ml_key
@@ -270,16 +279,15 @@ picklepicker/
 
 ## Próximas Ações
 
-v1.3 Hybrid UI Redesign completo. Planejando v1.4.
+v1.4 Launch Readiness completo. Planejando v1.5 — Production Readiness (infra, legal, reliability).
 
 ---
 
 ## Contato & Suporte
 
-- **Workflow:** Type `ultrawork` para AI-assisted development
 - **Deferred work:** Veja [TODOS.md](./TODOS.md) para 7 itens do eng review
 
 ---
 
-**Status do Projeto:** v1.3.0.1 — 4 milestones entregues
-**Última atualização:** 2026-04-03
+**Status do Projeto:** v1.4.0 — 5 milestones entregues
+**Última atualização:** 2026-04-05
