@@ -43,7 +43,7 @@ Users can confidently choose the right pickleball paddle through AI-powered reco
 
 ## Context
 
-**Current state (v1.4.0):** All launch-blocking bugs fixed. Core flows (catalog, detail, chat) work without errors. 174 backend + 161 frontend tests passing. Ready for production infrastructure provisioning.
+**Current state (v1.4.0):** All launch-blocking bugs fixed. Core flows work without errors. 174 backend + 161 frontend tests passing. v1.5 (Production Readiness) planned but not started. v1.6 (UI Redesign) next — based on 9-variant design review completed 2026-04-05.
 
 ## Constraints
 
@@ -51,7 +51,8 @@ Users can confidently choose the right pickleball paddle through AI-powered reco
 - **No ORM:** Raw psycopg with parameterized queries — must validate column names against `pipeline/db/schema.sql`
 - **Tests:** pytest-asyncio (backend) + Vitest (frontend) — must not introduce regressions
 - **Locale:** PT-BR for all user-facing text
-- **Design system:** Follow DESIGN.md strictly
+- **Design system:** Follow DESIGN.md (updating to v3.0 this milestone based on design review)
+- **Design review:** Follow approved.json decisions from `all-screens-20260405/`
 
 ## Key Decisions
 
@@ -61,17 +62,30 @@ Users can confidently choose the right pickleball paddle through AI-powered reco
 | Groq over Claude | Cost optimization | ✓ Working for chat |
 | Jina AI over OpenAI | Free embeddings | ✓ Working for RAG |
 | placehold.co for seed data | Quick prototyping | ⚠️ Causes image errors in production |
+| Quiz-Forward (Home-C) | Max funnel conversion (score 9/10) | 🆕 v1.6 — approved variant |
+| Sidebar Companion (Chat-B) | Buy button always visible (score 9/10) | 🆕 v1.6 — approved variant |
+| Comparison Table (Catalog-A) | Data density for analytical persona (score 9/10) | 🆕 v1.6 — approved variant |
+| DESIGN.md v3.0 updates | 6 changes from design review (Metis analysis) | 🆕 v1.6 — planned |
 
-## Current Milestone: v1.5 Production Readiness
+## Current Milestone: v1.6 UI Redesign
 
-**Goal:** Provision production infrastructure, ensure legal compliance, and harden embedding/chat reliability before scaling.
+**Goal:** Implement the winning design variants from the 9-variant design review (2026-04-05). Redesign Home, Catalog, and Chat screens to maximize funnel conversion and cross-screen coherence.
+
+**Design review source:** `~/.gstack/projects/diegopereira93-picklepicker/designs/all-screens-20260405/`
+
+**Winning combination:**
+- **Home**: C (Quiz-Forward) + data stats from A — quiz above-the-fold captures intent immediately
+- **Catalog**: A (Comparison Table) + product images from B + grid toggle — sortable data for analytical persona
+- **Chat**: B (Sidebar Companion) + card responses from C — split-panel keeps buy button accessible
 
 **Target features:**
-- Supabase + Railway production infrastructure (T1)
-- Legal assessment of BR retailer scraping (T3)
-- Eval gate as monthly CI job (T2)
-- Local embedding fallback for Jina/HuggingFace outages
-- Basic uptime/error monitoring for /chat and scrapers
+- DESIGN.md v3.0 with 6 proposed updates (chat UI, semantic colors, border radius, widgets, max-width, full-dark sections)
+- Home page redesigned with quiz widget above-the-fold
+- Chat redesigned with sidebar companion layout + card-structured AI responses
+- Catalog redesigned with comparison table + visual grid toggle
+- Cross-screen coherence (consistent visual language, shared components)
+
+**Implementation order:** DESIGN.md → Home-C → Chat-B → Catalog-A → Polish
 
 ## Evolution
 
@@ -91,4 +105,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-05 after v1.4.0 completion — v1.5.0 milestone started*
+*Last updated: 2026-04-05 — v1.6.0 UI Redesign milestone created from design review*
