@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
 import { Suspense } from 'react'
-import Image from 'next/image'
+import { SafeImage } from '@/components/ui/safe-image'
 import { fetchPaddlesList } from '@/lib/seo'
 import { PaddleGridSkeleton } from '@/components/paddle-card-skeleton'
 
@@ -56,20 +56,11 @@ export default async function PaddlesPage() {
                 className="hy-product-card-inner"
                 data-testid="paddle-card-link"
               >
-                {paddle.image_url ? (
-                  <Image
-                    src={paddle.image_url}
-                    alt={`${paddle.brand} ${paddle.name} paddle`}
-                    width={320}
-                    height={192}
-                    className="w-full h-48 object-contain mb-3 hy-product-image"
-                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                  />
-                ) : (
-                  <div className="w-full h-48 bg-muted/50 rounded-lg flex items-center justify-center text-muted-foreground text-xs mb-3" aria-label={`${paddle.brand} ${paddle.name} — imagem indisponível`}>
-                    Foto
-                  </div>
-                )}
+                <SafeImage
+                  src={paddle.image_url}
+                  alt={`${paddle.brand} ${paddle.name} paddle`}
+                  className="w-full h-48 object-contain mb-3 hy-product-image"
+                />
                 <h2 className="hy-product-card-title">
                   {paddle.name}
                 </h2>
