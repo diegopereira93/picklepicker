@@ -22,6 +22,7 @@ router = APIRouter(prefix="/paddles", tags=["paddles"])
 @router.get("", response_model=PaddleListResponse, status_code=status.HTTP_200_OK)
 async def list_paddles(
     brand: Optional[str] = Query(None, description="Filter by brand"),
+    model_slug: Optional[str] = Query(None, description="Filter by model slug"),
     price_min: Optional[float] = Query(None, description="Min price BRL"),
     price_max: Optional[float] = Query(None, description="Max price BRL"),
     in_stock: Optional[bool] = Query(None, description="Only in-stock items"),
@@ -35,8 +36,11 @@ async def list_paddles(
     params = []
 
     if brand:
-        where_clauses.append("brand = %s")
+        where_clauses.append("LOWER(brand) = LOWER(%s)")
         params.append(brand)
+    if model_slug:
+        where_clauses.append("model_slug = %s")
+        params.append(model_slug)
     if price_min:
         where_clauses.append("price_min_brl >= %s")
         params.append(price_min)

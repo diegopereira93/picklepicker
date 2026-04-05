@@ -75,3 +75,39 @@ def test_openapi_schema__includes_paddles():
     paths = schema.get("paths", {})
     # Check that paddles endpoints are in schema
     assert "/paddles" in paths or "/health" in paths
+
+
+def test_list_paddles_with_model_slug_filter():
+    """Test GET /paddles?brand=selkirk&model_slug=vanguard-power-air returns filtered results."""
+    response = client.get("/api/v1/paddles?brand=selkirk&model_slug=vanguard-power-air")
+    assert response.status_code == 200
+    data = response.json()
+    assert "items" in data
+    # With mock DB returning empty results, items will be empty but endpoint must accept the param
+    assert isinstance(data["items"], list)
+
+
+def test_list_paddles_without_model_slug():
+    """Test GET /paddles?brand=selkirk returns all Selkirk paddles (no slug filter)."""
+    response = client.get("/api/v1/paddles?brand=selkirk")
+    assert response.status_code == 200
+    data = response.json()
+    assert "items" in data
+    assert isinstance(data["items"], list)
+
+
+def test_list_paddles_model_slug_and_brand_combined():
+    """Test both brand and model_slug filters work together."""
+    response = client.get("/api/v1/paddles?brand=selkirk&model_slug=vanguard-power-air")
+    assert response.status_code == 200
+    data = response.json()
+    assert isinstance(data["items"], list)
+
+
+def test_list_paddles_model_slug_not_found():
+    """Test non-existent model_slug returns 200 with empty items (not 404)."""
+    response = client.get("/api/v1/paddles?model_slug=nonexistent-paddle-slug")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["items"] == []
+    assert data["total"] == 0
