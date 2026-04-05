@@ -12,6 +12,18 @@
     --data-green: #76b900;           /* green for charts, tables, section labels */
     --data-green-light: #bff230;     /* hover state */
 
+    /* v3.0 — Semantic Level Colors */
+    --level-beginner: #4CAF50;
+    --level-intermediate: #FCD34D;
+    --level-advanced: #F44336;
+    --level-professional: #8B5CF6;
+
+    /* v3.0 — Border Radius */
+    --radius-conversational: 8px;
+
+    /* v3.0 — Layout Tokens */
+    --max-width-data: 1440px;
+
     /* === Base Palette === */
     --color-green: #76b900;          /* alias for compatibility */
     --color-black: #000000;
@@ -850,6 +862,68 @@ a.hy-link-sport:hover {
   100% { background-position: -200% 0; }
 }
 
+@keyframes hy-chat-message-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes hy-card-response-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes hy-quiz-selection-ripple {
+  0% {
+    box-shadow: 0 0 0 0 rgba(132, 204, 22, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(132, 204, 22, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(132, 204, 22, 0);
+  }
+}
+
+@keyframes hy-streaming-cursor {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
+}
+
+.hy-animate-chat-enter {
+  animation: hy-chat-message-enter 250ms cubic-bezier(0, 0, 0.2, 1) forwards;
+}
+
+.hy-animate-card-enter {
+  animation: hy-card-response-enter 300ms cubic-bezier(0, 0, 0.2, 1) forwards;
+}
+
+.hy-animate-quiz-ripple {
+  animation: hy-quiz-selection-ripple 400ms ease-out;
+}
+
+.hy-streaming-cursor::after {
+  content: '▊';
+  color: var(--sport-primary);
+  animation: hy-streaming-cursor 1s linear infinite;
+  margin-left: 2px;
+}
+
 /* === Buttons === */
 .hy-button {
   display: inline-flex;
@@ -1063,6 +1137,157 @@ a.hy-link-sport:hover {
 
 .hy-chat-send:hover {
   background-color: var(--sport-secondary);
+}
+
+/* v3.0 — Chat Card Responses (base styles for Phase 18) */
+.hy-chat-card {
+  border-radius: var(--radius-conversational);
+  overflow: hidden;
+}
+
+.hy-chat-card-product {
+  background: var(--color-near-black);
+  border: 1px solid var(--color-gray-border);
+  border-radius: var(--radius-conversational);
+  overflow: hidden;
+}
+
+.hy-chat-card-tip {
+  background: rgba(252, 211, 77, 0.08);
+  border-left: 3px solid #FCD34D;
+  border-radius: var(--radius-conversational);
+  padding: 12px 16px;
+}
+
+.hy-chat-card-comparison {
+  background: var(--color-near-black);
+  border: 1px solid var(--color-gray-border);
+  border-radius: var(--radius-conversational);
+  overflow: hidden;
+}
+
+/* v3.0 — Interactive Widget Base Styles */
+.hy-quiz-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  border: 2px solid var(--color-gray-border);
+  border-radius: var(--radius-conversational);
+  background: transparent;
+  color: var(--color-white);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hy-quiz-pill:hover {
+  border-color: var(--sport-primary);
+}
+
+.hy-quiz-pill.selected {
+  border-color: var(--sport-primary);
+  background: rgba(132, 204, 22, 0.1);
+  box-shadow: 0 0 0 1px var(--sport-primary), 0 0 12px rgba(132, 204, 22, 0.15);
+}
+
+.hy-toggle-track {
+  width: 40px;
+  height: 22px;
+  border-radius: 11px;
+  background: var(--color-gray-border);
+  position: relative;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.hy-toggle-track.active {
+  background: var(--sport-primary);
+}
+
+.hy-toggle-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: white;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform 150ms ease;
+}
+
+.hy-toggle-track.active .hy-toggle-thumb {
+  transform: translateX(18px);
+}
+
+.hy-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border: 1px solid var(--color-gray-border);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--color-gray-400);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.hy-filter-chip.active {
+  border-color: var(--sport-primary);
+  background: rgba(132, 204, 22, 0.1);
+  color: var(--sport-primary);
+}
+
+.hy-progress-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-gray-border);
+  transition: background 150ms ease;
+}
+
+.hy-progress-dot.active {
+  background: var(--sport-primary);
+}
+
+.hy-carousel-arrow {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--color-gray-border);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.hy-carousel-arrow:hover {
+  border-color: var(--sport-primary);
+  background: white;
+}
+
+/* === Lime underline text decoration === */
+.hy-text-underline-lime {
+  position: relative;
+}
+
+.hy-text-underline-lime::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: var(--sport-primary);
+  border-radius: 2px;
 }
 
 /* === NVIDIA compatibility aliases === */
