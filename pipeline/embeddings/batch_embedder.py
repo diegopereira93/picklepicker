@@ -1,4 +1,9 @@
-"""Batch embedding service using free providers (Jina AI / Hugging Face)."""
+"""Batch embedding service using configurable providers.
+
+Provider priority (based on EMBEDDING_PROVIDER env var):
+- When EMBEDDING_PROVIDER=gemini and GEMINI_API_KEY is set: use Gemini → Jina → HF → zero vector
+- When EMBEDDING_PROVIDER=jina or not set: use Jina → HF → zero vector (DEFAULT behavior)
+"""
 
 import asyncio
 import logging
@@ -16,8 +21,72 @@ logger = logging.getLogger(__name__)
 EMBEDDING_DIMENSIONS = 768
 
 
+async def _try_gemini(text: str) -> list[float]:
+    """Generate embedding via Gemini API (requires GEMINI_API_KEY)."""
+    gemini_key = os.environ.get("GEMINI_API_KEY")
+    if not gemini_key:
+        raise RuntimeError("GEMINI_API_KEY not configured")
+
+    payload = {
+        "model": "models/gemini-embedding-001",
+        "content": {
+            "parts": [{"text": text}]
+        },
+        "taskType": "RETRIEVAL_DOCUMENT",  # Using DOCUMENT for embedding storage
+        "outputDimensionality": EMBEDDING_DIMENSIONS,
+    }
+
+    headers = {
+        "Content-Type": "application/json",
+        "x-goog-api-key": gemini_key
+    }
+
+    async with httpx.AsyncClient(timeout=3.0) as client:
+        response = await client.post(
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-embedding-001:embedContent",
+            json=payload,
+            headers=headers
+        )
+        response.raise_for_status()
+        data = response.json()
+
+        if "embedding" not in data or "values" not in data["embedding"]:
+            raise RuntimeError("Invalid Gemini response: no embedding")
+
+        embedding = data["embedding"]["values"]
+
+        if len(embedding) != EMBEDDING_DIMENSIONS:
+            raise RuntimeError(
+                f"Unexpected dimension: {len(embedding)}, expected: {EMBEDDING_DIMENSIONS}"
+            )
+
+        return embedding
+
+
 async def _generate_embedding(text: str) -> list[float]:
-    """Generate embedding using free providers with fallback chain: Jina → HF → zero vector."""
+    """Generate embedding using configurable providers with fallback chain.
+    
+    Provider priority (based on EMBEDDING_PROVIDER env var):
+    - When EMBEDDING_PROVIDER=gemini and GEMINI_API_KEY is set: use Gemini → Jina → HF → zero vector
+    - When EMBEDDING_PROVIDER=jina or not set: use Jina → HF → zero vector (DEFAULT behavior)
+    """
+    provider = os.environ.get("EMBEDDING_PROVIDER", "jina").lower()
+    
+    logger.info(f"Embedding with provider: {provider}")
+    
+    # Provider selection based on EMBEDDING_PROVIDER env var
+    if provider == "gemini":
+        # When EMBEDDING_PROVIDER=gemini and GEMINI_API_KEY is set: use Gemini API
+        gemini_key = os.environ.get("GEMINI_API_KEY")
+        if gemini_key:
+            try:
+                embedding = await _try_gemini(text)
+                logger.info(f"embedding_provider: gemini, dimensions: {EMBEDDING_DIMENSIONS}")
+                return embedding
+            except Exception as e:
+                logger.warning(f"gemini_failed: {str(e)}, falling_back: jina")
+    
+    # Default behavior: Jina → HF → zero vector
     headers_base = {"Content-Type": "application/json"}
     jina_key = os.environ.get("JINA_API_KEY")
     if jina_key:
@@ -38,7 +107,7 @@ async def _generate_embedding(text: str) -> list[float]:
                         return emb + [0.0] * (EMBEDDING_DIMENSIONS - len(emb))
                     return emb[:EMBEDDING_DIMENSIONS]
     except Exception as e:
-        logger.warning(f"Jina AI failed: {e}")
+        logger.warning(f"jina_failed: {str(e)}, falling_back: huggingface")
 
     hf_headers = {}
     hf_key = os.environ.get("HUGGINGFACE_API_KEY")
@@ -60,9 +129,9 @@ async def _generate_embedding(text: str) -> list[float]:
                         return emb + [0.0] * (EMBEDDING_DIMENSIONS - len(emb))
                     return emb[:EMBEDDING_DIMENSIONS]
     except Exception as e:
-        logger.warning(f"Hugging Face failed: {e}")
+        logger.error(f"huggingface_failed: {str(e)}")
 
-    logger.warning("All embedding providers failed, returning zero vector")
+    logger.warning("embedding_fallback_zero_vector")
     return [0.0] * EMBEDDING_DIMENSIONS
 
 
@@ -129,7 +198,8 @@ async def batch_embed_paddles(
                     [paddle_id, str(embedding), now],
                 )
                 total_embedded += 1
-                logger.info(f"Embedded paddle {paddle_id} ({total_embedded}/{len(paddle_ids)})")
+                provider = os.environ.get("EMBEDDING_PROVIDER", "jina").lower()
+                logger.info(f"Embedded paddle {paddle_id} with provider {provider} ({total_embedded}/{len(paddle_ids)})")
 
                 if total_embedded % batch_size == 0:
                     await asyncio.sleep(0.5)
