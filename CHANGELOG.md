@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.0] - 2026-04-05
+
+### Added
+- **Phase 16: Design System v3.0** — DESIGN.md upgraded to v3.0 with expanded typography scale, responsive grid system, animation keyframes (chat-enter, card-enter, fade-in), and AI slop prevention checklist.
+- **Phase 17: Home-C Hero Section** — Redesigned homepage with split-panel layout, quiz integration, animated hero section, and responsive grid system. New `home/` component directory.
+- **Phase 18: Chat-B Sidebar Companion** — Split-panel chat layout (55% sidebar / 45% chat). New sidebar product card with specs grid and color-coded score badge. Related paddles grid, comparison table for 2+ paddles, tip cards, and suggested question pills. Chat message bubble v3.0 styling with lime accent borders.
+- **Phase 19: Catalog-A Comparison Table** — Full catalog redesign with brand/level filter chips, sort dropdown, table/card view toggle, selection bar with compare CTA, sortable comparison table, and responsive product grid.
+- **Component Tests** — 21 new unit tests for catalog components (FilterBar, SelectionBar, SuggestedQuestions, TipCard, ComparisonCard).
+
+### Changed
+- **Chat Page Layout** — Converted from single-column to split-panel with product sidebar and recommendation flow integration.
+- **Catalog Page** — Converted paddles page to server/client hybrid with client-side filtering and sorting.
+- **Design Tokens** — All new components use CSS custom properties exclusively (no shadcn color classes).
+- **Message Bubbles** — User messages get dark background with lime accent border, AI messages animate on entry.
+
 ## [1.4.1] - 2026-04-05
 
 ### Changed
