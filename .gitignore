@@ -44,6 +44,8 @@ node-jiti/
 # GSD / Planning archives (phase directories are ephemeral)
 # .planning/ is tracked for milestone artifacts (PROJECT.md, REQUIREMENTS.md, etc.)
 .gstack/
+.sisyphus/
+designs/
 
 # Claude / OmO configs (local only)
 .claude/

@@ -3,23 +3,26 @@
 import { useEffect, useRef, useState } from 'react'
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
-import type { UserProfile } from '@/types/paddle'
+import type { ChatRecommendation, UserProfile } from '@/types/paddle'
 import { MessageBubble } from './message-bubble'
+import { SuggestedQuestions } from './suggested-questions'
 
 interface ChatWidgetProps {
   profile: UserProfile
+  onRecommendations?: (recommendations: ChatRecommendation[]) => void
 }
 
 const SUGGESTED_QUESTIONS = [
-  'Qual raquete para iniciante?',
-  'Melhor custo-beneficio ate R$ 600?',
-  'Qual raquete para jogo de controle?',
+  'Qual a diferenca entre 13mm e 16mm?',
+  'Melhor raquete para iniciante?',
+  'Raquete com melhor custo-beneficio?',
 ]
 
-export function ChatWidget({ profile }: ChatWidgetProps) {
+export function ChatWidget({ profile, onRecommendations }: ChatWidgetProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const [input, setInput] = useState('')
   const [lastMessage, setLastMessage] = useState<string>('')
+  const prevRecCountRef = useRef(0)
 
   const { messages, sendMessage, status, error } = useChat({
     transport: new DefaultChatTransport({
@@ -33,6 +36,18 @@ export function ChatWidget({ profile }: ChatWidgetProps) {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
+
+  useEffect(() => {
+    const lastMsg = messages[messages.length - 1]
+    if (!lastMsg) return
+    const recPart = lastMsg.parts.find((p) => p.type === 'data-recommendations')
+    if (!recPart) return
+    const recs = (recPart as { type: string; data: unknown }).data as ChatRecommendation[]
+    if (!Array.isArray(recs) || recs.length === 0) return
+    if (recs.length === prevRecCountRef.current) return
+    prevRecCountRef.current = recs.length
+    onRecommendations?.(recs)
+  }, [messages, onRecommendations])
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -55,31 +70,20 @@ export function ChatWidget({ profile }: ChatWidgetProps) {
   }
 
   return (
-    <div className="flex flex-col h-full max-h-[calc(100vh-57px)]">
+    <div className="flex flex-col h-full">
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-1">
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full gap-6 pb-8">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-sm font-bold">
-                PI
+              <div style={{ backgroundColor: 'var(--color-near-black)' }} className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold">
+                <span style={{ color: 'var(--sport-primary)' }}>PI</span>
               </div>
-              <p className="text-muted-foreground text-sm">
+              <p className="text-sm" style={{ color: 'var(--color-gray-300)' }}>
                 Oi! Sou o PickleIQ. Me conta o que voce procura e vou recomendar as melhores raquetes para voce.
               </p>
             </div>
-            <div className="flex flex-wrap gap-2 justify-center">
-              {SUGGESTED_QUESTIONS.map((q) => (
-                <button
-                  key={q}
-                  type="button"
-                  onClick={() => handleSuggestedQuestion(q)}
-                  className="text-sm border rounded-full px-4 py-2 hover:bg-muted transition-colors"
-                >
-                  {q}
-                </button>
-              ))}
-            </div>
+            <SuggestedQuestions questions={SUGGESTED_QUESTIONS} onSelect={handleSuggestedQuestion} disabled={isLoading} />
           </div>
         )}
 
@@ -107,10 +111,10 @@ export function ChatWidget({ profile }: ChatWidgetProps) {
 
         {isLoading && (
           <div className="flex justify-start mb-3 gap-2">
-            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold shrink-0" aria-hidden="true">
-              PI
+            <div style={{ backgroundColor: 'var(--color-near-black)' }} className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0" aria-hidden="true">
+              <span style={{ color: 'var(--sport-primary)' }}>PI</span>
             </div>
-            <div className="bg-muted rounded-2xl rounded-bl-sm px-4 py-3 text-sm text-muted-foreground">
+            <div style={{ backgroundColor: 'transparent', borderRadius: '8px' }} className="px-4 py-3 text-sm">
               <span className="inline-flex gap-1">
                 <span className="animate-bounce [animation-delay:0ms]">.</span>
                 <span className="animate-bounce [animation-delay:150ms]">.</span>
@@ -123,8 +127,8 @@ export function ChatWidget({ profile }: ChatWidgetProps) {
         {/* Error handling per DESIGN.md: inline retry */}
         {error && (
           <div className="flex justify-start mb-3">
-            <div className="bg-destructive/10 text-destructive text-sm rounded-lg px-4 py-2 flex items-center gap-2">
-              <span>⚠️ Erro ao carregar.</span>
+            <div style={{ backgroundColor: 'rgba(185, 28, 28, 0.1)' }} className="text-sm rounded-lg px-4 py-2 flex items-center gap-2">
+              <span style={{ color: '#B91C1C' }}>⚠️ Erro ao carregar.</span>
               <button
                 type="button"
                 onClick={handleRetry}
@@ -136,11 +140,22 @@ export function ChatWidget({ profile }: ChatWidgetProps) {
           </div>
         )}
 
+        {/* Suggested questions */}
+        {messages.length > 0 && (
+          <div className="px-4 pt-2">
+            <SuggestedQuestions
+              questions={SUGGESTED_QUESTIONS}
+              onSelect={handleSuggestedQuestion}
+              disabled={isLoading}
+            />
+          </div>
+        )}
+
         <div ref={messagesEndRef} />
       </div>
 
       {/* Input */}
-      <div className="border-t px-4 py-3 bg-background">
+      <div style={{ backgroundColor: 'var(--color-near-black)', borderColor: 'var(--color-gray-border)' }} className="border-t px-4 py-3">
         <form id="chat-form" onSubmit={handleSubmit} className="flex gap-2">
           <input
             type="text"
@@ -148,12 +163,13 @@ export function ChatWidget({ profile }: ChatWidgetProps) {
             onChange={(e) => setInput(e.target.value)}
             disabled={isLoading}
             placeholder="Pergunte sobre raquetes..."
-            className="flex-1 border rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
+            style={{ border: '1px solid var(--color-gray-border)', borderRadius: '8px', backgroundColor: 'var(--color-black)', color: 'var(--color-white)' }}
+            className="flex-1 px-4 py-2 text-sm focus:outline-none disabled:opacity-50"
           />
           <button
             type="submit"
             disabled={isLoading || !input.trim()}
-            className="bg-primary text-primary-foreground px-4 py-2 rounded-xl text-sm font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary/90 transition-colors"
+            className="hy-chat-send disabled:opacity-40 disabled:cursor-not-allowed"
           >
             Enviar
           </button>
