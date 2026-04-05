@@ -9,28 +9,28 @@ Bug fixes for launch-blocking issues. Each maps to roadmap phases.
 
 ### Product Images
 
-- [ ] **IMG-01**: All paddles with `image_url` set display a valid image — no "not a valid image" console errors on `/paddles` catalog page
-- [ ] **IMG-02**: Paddle detail pages (`/paddles/[brand]/[model-slug]`) show either a real product image or a styled placeholder — never a broken image
-- [ ] **IMG-03**: `placehold.co` URLs are removed from the database seed and replaced with either real URLs or NULL (triggering the existing "Foto" fallback)
-- [ ] **IMG-04**: Chat product cards show a styled placeholder image instead of attempting to load external URLs
+- [x] **IMG-01**: All paddles with `image_url` set display a valid image — no "not a valid image" console errors on `/paddles` catalog page
+- [x] **IMG-02**: Paddle detail pages (`/paddles/[brand]/[model-slug]`) show either a real product image or a styled placeholder — never a broken image
+- [x] **IMG-03**: `placehold.co` URLs are removed from the database seed and replaced with either real URLs or NULL (triggering the existing "Foto" fallback)
+- [x] **IMG-04**: Chat product cards show a styled placeholder image instead of attempting to load external URLs
 
 ### Paddle Detail Routing
 
-- [ ] **RTE-01**: Backend `GET /api/v1/paddles` accepts `model_slug` as an optional query parameter and filters results by exact match
-- [ ] **RTE-02**: Frontend `fetchProductData(brand, modelSlug)` correctly resolves to the exact paddle matching both brand and model_slug — no 404 for valid paddles
-- [ ] **RTE-03**: Paddle detail page returns 404 only when the paddle genuinely does not exist in the database
+- [x] **RTE-01**: Backend `GET /api/v1/paddles` accepts `model_slug` as an optional query parameter and filters results by exact match
+- [x] **RTE-02**: Frontend `fetchProductData(brand, modelSlug)` correctly resolves to the exact paddle matching both brand and model_slug — no 404 for valid paddles
+- [x] **RTE-03**: Paddle detail page returns 404 only when the paddle genuinely does not exist in the database
 
 ### Chat Endpoint
 
-- [ ] **CHT-01**: Frontend chat proxy handles all edge cases in the payload — zero `budget_max`, empty messages, missing profile fields — without returning 422
-- [ ] **CHT-02**: Chat works end-to-end from quiz completion through AI response — no validation errors at any step
-- [ ] **CHT-03**: Error responses from the backend are surfaced to the user with a meaningful message (not a raw 422/500)
+- [x] **CHT-01**: Frontend chat proxy handles all edge cases in the payload — zero `budget_max`, empty messages, missing profile fields — without returning 422
+- [x] **CHT-02**: Chat works end-to-end from quiz completion through AI response — no validation errors at any step
+- [x] **CHT-03**: Error responses from the backend are surfaced to the user with a meaningful message (not a raw 422/500)
 
 ### Quality Assurance
 
-- [ ] **QA-01**: All existing tests pass (167 backend + 152 frontend) with no regressions
-- [ ] **QA-02**: New regression tests cover the 3 fixed bugs — paddle detail routing, chat payload validation, image fallback behavior
-- [ ] **QA-03**: Manual smoke test of core flows produces zero console errors: browse catalog → view detail → complete quiz → chat
+- [x] **QA-01**: All existing tests pass (167 backend + 152 frontend) with no regressions
+- [x] **QA-02**: New regression tests cover the 3 fixed bugs — paddle detail routing, chat payload validation, image fallback behavior
+- [x] **QA-03**: Manual smoke test of core flows produces zero console errors: browse catalog → view detail → complete quiz → chat
 
 ## v2 Requirements
 
@@ -61,19 +61,19 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| IMG-01 | Phase 14 | Pending |
-| IMG-02 | Phase 14 | Pending |
-| IMG-03 | Phase 14 | Pending |
-| IMG-04 | Phase 14 | Pending |
-| RTE-01 | Phase 14 | Pending |
-| RTE-02 | Phase 14 | Pending |
-| RTE-03 | Phase 14 | Pending |
-| CHT-01 | Phase 14 | Pending |
-| CHT-02 | Phase 14 | Pending |
-| CHT-03 | Phase 14 | Pending |
-| QA-01 | Phase 14 | Pending |
-| QA-02 | Phase 14 | Pending |
-| QA-03 | Phase 14 | Pending |
+| IMG-01 | Phase 14 | ✅ Complete |
+| IMG-02 | Phase 14 | ✅ Complete |
+| IMG-03 | Phase 14 | ✅ Complete |
+| IMG-04 | Phase 14 | ✅ Complete |
+| RTE-01 | Phase 14 | ✅ Complete |
+| RTE-02 | Phase 14 | ✅ Complete |
+| RTE-03 | Phase 14 | ✅ Complete |
+| CHT-01 | Phase 14 | ✅ Complete |
+| CHT-02 | Phase 14 | ✅ Complete |
+| CHT-03 | Phase 14 | ✅ Complete |
+| QA-01 | Phase 14 | ✅ Complete |
+| QA-02 | Phase 14 | ✅ Complete |
+| QA-03 | Phase 14 | ✅ Complete |
 
 **Coverage:**
 - v1.4 requirements: 13 total
@@ -82,4 +82,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-04-04*
-*Last updated: 2026-04-04 after initial definition*
+*Last updated: 2026-04-05 — v1.4.0 all requirements validated*
