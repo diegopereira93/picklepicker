@@ -8,7 +8,7 @@ const FASTAPI_URL = process.env.FASTAPI_URL ?? 'http://localhost:8000'
 
 export async function POST(request: Request) {
   let body: {
-    messages?: { role: string; content: string }[]
+    messages?: { role: string; parts?: { type: string; text?: string }[]; content?: string }[]
     profile?: { level?: string; style?: string; budget_max?: number }
   }
 
@@ -26,6 +26,17 @@ export async function POST(request: Request) {
     return new Response(JSON.stringify({ error: 'No user message' }), { status: 400 })
   }
 
+  function extractText(msg: typeof lastUserMessage): string {
+    if (msg.content) return msg.content
+    if (msg.parts) {
+      return msg.parts
+        .filter((p) => p.type === 'text')
+        .map((p) => p.text ?? '')
+        .join('')
+    }
+    return ''
+  }
+
   // Sanitize skill_level to match backend validator (beginner | intermediate | advanced)
   const VALID_LEVELS = ['beginner', 'intermediate', 'advanced'] as const
   const rawLevel = profile?.level?.toLowerCase() ?? ''
@@ -33,11 +44,19 @@ export async function POST(request: Request) {
     ? (rawLevel as ChatRequest['skill_level'])
     : 'beginner'
 
+  const trimmedMessage = extractText(lastUserMessage).trim()
+  if (!trimmedMessage) {
+    return new Response(JSON.stringify({ error: 'Mensagem vazia — por favor, descreva o que procura.' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+
   const chatRequest: ChatRequest = {
-    message: lastUserMessage.content,
+    message: trimmedMessage,
     skill_level,
-    budget_brl: profile?.budget_max ?? 600,
-    style: profile?.style,
+    budget_brl: Math.max(profile?.budget_max ?? 600, 1),
+    style: profile?.style || null,
   }
 
   let fastapiResponse: Response

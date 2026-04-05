@@ -8,14 +8,20 @@ CREATE EXTENSION IF NOT EXISTS vector;
 -- Table 1: paddles — Master paddle catalog
 -- ============================================================
 CREATE TABLE paddles (
-    id              BIGSERIAL PRIMARY KEY,
-    name            TEXT NOT NULL,
-    brand           TEXT NOT NULL,
-    model           TEXT NOT NULL,
-    manufacturer_sku TEXT,
-    images          TEXT[],
-    created_at      TIMESTAMPTZ DEFAULT NOW(),
-    updated_at      TIMESTAMPTZ DEFAULT NOW(),
+    id                BIGSERIAL PRIMARY KEY,
+    name              TEXT NOT NULL,
+    brand             TEXT NOT NULL,
+    model             TEXT NOT NULL,
+    manufacturer_sku  TEXT,
+    image_url         TEXT,                          -- real product image URL (single)
+    images            TEXT[],                         -- legacy: ML thumbnail array (kept for compat)
+    model_slug        TEXT,                           -- URL-safe slug for routing
+    skill_level       TEXT,                           -- beginner | intermediate | advanced
+    in_stock          BOOLEAN DEFAULT true,
+    price_min_brl     NUMERIC(10,2),
+    needs_reembed     BOOLEAN DEFAULT false,
+    created_at        TIMESTAMPTZ DEFAULT NOW(),
+    updated_at        TIMESTAMPTZ DEFAULT NOW(),
     CONSTRAINT unique_paddle_name UNIQUE (name)
 );
 
