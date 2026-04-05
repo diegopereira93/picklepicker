@@ -1,6 +1,7 @@
 'use client'
 
 import type { Paddle } from '@/types/paddle'
+import { SafeImage } from '@/components/ui/safe-image'
 
 interface RelatedPaddlesProps {
   paddles: Paddle[]
@@ -36,24 +37,12 @@ export function RelatedPaddles({ paddles, onSelect }: RelatedPaddlesProps) {
             aria-label={`Selecionar raquete ${brand} ${name}`}
           >
             <div className="relative mb-2 overflow-hidden rounded-sm" style={{ height: '80px' }}>
-              {imageUrl ? (
-                <img
-                  src={imageUrl}
-                  alt={`${brand} ${name}`}
-                  width={120}
-                  height={80}
-                  className="object-cover w-full h-full"
-                  loading="lazy"
-                  style={{ borderRadius: 'var(--radius-sharp)' }}
-                />
-              ) : (
-                <div
-                  className="flex items-center justify-center w-full h-full text-[10px] font-medium text-muted-foreground"
-                  style={{ color: 'var(--color-gray-500)' }}
-                >
-                  Foto
-                </div>
-              )}
+              <SafeImage
+                src={imageUrl}
+                alt={`${brand} ${name}`}
+                className="object-cover w-full h-full"
+                style={{ borderRadius: 'var(--radius-sharp)' }}
+              />
             </div>
 
             <div
