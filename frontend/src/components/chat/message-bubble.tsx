@@ -2,6 +2,8 @@
 
 import type { ChatRecommendation } from '@/types/paddle'
 import { ProductCard } from './product-card'
+import { ComparisonCard } from './comparison-card'
+import { TipCard } from './tip-card'
 
 interface MessageBubbleProps {
   role: 'user' | 'assistant'
@@ -26,13 +28,21 @@ function renderText(text: string) {
   ))
 }
 
+function isTipContent(text: string): boolean {
+  const tipKeywords = ['dica', 'importante', 'lembre-se', 'saiba que', 'recomendo', 'sugestão', 'sugestao']
+  const hasKeyword = tipKeywords.some(kw => text.toLowerCase().includes(kw))
+  const isShort = text.length < 300
+  return hasKeyword && isShort
+}
+
 function PickleIQAvatar() {
   return (
     <div
-      className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold shrink-0"
+      style={{ backgroundColor: 'var(--color-near-black)' }}
+      className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
       aria-hidden="true"
     >
-      PI
+      <span style={{ color: 'var(--sport-primary)' }}>PI</span>
     </div>
   )
 }
@@ -47,27 +57,40 @@ export function MessageBubble({ role, content, annotations }: MessageBubbleProps
 
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-3 gap-2`}>
-      {/* Avatar for assistant messages per DESIGN.md */}
       {!isUser && <PickleIQAvatar />}
 
-      <div className="max-w-[85%] space-y-3">
+      <div style={{ maxWidth: '80%' }}>
         {content && (
           <div
-            className={`px-4 py-3 rounded-2xl text-sm leading-relaxed ${
-              isUser
-                ? 'bg-primary text-primary-foreground rounded-br-sm'
-                : 'bg-muted text-foreground rounded-bl-sm'
-            }`}
+            style={{
+              backgroundColor: isUser ? '#111111' : 'transparent',
+              borderLeft: isUser ? '2px solid #84CC16' : 'none',
+              borderRadius: '8px',
+              color: '#ffffff',
+              padding: '12px 16px',
+              fontSize: 'var(--font-size-body)',
+              lineHeight: 'var(--line-height-normal)',
+            }}
+            className={isUser ? '' : 'hy-animate-chat-enter'}
           >
             {renderText(content)}
           </div>
         )}
+
+        {/* ProductCard(s) or ComparisonCard — rendered inside message bubble area */}
         {recommendations && recommendations.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
-            {recommendations.map((rec) => (
-              <ProductCard key={rec.paddle_id} {...rec} />
-            ))}
+          <div className="mt-2">
+            {recommendations.length >= 2 ? (
+              <ComparisonCard paddles={recommendations} />
+            ) : (
+              <ProductCard key={recommendations[0].paddle_id} {...recommendations[0]} />
+            )}
           </div>
+        )}
+
+        {/* TipCard — rendered when there's text but no recommendations */}
+        {!recommendations?.length && content && isTipContent(content) && (
+          <TipCard content={content} />
         )}
       </div>
     </div>

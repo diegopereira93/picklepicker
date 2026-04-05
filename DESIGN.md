@@ -1,6 +1,6 @@
 # PickleIQ — Design System
 
-**Version:** 2.0 (Hybrid Modern Sports Tech, 2026-04-02)
+**Version:** 3.0 (Hybrid Modern Sports Tech — UI Redesign, 2026-04-05)
 **Type:** APP UI — task-focused, data-dense, sporty + tech-credible
 
 **Changelog v2.0:**
@@ -10,6 +10,15 @@
 - Alternating dark/light sections instead of all-light
 - Sharp 2px border radius (tech edge, not rounded)
 - Section labels in uppercase with accent color
+
+**Changelog v3.0:**
+- Added Chat Components section (message bubbles, card responses, typing indicator, input area)
+- Added Interactive Widgets section (quiz cards with selected state, toggle switches, progress indicators, carousels)
+- Added semantic level colors (--level-beginner, --level-intermediate, --level-advanced, --level-professional)
+- Added conversational border radius (8px) for chat bubbles and tip cards
+- Added --max-width-data: 1440px for data-dense layouts
+- Allowed full-dark sections exception for immersive flows (chat, dashboards)
+- Updated Motion System with 4 new animation patterns
 
 ---
 
@@ -82,6 +91,15 @@
 --error: #e52020;             /* red */
 --info: #0046a4;              /* blue */
 ```
+
+### Skill Level Colors
+
+--level-beginner: #4CAF50;       /* green — Iniciante */
+--level-intermediate: #FCD34D;   /* amber — Intermediário */
+--level-advanced: #F44336;       /* red — Avançado */
+--level-professional: #8B5CF6;   /* violet — Profissional/Elite */
+
+**Usage:** Skill level badges on product cards, filter chips in catalog, quiz profile display. Background color with white text (beginner/advanced) or dark text (intermediate). Violet reserved for professional/elite only.
 
 ### Interactive Colors
 
@@ -198,9 +216,12 @@ color: #ffffff;
 --radius-card: 4px;      /* subtle rounding for cards */
 --radius-button: 2px;    /* consistent with tech aesthetic */
 --radius-avatar: 50%;    /* circles only for user images */
+--radius-conversational: 8px;  /* chat bubbles, tip cards, quiz pills — softer for human feel */
 ```
 
 **Why 2px?** Sharp corners signal precision and data. This is a deliberate choice: "we take specs seriously."
+
+**Exception:** `--radius-conversational: 8px` for chat bubbles, tip cards, and interactive widget elements (quiz pills, toggle switches). Softer edges improve readability and reduce visual fatigue in conversation flows. The 2px default remains for all other elements.
 
 ---
 
@@ -209,10 +230,18 @@ color: #ffffff;
 ### Max Content Width
 
 ```css
+/* Default: content pages, marketing, product listings */
 max-width: 1200px;
 margin: 0 auto;
 padding: 0 24px;
+
+/* Data-dense: comparison tables, split-panels, dashboards */
+max-width: 1440px;
+margin: 0 auto;
+padding: 0 24px;
 ```
+
+**When to use which:** Default `1200px` for homepage, catalog cards, chat (single-panel), quiz flows. Use `--max-width-data: 1440px` for 9+ column comparison tables, chat split-panels (55%/45%), and any data-dense layout where horizontal space improves scannability.
 
 ### Section Alternation
 
@@ -227,6 +256,22 @@ Pages alternate between dark and light sections:
 [Quiz: Dark #1a1a1a]
 [Comparison: Light #ffffff]
 [Chat: Dark #1a1a1a]
+```
+
+**Exception — Full-Dark Sections:**
+
+Chat interfaces and dashboard-style screens may use continuous dark backgrounds instead of alternating. This creates immersion for focused interaction flows.
+
+Apply to: `/chat` (split-panel layout), admin panels, data visualization screens.
+Do NOT apply to: marketing pages (`/`), product listings (`/paddles`), comparison tables.
+
+```css
+/* Full-dark section (no alternation) */
+.chat-full-dark {
+  background: #1a1a1a;
+  color: #ffffff;
+  /* No light section follows — continuous dark */
+}
 ```
 
 ### Responsive Breakpoints
@@ -449,6 +494,289 @@ a:hover {
 }
 ```
 
+### Chat Components
+
+#### Message Bubbles
+
+User messages: right-aligned, lime (#84CC16) left border (2px), dark (#111) background, 8px border-radius (--radius-conversational), white text. Max-width 80% of chat container.
+
+AI messages: left-aligned, transparent background, white text, 8px border-radius. Max-width 80% of chat container. Appears with hy-chat-message-enter animation (250ms).
+
+```css
+.chat-bubble-user {
+  background: #111111;
+  border-left: 2px solid #84CC16;
+  border-radius: 8px;
+  color: #ffffff;
+  max-width: 80%;
+  align-self: flex-end;
+  padding: 12px 16px;
+}
+
+.chat-bubble-ai {
+  background: transparent;
+  border-radius: 8px;
+  color: #ffffff;
+  max-width: 80%;
+  align-self: flex-start;
+  padding: 12px 16px;
+  animation: hy-chat-message-enter 250ms cubic-bezier(0, 0, 0.2, 1) forwards;
+}
+```
+
+#### Card Responses
+
+AI responses can include structured cards. Max 1 card type per response.
+
+**ProductCard:** Embedded in AI message. Image (180px height), paddle name (Instrument Sans 600, 20px), brand (Inter 12px uppercase), price (JetBrains Mono, data-green), key specs, "Ver no site →" CTA. Dark (#1a1a1a) background, 1px gray border.
+
+```css
+.chat-card-product {
+  background: #1a1a1a;
+  border: 1px solid #5e5e5e;
+  border-radius: 8px;
+  overflow: hidden;
+  animation: hy-card-response-enter 300ms cubic-bezier(0, 0, 0.2, 1) forwards;
+}
+```
+
+**ComparisonCard:** Mini-table with 2-3 paddles side-by-side. Columns: name, price, key spec, score. Green (#76b900) highlight on best values. JetBrains Mono for data cells.
+
+**TipCard:** Informational content with amber (#FCD34D) left border (3px). Used for gameplay tips, explanations. No CTA button.
+
+```css
+.chat-card-tip {
+  background: rgba(252, 211, 77, 0.08);
+  border-left: 3px solid #FCD34D;
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+```
+
+#### Typing Indicator
+
+3 animated dots (8px each, gray-muted #a7a7a7 color), left-aligned below last AI message. Staggered 150ms animation — each dot delayed by 150ms.
+
+```css
+.typing-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #a7a7a7;
+  animation: typing-bounce 600ms ease-in-out infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: 150ms; }
+.typing-dot:nth-child(3) { animation-delay: 300ms; }
+
+@keyframes typing-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+```
+
+#### Input Area
+
+Bottom-pinned to chat panel. Dark (#1a1a1a) background. Rounded text input (8px radius, 1px gray border). Lime (#84CC16) send button (32x32px, 2px radius). Suggested question pills above input area.
+
+```css
+.chat-input-area {
+  background: #1a1a1a;
+  border-top: 1px solid #5e5e5e;
+  padding: 12px 16px;
+  position: sticky;
+  bottom: 0;
+}
+
+.chat-input {
+  background: transparent;
+  border: 1px solid #5e5e5e;
+  border-radius: 8px;
+  color: #ffffff;
+  padding: 10px 16px;
+  width: 100%;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+}
+```
+
+#### Streaming Animation
+
+Cursor blink at end of streaming AI text. Lime (#84CC16) color, 1s infinite linear loop.
+
+```css
+.streaming-cursor::after {
+  content: '▊';
+  color: #84CC16;
+  animation: cursor-blink 1s linear infinite;
+  margin-left: 2px;
+}
+
+@keyframes cursor-blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+```
+
+### Interactive Widgets
+
+#### Quiz Pill Toggle Buttons
+
+Inline selectable pills for quiz options (level, budget, play style). Used in homepage quiz widget and chat quiz flow.
+
+Default state: gray border, transparent bg, white text.
+Selected state: lime (#84CC16) border, lime tint bg, lime box-shadow glow.
+
+```css
+.quiz-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  border: 2px solid #5e5e5e;
+  border-radius: 8px;
+  background: transparent;
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.quiz-pill:hover {
+  border-color: #84CC16;
+}
+
+.quiz-pill.selected {
+  border-color: #84CC16;
+  background: rgba(132, 204, 22, 0.1);
+  box-shadow: 0 0 0 1px #84CC16, 0 0 12px rgba(132, 204, 22, 0.15);
+}
+```
+
+#### Toggle Switch (Table/Card View)
+
+40x22px track with 18x18px thumb. Used for catalog view switching.
+
+Off state: gray border track, white thumb on left.
+On state: lime (#84CC16) track, white thumb translated 18px right.
+
+```css
+.toggle-track {
+  width: 40px;
+  height: 22px;
+  border-radius: 11px;
+  background: #5e5e5e;
+  position: relative;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.toggle-track.active {
+  background: #84CC16;
+}
+
+.toggle-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform 150ms ease;
+}
+
+.toggle-track.active .toggle-thumb {
+  transform: translateX(18px);
+}
+```
+
+#### Progress Indicators
+
+Dot style (8px circles) connected by 2px gray lines. Used in quiz flow.
+
+Active dot: lime (#84CC16) fill.
+Inactive dot: gray border (#5e5e5e) fill.
+
+```css
+.progress-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #5e5e5e;
+  transition: background 150ms ease;
+}
+
+.progress-dot.active {
+  background: #84CC16;
+}
+
+.progress-line {
+  width: 24px;
+  height: 2px;
+  background: #5e5e5e;
+}
+```
+
+#### Carousel Arrows
+
+36x36px circular buttons with chevron icon. Used for product carousels and related paddles.
+
+Default: gray border, transparent bg.
+Hover: lime border, white bg.
+
+```css
+.carousel-arrow {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid #5e5e5e;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.carousel-arrow:hover {
+  border-color: #84CC16;
+  background: #ffffff;
+}
+```
+
+#### Filter Chips
+
+Inline selectable chips for catalog filters (MARCA, NÍVEL, PREÇO).
+
+Default: transparent bg, gray border, gray text, Inter 12px 500 uppercase.
+Active: lime border, lime tint bg, lime text.
+
+```css
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border: 1px solid #5e5e5e;
+  border-radius: 4px;
+  background: transparent;
+  color: #898989;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.filter-chip.active {
+  border-color: #84CC16;
+  background: rgba(132, 204, 22, 0.1);
+  color: #84CC16;
+}
+```
+
 ---
 
 ## Motion System
@@ -507,6 +835,40 @@ a:hover {
 .product-card:hover {
   transform: translateY(-2px);
   box-shadow: rgba(0, 0, 0, 0.5) 0px 4px 12px 0px;
+}
+```
+
+**Card Response Enter:**
+```css
+@keyframes hy-card-response-enter {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.hy-chat-card-product {
+  animation: hy-card-response-enter 300ms var(--ease-enter) forwards;
+}
+```
+
+**Quiz Selection Ripple:**
+```css
+@keyframes hy-quiz-selection-ripple {
+  0% { box-shadow: 0 0 0 0 rgba(132, 204, 22, 0.4); }
+  70% { box-shadow: 0 0 0 8px rgba(132, 204, 22, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(132, 204, 22, 0); }
+}
+
+.hy-quiz-pill.selected {
+  animation: hy-quiz-selection-ripple 400ms ease-out;
+}
+```
+
+**Streaming Cursor:**
+```css
+.hy-streaming-cursor::after {
+  content: '▊';
+  color: #84CC16;
+  animation: hy-streaming-cursor 1s linear infinite;
 }
 ```
 
@@ -628,3 +990,9 @@ Before shipping any UI, verify:
 | 2026-04-02 | Alternating dark/light sections | Industry standard for sports + tech hybrids |
 | 2026-04-02 | Instrument Sans for display | Editorial meets tech, modern without being generic |
 | 2026-04-02 | Section labels in uppercase | Category/taxonomy visual language |
+| 2026-04-05 | 8px conversational radius exception | Chat bubbles and quiz pills need softness; 2px feels robotic in conversation |
+| 2026-04-05 | 1440px max-width for data layouts | 9-column comparison tables need horizontal space; 1200px forces truncation |
+| 2026-04-05 | Full-dark section exception for chat | Chat/terminal flows need immersion; alternation breaks conversational context |
+| 2026-04-05 | Semantic skill level colors | Visual taxonomy for paddle categorization across catalog, chat, and quiz |
+| 2026-04-05 | Chat Components + Widgets sections | Core interaction surfaces lacked documented patterns in v2.0 |
+| 2026-04-05 | Card-structured AI responses | Plain text AI answers aren't scannable; cards make recommendations actionable |
