@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.1] - 2026-04-05
+
+### Changed
+- **LLM Model** — Chat upgraded from Mixtral 8x7B to Llama 3.3 70B (via Groq) for better recommendation quality.
+- **Embedding Provider Config** — New `EMBEDDING_PROVIDER` env var (jina/gemini/auto) controls embedding priority chain. Default is "auto" (Jina-first) for API, "jina" for batch pipeline.
+- **Logging** — Chat and embedding services now use structlog for structured logging with provider selection, error types, and fallback events.
+- **Planning** — Milestone updated to v1.6 UI Redesign with phases 16-19 (DESIGN.md v3.0, Home-C, Chat-B, Catalog-A).
+
+### Added
+- **Gemini Embedding Support** — Google Gemini embedding API (gemini-embedding-001, 768d) as optional provider for both API and batch pipeline.
+- **Provider Config Tests** — 70 new test lines covering EMBEDDING_PROVIDER env var routing, Jina priority, Gemini skip behavior.
+
 ## [1.4.0] - 2026-04-05
 
 ### Added

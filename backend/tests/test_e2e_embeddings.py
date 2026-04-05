@@ -9,10 +9,10 @@ from app.services.embedding import EmbeddingManager
 
 @pytest.fixture
 def embedding_manager():
-    """Create embedding manager with test API keys."""
     with patch.dict("os.environ", {
         "GEMINI_API_KEY": "test-gemini-key",
-        "JINA_API_KEY": "test-jina-key"
+        "JINA_API_KEY": "test-jina-key",
+        "EMBEDDING_PROVIDER": "gemini",
     }):
         return EmbeddingManager()
 
