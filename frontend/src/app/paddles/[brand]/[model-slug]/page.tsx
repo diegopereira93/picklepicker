@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import Image from 'next/image'
+import { SafeImage } from '@/components/ui/safe-image'
 import { notFound } from 'next/navigation'
 import nextDynamic from 'next/dynamic'
 import { generateProductMetadata, fetchProductData } from '@/lib/seo'
@@ -14,14 +14,20 @@ const PriceHistoryChart = nextDynamic(
 
 type PageParams = { brand: string; 'model-slug': string }
 
+function decodeParam(param: string): string {
+  try { return decodeURIComponent(param) } catch { return param }
+}
+
 export async function generateMetadata({
   params,
 }: {
   params: PageParams
 }): Promise<Metadata> {
-  const paddle = await fetchProductData(params.brand, params['model-slug'])
+  const brand = decodeParam(params.brand)
+  const slug = decodeParam(params['model-slug'])
+  const paddle = await fetchProductData(brand, slug)
   if (!paddle) return { title: 'Product not found' }
-  return generateProductMetadata(params.brand, params['model-slug'], paddle)
+  return generateProductMetadata(brand, slug, paddle)
 }
 
 // Force dynamic rendering to avoid build-time data fetching
@@ -29,10 +35,12 @@ export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
 export default async function ProductPage({ params }: { params: PageParams }) {
-  const paddle = await fetchProductData(params.brand, params['model-slug'])
+  const brand = decodeParam(params.brand)
+  const slug = decodeParam(params['model-slug'])
+  const paddle = await fetchProductData(brand, slug)
   if (!paddle) notFound()
 
-  const canonicalUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://pickleiq.com'}/paddles/${params.brand}/${params['model-slug']}`
+  const canonicalUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://pickleiq.com'}/paddles/${encodeURIComponent(brand)}/${encodeURIComponent(slug)}`
 
   return (
     <>
@@ -51,21 +59,12 @@ export default async function ProductPage({ params }: { params: PageParams }) {
           </ol>
         </nav>
         <p className="nv-section-label">RAQUETE</p>
-        {paddle.image_url ? (
-          <Image
-            src={paddle.image_url}
-            alt={`${paddle.brand} ${paddle.name} paddle`}
-            width={600}
-            height={600}
-            priority={true}
-            className="w-full max-w-md mx-auto mb-6 nv-product-image"
-            sizes="(max-width: 768px) 100vw, 50vw"
-          />
-        ) : (
-          <div className="w-full max-w-md mx-auto mb-6 h-[300px] bg-muted/50 rounded-lg flex items-center justify-center text-muted-foreground text-sm" aria-label={`${paddle.brand} ${paddle.name} — imagem indisponível`}>
-            Foto
-          </div>
-        )}
+        <SafeImage
+          src={paddle.image_url}
+          alt={`${paddle.brand} ${paddle.name} paddle`}
+          className="w-full max-w-md mx-auto mb-6 nv-product-image"
+          fallbackClassName="w-full max-w-md mx-auto mb-6 h-[300px] bg-muted/50 rounded-lg flex items-center justify-center text-muted-foreground text-sm"
+        />
         <h1 className="nv-display mb-2">{paddle.name}</h1>
         <p className="nv-caption mb-4">{paddle.brand}</p>
         {paddle.description && (
