@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.1] - 2026-04-05
+
+### Fixed
+- **Empty Catalog Root Cause** — Three independent bugs caused the catalog to show zero paddles:
+  1. **CORS middleware missing** — FastAPI backend had no CORS headers, silently blocking all frontend requests (localhost:3000 → localhost:8000). Added `CORSMiddleware` with configurable `CORS_ORIGINS` env var.
+  2. **Brazil Store & Dropshot crawlers never populated `paddles` table** — Both crawlers inserted `paddle_id=NULL` into `price_snapshots`, making products invisible to the API. Rewrote `save_products_to_db()` with atomic upsert (INSERT ON CONFLICT DO UPDATE RETURNING id) matching the Mercado Livre crawler pattern.
+  3. **Missing `__main__` blocks** — Brazil Store and Dropshot couldn't be run directly via `python -m pipeline.crawlers.*`. Added entry points matching Mercado Livre convention.
+
+### Changed
+- **Crawler default `in_stock`** — Changed from `False` to `True` for Brazil Store and Dropshot (products listed on the site are assumed available unless explicitly marked otherwise).
+
 ## [1.5.0] - 2026-04-05
 
 ### Added
