@@ -53,10 +53,13 @@ def extract_products(app: FirecrawlApp, url: str) -> dict:
 
 
 async def save_products_to_db(products: list[dict], retailer_id: int, conn) -> int:
-    """Save extracted products to price_snapshots.
+    """Save extracted products to paddles + price_snapshots.
 
-    Skips items without price_brl. Returns count of saved rows.
-    paddle_id is left NULL in this phase — dedup/matching is Phase 2.
+    Uses atomic upsert for paddles (INSERT ... ON CONFLICT DO UPDATE)
+    to avoid TOCTOU race conditions. Requires UNIQUE constraint on
+    paddles.name.
+
+    Skips items without price_brl. Returns count of saved snapshots.
     """
     saved = 0
     for product in products:
@@ -67,6 +70,39 @@ async def save_products_to_db(products: list[dict], retailer_id: int, conn) -> i
             )
             continue
 
+        name = product.get("name", "")
+        brand = product.get("brand", "")
+        image_url = product.get("image_url", "")
+
+        result = await conn.execute(
+            """
+            INSERT INTO paddles (name, brand, model, image_url, in_stock, price_min_brl)
+            VALUES (%(name)s, %(brand)s, %(model)s, %(image_url)s, %(in_stock)s, %(price_min_brl)s)
+            ON CONFLICT (name) DO UPDATE SET
+                brand = EXCLUDED.brand,
+                model = EXCLUDED.model,
+                image_url = COALESCE(NULLIF(EXCLUDED.image_url, ''), paddles.image_url),
+                in_stock = EXCLUDED.in_stock,
+                price_min_brl = LEAST(paddles.price_min_brl, EXCLUDED.price_min_brl),
+                updated_at = NOW()
+            RETURNING id
+            """,
+            {
+                "name": name,
+                "brand": brand or "",
+                "model": name,
+                "image_url": image_url,
+                "in_stock": product.get("in_stock", True),
+                "price_min_brl": price,
+            },
+        )
+        row = await result.fetchone()
+        if row is None:
+            logger.error("Upsert failed for paddle: %s", name)
+            continue
+
+        paddle_id = row[0]
+
         await conn.execute(
             """
             INSERT INTO price_snapshots
@@ -75,10 +111,10 @@ async def save_products_to_db(products: list[dict], retailer_id: int, conn) -> i
                 (%(paddle_id)s, %(retailer_id)s, %(price_brl)s, 'BRL', %(in_stock)s, %(affiliate_url)s, NOW(), %(source_raw)s)
             """,
             {
-                "paddle_id": None,
+                "paddle_id": paddle_id,
                 "retailer_id": retailer_id,
                 "price_brl": price,
-                "in_stock": product.get("in_stock", False),
+                "in_stock": product.get("in_stock", True),
                 "affiliate_url": product.get("product_url", ""),
                 "source_raw": json.dumps(product),
             },
@@ -131,3 +167,10 @@ async def run_dropshot_brasil_crawler(app: FirecrawlApp | None = None) -> int:
 
     logger.info("Saved %d products to price_snapshots", saved)
     return saved
+
+
+if __name__ == "__main__":
+    import asyncio
+
+    logging.basicConfig(level=logging.INFO)
+    asyncio.run(run_dropshot_brasil_crawler())
