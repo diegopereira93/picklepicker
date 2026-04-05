@@ -56,14 +56,46 @@ def extract_products(app: FirecrawlApp, url: str) -> dict:
 def extract_image_from_markdown(markdown: str) -> Optional[str]:
     """Extract image URL from markdown content using regex.
 
-    Looks for mitiendanube.com CDN URLs and transforms them to smaller size.
+    Handles multiple CDN patterns with priority ordering:
+    1. mitiendanube.com (Brazil Store's CDN) - with size transformation
+    2. cloudfront.net
+    3. amazonaws.com
+    4. any URL containing 'cdn'
+    5. fallback: first match if URL length > 80 chars
     """
     pattern = r'!\[.*?\]\((https?://[^)]+\.(?:jpg|jpeg|png|webp))\)'
     matches = re.findall(pattern, markdown, re.IGNORECASE)
+    
+    if not matches:
+        return None
+    
+    # Priority 1: mitiendanube.com (Brazil Store's CDN)
     for match in matches:
         if 'mitiendanube.com' in match:
             return match.replace('-1024-1024', '-480-0')
-    return None
+    
+    # Priority 2: cloudfront.net
+    for match in matches:
+        if 'cloudfront.net' in match:
+            return match
+    
+    # Priority 3: amazonaws.com
+    for match in matches:
+        if 'amazonaws.com' in match:
+            return match
+    
+    # Priority 4: any URL containing 'cdn'
+    for match in matches:
+        if 'cdn' in match:
+            return match
+    
+    # Fallback: first match if URL length > 80 chars (likely a specific product image)
+    for match in matches:
+        if len(match) > 80:
+            return match
+    
+    # Last resort: return first match
+    return matches[0] if matches else None
 
 
 @retry(
@@ -161,6 +193,33 @@ async def save_products_to_db(products: list[dict], retailer_id: int, conn) -> i
     return saved
 
 
+def validate_image_belongs_to_product(image_url: str, product_name: str) -> bool:
+    """Validate that an image URL likely belongs to the specified product.
+
+    Returns True if the image is likely correct, False if uncertain.
+    Handles both descriptive URLs and UUID-based CDN filenames.
+    """
+    if not image_url or not product_name:
+        return False
+
+    skip_words = {'the', 'and', 'or', 'de', 'do', 'da', 'em', 'um', 'uma'}
+    keywords = [w.lower() for w in product_name.split() if w.lower() not in skip_words and len(w) > 2]
+
+    image_lower = image_url.lower()
+    matching_keywords = [kw for kw in keywords if kw in image_lower]
+
+    if matching_keywords:
+        return True
+
+    # UUID-based CDN URLs won't contain product name keywords.
+    # Accept if URL is from a known product CDN and has a valid image extension.
+    cdn_domains = ['mitiendanube.com', 'cloudfront.net', 'amazonaws.com', 'dropshotbrasil.com.br']
+    has_valid_extension = any(ext in image_lower for ext in ['.jpg', '.jpeg', '.png', '.webp'])
+    is_known_cdn = any(domain in image_lower for domain in cdn_domains)
+
+    return is_known_cdn and has_valid_extension
+
+
 async def run_brazil_store_crawler(app: FirecrawlApp | None = None) -> int:
     """Main entry point: extract from Brazil Pickleball Store, save to DB.
 
@@ -192,14 +251,38 @@ async def run_brazil_store_crawler(app: FirecrawlApp | None = None) -> int:
     for i, product in enumerate(products):
         product_url = product.get("product_url") or product.get("url")
         current_image = product.get("image_url", "")
+        product_name = product.get("name", "Unknown")
 
-        # Only scrape if we have a product URL and no/placeholder image
-        if product_url and (not current_image or "placeholder" in current_image.lower()):
+        # Always scrape if product_url exists - improved confidence-based replacement
+        if product_url:
             logger.debug(f"Scraping product page {i+1}/{len(products)}: {product_url}")
-            image_url = scrape_product_page(app, product_url)
-            if image_url:
-                product["image_url"] = image_url
-                logger.info(f"Found image for '{product.get('name', 'Unknown')[:40]}...': {image_url[:60]}...")
+            phase2_image = scrape_product_page(app, product_url)
+            if phase2_image:
+                should_replace = False
+                if not current_image:
+                    should_replace = True
+                elif "placeholder" in current_image.lower():
+                    should_replace = True
+                elif len(phase2_image) > len(current_image) + 20:
+                    # Phase 2 URL is significantly longer (more specific)
+                    should_replace = True
+                elif current_image.count("/") < phase2_image.count("/"):
+                    # Phase 2 has deeper path (more specific)
+                    should_replace = True
+                
+                # NEW: Validate image belongs to product before replacing
+                if should_replace and not validate_image_belongs_to_product(phase2_image, product_name):
+                    logger.warning(f"Phase 2 image for '{product_name[:40]}' may not belong to product: {phase2_image[:60]}...")
+                    # Still use it if current image is placeholder or empty
+                    if not current_image or "placeholder" in current_image.lower():
+                        pass  # Use it anyway
+                    else:
+                        should_replace = False  # Keep current image
+
+                if should_replace:
+                    product["image_url"] = phase2_image
+                    logger.info(f"Phase 2 image for '{product_name[:40]}...': {phase2_image[:60]}...")
+            
             # Rate limiting: sleep between scrapes
             if i < len(products) - 1:
                 time.sleep(1)
