@@ -8,7 +8,29 @@ from app.services.embedding import EmbeddingManager
 def embedding_manager():
     with patch.dict("os.environ", {
         "GEMINI_API_KEY": "test-gemini-key",
-        "JINA_API_KEY": "test-jina-key"
+        "JINA_API_KEY": "test-jina-key",
+        "EMBEDDING_PROVIDER": "gemini",
+    }):
+        return EmbeddingManager()
+
+
+@pytest.fixture
+def jina_embedding_manager():
+    """EmbeddingManager configured to use Jina as primary provider."""
+    with patch.dict("os.environ", {
+        "GEMINI_API_KEY": "test-gemini-key",
+        "JINA_API_KEY": "test-jina-key",
+        "EMBEDDING_PROVIDER": "jina",
+    }):
+        return EmbeddingManager()
+
+
+@pytest.fixture
+def default_embedding_manager():
+    """EmbeddingManager with default (auto) provider config."""
+    with patch.dict("os.environ", {
+        "GEMINI_API_KEY": "test-gemini-key",
+        "JINA_API_KEY": "test-jina-key",
     }):
         return EmbeddingManager()
 
@@ -34,6 +56,15 @@ class TestEmbeddingManager:
     def test_init_loads_api_keys(self, embedding_manager):
         assert embedding_manager._gemini_key == "test-gemini-key"
         assert embedding_manager._jina_key == "test-jina-key"
+
+    def test_init_loads_provider_config(self, embedding_manager):
+        assert embedding_manager._provider == "gemini"
+
+    def test_default_provider_is_auto(self, default_embedding_manager):
+        assert default_embedding_manager._provider == "auto"
+
+    def test_jina_provider_config(self, jina_embedding_manager):
+        assert jina_embedding_manager._provider == "jina"
 
     @pytest.mark.asyncio
     async def test_get_embedding_uses_gemini_first(self, embedding_manager, gemini_success_response):
@@ -121,3 +152,40 @@ class TestEmbeddingManager:
         with patch("httpx.AsyncClient.post", side_effect=mock_post):
             result = await embedding_manager.get_embedding("test query")
             assert len(result) == 768
+
+    @pytest.mark.asyncio
+    async def test_default_uses_jina_priority(self, default_embedding_manager, jina_success_response):
+        mock_jina_response = MagicMock()
+        mock_jina_response.status_code = 200
+        mock_jina_response.json.return_value = jina_success_response
+        mock_jina_response.raise_for_status = MagicMock()
+
+        with patch("httpx.AsyncClient.post", new_callable=AsyncMock) as mock_post:
+            mock_post.return_value = mock_jina_response
+            result = await default_embedding_manager.get_embedding("test query")
+
+            assert len(result) == 768
+            assert result[0] == 0.2
+            mock_post.assert_called_once()
+            call_url = mock_post.call_args[0][0]
+            assert "jina.ai" in call_url
+
+    @pytest.mark.asyncio
+    async def test_jina_provider_skips_gemini(self, jina_embedding_manager, jina_success_response):
+        mock_jina_response = MagicMock()
+        mock_jina_response.status_code = 200
+        mock_jina_response.json.return_value = jina_success_response
+        mock_jina_response.raise_for_status = MagicMock()
+
+        urls_called = []
+
+        async def mock_post(url, **kwargs):
+            urls_called.append(url)
+            return mock_jina_response
+
+        with patch("httpx.AsyncClient.post", side_effect=mock_post):
+            result = await jina_embedding_manager.get_embedding("test query")
+
+            assert len(result) == 768
+            assert all("generativelanguage" not in u for u in urls_called)
+            assert any("jina.ai" in u for u in urls_called)
