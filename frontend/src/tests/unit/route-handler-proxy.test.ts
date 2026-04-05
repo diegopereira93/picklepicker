@@ -278,4 +278,72 @@ describe('Route Handler integration (mocked fetch + ai)', () => {
     expect(sentBody.skill_level).toBe('beginner')
     expect(sentBody.budget_brl).toBe(600)
   })
+
+  it('handles budget_max=0 gracefully', async () => {
+    const sseStream = buildSSEStream(['event: done\ndata: {}\n\n'])
+    mockFetch.mockResolvedValueOnce(new Response(sseStream, { status: 200 }))
+    const { POST } = await import('@/app/api/chat/route')
+    const request = new Request('http://localhost/api/chat', {
+      method: 'POST',
+      body: JSON.stringify({
+        messages: [{ role: 'user', content: 'Qual raquete?' }],
+        profile: { level: 'beginner', style: 'control', budget_max: 0 },
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    })
+    const response = await POST(request)
+    expect(response.status).toBe(200)
+    const lastCallIndex = mockFetch.mock.calls.length - 1
+    const callBody = JSON.parse(mockFetch.mock.calls[lastCallIndex][1].body)
+    expect(callBody.budget_brl).toBeGreaterThanOrEqual(1)
+  })
+
+  it('rejects empty message with 400', async () => {
+    const { POST } = await import('@/app/api/chat/route')
+    const request = new Request('http://localhost/api/chat', {
+      method: 'POST',
+      body: JSON.stringify({
+        messages: [{ role: 'user', content: '' }],
+        profile: { level: 'beginner', budget_max: 600 },
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    })
+    const response = await POST(request)
+    expect(response.status).toBe(400)
+    const body = await response.json()
+    expect(body.error).toBeTruthy()
+  })
+
+  it('rejects whitespace-only message with 400', async () => {
+    const { POST } = await import('@/app/api/chat/route')
+    const request = new Request('http://localhost/api/chat', {
+      method: 'POST',
+      body: JSON.stringify({
+        messages: [{ role: 'user', content: '   ' }],
+        profile: { level: 'beginner', budget_max: 600 },
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    })
+    const response = await POST(request)
+    expect(response.status).toBe(400)
+  })
+
+  it('surfaces backend error with PT-BR message', async () => {
+    mockFetch.mockResolvedValueOnce(
+      new Response('{"detail":"Invalid budget"}', { status: 422 })
+    )
+    const { POST } = await import('@/app/api/chat/route')
+    const request = new Request('http://localhost/api/chat', {
+      method: 'POST',
+      body: JSON.stringify({
+        messages: [{ role: 'user', content: 'Qual raquete?' }],
+        profile: { level: 'beginner', budget_max: 600 },
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    })
+    const response = await POST(request)
+    expect(response.status).toBe(422)
+    const body = await response.json()
+    expect(body.error).toBeTruthy()
+  })
 })
