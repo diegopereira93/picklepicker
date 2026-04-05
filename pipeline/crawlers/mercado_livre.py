@@ -141,16 +141,20 @@ async def save_ml_items_to_db(items: list[dict], affiliate_tag: str, conn) -> in
         title = item.get("title", "")
         permalink = item.get("permalink", "")
         affiliate_url = build_affiliate_url(permalink, affiliate_tag)
+        
+        # Extract image URL - prefer official_image_url if available, fallback to thumbnail
+        image_url = item.get("official_image_url") or item.get("thumbnail", "")
 
         # Atomic upsert: insert or update, always return id
         result = await conn.execute(
             """
-            INSERT INTO paddles (name, brand, model, images)
-            VALUES (%(name)s, %(brand)s, %(model)s, %(images)s)
+            INSERT INTO paddles (name, brand, model, images, image_url)
+            VALUES (%(name)s, %(brand)s, %(model)s, %(images)s, %(image_url)s)
             ON CONFLICT (name) DO UPDATE SET
                 brand = EXCLUDED.brand,
                 model = EXCLUDED.model,
                 images = EXCLUDED.images,
+                image_url = COALESCE(NULLIF(EXCLUDED.image_url, ''), paddles.image_url),
                 updated_at = NOW()
             RETURNING id
             """,
@@ -159,6 +163,7 @@ async def save_ml_items_to_db(items: list[dict], affiliate_tag: str, conn) -> in
                 "brand": "",  # ML search doesn't always have separate brand
                 "model": title,
                 "images": [item.get("thumbnail", "")],
+                "image_url": image_url,
             },
         )
         row = await result.fetchone()
