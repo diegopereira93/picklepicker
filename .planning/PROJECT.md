@@ -19,14 +19,20 @@ Users can confidently choose the right pickleball paddle through AI-powered reco
 - ✓ Hybrid Modern Sports Tech design system — v1.3
 - ✓ 101 backend tests + 152 frontend tests passing — v1.1
 - ✓ E2E scraper validation with 94% coverage — v1.1
+- ✓ FIX-01: All paddle images render correctly (no broken/placeholder errors) — v1.4
+- ✓ FIX-02: Paddle detail pages resolve by brand+model_slug (no 404s) — v1.4
+- ✓ FIX-03: Chat endpoint accepts all valid frontend payloads (no 422s) — v1.4
+- ✓ FIX-04: Zero console errors on core user flows (catalog, detail, chat) — v1.4
+- ✓ FIX-05: Existing tests pass + new regression tests for fixed bugs — v1.4
 
 ### Active
 
-- [ ] FIX-01: All paddle images render correctly (no broken/placeholder errors)
-- [ ] FIX-02: Paddle detail pages resolve by brand+model_slug (no 404s)
-- [ ] FIX-03: Chat endpoint accepts all valid frontend payloads (no 422s)
-- [ ] FIX-04: Zero console errors on core user flows (catalog, detail, chat)
-- [ ] FIX-05: Existing tests pass + new regression tests for fixed bugs
+- [ ] T1: Provision Supabase/Railway production infrastructure
+- [ ] T2: Eval gate as monthly CI job (currently mock scores)
+- [ ] T3: Legal assessment of scraping BR retailer data
+- [ ] T5: Load test /chat endpoint (P95 < 3s target)
+- [ ] T6: Zero-paddle alert in crawler GitHub Actions
+- [ ] Embedding provider reliability (local fallback for Jina/HuggingFace outages)
 
 ### Out of Scope
 
@@ -37,12 +43,7 @@ Users can confidently choose the right pickleball paddle through AI-powered reco
 
 ## Context
 
-**Current state (v1.3.0.2):** CHANGELOG claims 3 bugs were fixed (paddle detail 404, chat 422, broken images), but local testing shows all 3 still reproducible. The fixes were superficial — response shape parsing and skill_level sanitization — without addressing root causes.
-
-**Root causes identified:**
-1. **Images:** DB seed (`scripts/populate_paddles.sql`) fills paddles with `placehold.co` URLs. Next.js Image optimizer cannot process placehold.co responses. The "Foto" fallback only triggers when `image_url` is NULL, but paddles have invalid (non-null) URLs.
-2. **Paddle detail 404:** Backend `GET /api/v1/paddles` does NOT accept `model_slug` as a query parameter. The frontend sends `?brand=X&model_slug=Y` but the backend ignores `model_slug`, returning all paddles for the brand. `fetchProductData` takes `items[0]` which may not match the requested slug.
-3. **Chat 422:** Edge cases in payload validation — `budget_max` of 0 bypasses `?? 600` fallback (0 is falsy but not null), empty/whitespace messages from the chat widget, or profile structure mismatch between quiz output and proxy expectations.
+**Current state (v1.4.0):** All launch-blocking bugs fixed. Core flows (catalog, detail, chat) work without errors. 174 backend + 161 frontend tests passing. Ready for production infrastructure provisioning.
 
 ## Constraints
 
@@ -61,16 +62,16 @@ Users can confidently choose the right pickleball paddle through AI-powered reco
 | Jina AI over OpenAI | Free embeddings | ✓ Working for RAG |
 | placehold.co for seed data | Quick prototyping | ⚠️ Causes image errors in production |
 
-## Current Milestone: v1.4 Launch Readiness
+## Current Milestone: v1.5 Production Readiness
 
-**Goal:** Fix all launch-blocking bugs so core user flows (catalog browsing, paddle detail, AI chat) work without errors.
+**Goal:** Provision production infrastructure, ensure legal compliance, and harden embedding/chat reliability before scaling.
 
 **Target features:**
-- Working product images on catalog and detail pages
-- Paddle detail pages resolving correctly by brand+model_slug
-- Chat endpoint accepting all valid payloads from the quiz flow
-- Zero console errors on core flows
-- Regression tests preventing these bugs from recurring
+- Supabase + Railway production infrastructure (T1)
+- Legal assessment of BR retailer scraping (T3)
+- Eval gate as monthly CI job (T2)
+- Local embedding fallback for Jina/HuggingFace outages
+- Basic uptime/error monitoring for /chat and scrapers
 
 ## Evolution
 
@@ -90,4 +91,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-04 after v1.4 milestone start*
+*Last updated: 2026-04-05 after v1.4.0 completion — v1.5.0 milestone started*
