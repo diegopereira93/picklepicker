@@ -1,6 +1,9 @@
 'use client'
 
-import type { ChatRecommendation } from '@/types/paddle'
+import { useEffect, useState } from 'react'
+import type { ChatRecommendation, Paddle } from '@/types/paddle'
+import { fetchPaddle } from '@/lib/api'
+import { SafeImage } from '@/components/ui/safe-image'
 
 interface ProductCardProps extends ChatRecommendation {
   in_stock?: boolean
@@ -38,6 +41,24 @@ export function ProductCard({
   stock_level,
   reason,
 }: ProductCardProps) {
+  const [paddleDetails, setPaddleDetails] = useState<Paddle | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchPaddleDetails = async () => {
+      try {
+        const details = await fetchPaddle(paddle_id)
+        setPaddleDetails(details)
+      } catch (error) {
+        console.error(`Failed to fetch paddle details for ID ${paddle_id}:`, error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchPaddleDetails()
+  }, [paddle_id])
+
   const effectiveStockLevel: 'available' | 'low' | 'unavailable' =
     stock_level ?? (in_stock === false ? 'unavailable' : 'available')
 
@@ -59,14 +80,22 @@ export function ProductCard({
         </div>
       )}
 
-      {/* Image placeholder - 80x80 per DESIGN.md */}
-      <div
-        className="w-20 h-20 bg-muted rounded-lg flex items-center justify-center text-muted-foreground text-xs shrink-0"
-        role="img"
-        aria-label={`Imagem da raquete ${brand} ${name}`}
-      >
-        Foto
-      </div>
+      {isLoading ? (
+        <div
+          className="w-20 h-20 bg-muted rounded-lg flex items-center justify-center text-muted-foreground text-xs shrink-0 animate-pulse"
+          role="img"
+          aria-label={`Carregando imagem da raquete ${brand} ${name}`}
+        >
+          <div className="w-4 h-4 bg-muted-foreground/20 rounded" />
+        </div>
+      ) : (
+        <SafeImage 
+          src={paddleDetails?.image_url || null} 
+          alt={`${brand} ${name}`}
+          className="w-20 h-20 object-contain rounded-lg shrink-0"
+          fallbackClassName="w-20 h-20 bg-muted rounded-lg flex items-center justify-center text-muted-foreground text-xs shrink-0"
+        />
+      )}
 
       <div className="flex-1 space-y-1">
         <div className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{brand}</div>

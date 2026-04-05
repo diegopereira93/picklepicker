@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.5.2] - 2026-04-05
+
+### Fixed
+- **Chat product cards show placeholder instead of real images** — Product cards in chat rendered a static "Foto" placeholder. Now fetches paddle details via API and uses `SafeImage` component to display real product images with loading skeleton.
+- **Related paddles use raw `<img>` instead of SafeImage** — Inconsistent with the rest of the codebase. Migrated to `SafeImage` for proper fallback handling.
+
+### Changed
+- **Brazil Store image extraction** — Multi-priority CDN matching (mitiendanube → cloudfront → amazonaws → cdn → fallback). Added `validate_image_belongs_to_product()` to prevent wrong images from being assigned. Phase 2 scraping now uses confidence-based replacement logic instead of all-or-nothing.
+- **Dropshot Brasil crawler gets Phase 2 scraping** — Now scrapes individual product pages for higher-quality images, matching Brazil Store's two-phase approach. Rate limited with 1s sleep between requests.
+- **Mercado Livre crawler persists `image_url`** — Upsert now includes `image_url` column with `COALESCE(NULLIF(...))` to avoid overwriting existing images with empty strings.
+- **Image migration scripts** — `extract_real_images.py`, `migrate_real_images.py`, and `update_real_from_scraper.py` all upgraded with exact-match-first strategy, fuzzy fallback, and brand-prefix stripping for better paddle matching.
+
 ## [1.5.1] - 2026-04-05
 
 ### Fixed

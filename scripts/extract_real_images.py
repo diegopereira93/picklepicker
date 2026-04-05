@@ -74,21 +74,58 @@ async def main():
 
     # Get products from price_snapshots with URLs
     async with get_connection() as conn:
+        # Phase 1: Exact name matching (normalized, trimmed)
         result = await conn.execute("""
             SELECT DISTINCT ON (ps.id)
                 p.id as paddle_id,
                 ps.source_raw->>'name' as product_name,
-                ps.affiliate_url as product_url
+                ps.affiliate_url as product_url,
+                'exact' as match_type
             FROM price_snapshots ps
-            JOIN paddles p ON LOWER(ps.source_raw->>'name') LIKE '%' || LOWER(p.name) || '%'
+            JOIN paddles p ON LOWER(TRIM(ps.source_raw->>'name')) = LOWER(TRIM(p.name))
             WHERE ps.affiliate_url IS NOT NULL
               AND ps.affiliate_url != ''
-              AND p.image_url LIKE '%example%'
+              AND (p.image_url LIKE '%example%' OR p.image_url IS NULL)
+            LIMIT 20
+        """)
+
+        rows = list(await result.fetchall())
+        exact_count = len(rows)
+        print(f"Exact matches: {exact_count}")
+
+        # Phase 2: Fuzzy matching for paddles without exact matches
+        fuzzy_result = await conn.execute("""
+            SELECT DISTINCT ON (ps.id)
+                p.id as paddle_id,
+                ps.source_raw->>'name' as product_name,
+                ps.affiliate_url as product_url,
+                'fuzzy' as match_type
+            FROM price_snapshots ps
+            JOIN paddles p ON LOWER(ps.source_raw->>'name') LIKE '%' || LOWER(p.name) || '%'
+                AND LOWER(p.name) LIKE '%' || LOWER(SPLIT_PART(TRIM(ps.source_raw->>'name'), ' ', 1)) || '%'
+            WHERE ps.affiliate_url IS NOT NULL
+              AND ps.affiliate_url != ''
+              AND (p.image_url LIKE '%example%' OR p.image_url IS NULL)
+              AND NOT EXISTS (
+                  SELECT 1 FROM paddles p2
+                  WHERE LOWER(TRIM(ps.source_raw->>'name')) = LOWER(TRIM(p2.name))
+              )
             LIMIT 10
         """)
 
-        rows = await result.fetchall()
-        print(f"Found {len(rows)} products to scrape\n")
+        fuzzy_rows = await fuzzy_result.fetchall()
+        rows.extend(fuzzy_rows)
+        fuzzy_count = len(fuzzy_rows)
+        print(f"Fuzzy matches: {fuzzy_count}")
+        print(f"Total products to scrape: {len(rows)}\n")
+
+        for row in rows:
+            match_type = row['match_type']
+            product_name = row['product_name']
+            paddle_id = row['paddle_id']
+            label = "EXACT" if match_type == 'exact' else "FUZZY"
+            print(f"  [{label}] Paddle {paddle_id}: {product_name[:60]}")
+        print()
 
         updated = 0
         for row in rows:
@@ -100,7 +137,7 @@ async def main():
                 updated += 1
 
         print(f"\n{'=' * 60}")
-        print(f"Updated {updated} paddles with real images")
+        print(f"Updated {updated} paddles with real images ({exact_count} exact, {fuzzy_count} fuzzy)")
         print(f"{'=' * 60}")
 
     await close_pool()
