@@ -6,12 +6,15 @@ import os
 import time
 from typing import Optional
 
+import structlog
 from groq import AsyncGroq
 from fastapi import APIRouter
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, field_validator
 
 from app.agents.rag_agent import RAGAgent, UserProfile
+
+logger = structlog.get_logger()
 
 # Initialize Groq client (lazy initialization)
 groq_client = None
@@ -150,7 +153,7 @@ Forneça uma explicação em português de por que estas raquetes são adequadas
 
                 response = await asyncio.wait_for(
                     groq_client.chat.completions.create(
-                        model="mixtral-8x7b-32768",
+                        model="llama-3.3-70b-versatile",
                         messages=[{"role": "user", "content": prompt}],
                         max_tokens=1024,
                         stream=True,
@@ -164,7 +167,7 @@ Forneça uma explicação em português de por que estas raquetes são adequadas
                         reasoning_text += chunk.choices[0].delta.content
 
                 reasoning = reasoning_text
-                model_used = "mixtral-8x7b-32768"
+                model_used = "llama-3.3-70b-versatile"
 
                 # Get token counts if available
                 if hasattr(response, "usage") and response.usage:
@@ -172,6 +175,13 @@ Forneça uma explicação em português de por que estas raquetes são adequadas
                     output_tokens = response.usage.completion_tokens
 
             except (asyncio.TimeoutError, Exception) as e:
+                logger.error(
+                    "groq_api_error",
+                    error_type=type(e).__name__,
+                    error_message=str(e),
+                    model="llama-3.3-70b-versatile",
+                )
+                
                 # Degraded mode: use template response
                 if isinstance(e, asyncio.TimeoutError):
                     reasoning = f"Com base no seu perfil de {request.skill_level} jogador com orçamento de R${request.budget_brl:.0f}, recomendo estas raquetes que equilibram qualidade e preço. (Resposta rápida devido a timeout)"

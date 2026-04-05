@@ -38,7 +38,7 @@ class EvalResult(BaseModel):
 
 
 async def run_eval_gate(
-    groq_model: str = "mixtral-8x7b-32768",
+    groq_model: str = "llama-3.3-70b-versatile",
     claude_model: str = "claude-3-5-sonnet-20241022",
     threshold: float = 4.0,
 ) -> EvalResult:
