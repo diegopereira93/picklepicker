@@ -11,7 +11,15 @@ export async function fetchProductData(brand: string, modelSlug: string): Promis
     )
     if (!res.ok) return null
     const data = await res.json()
-    const paddle = data.data?.[0] ?? data.paddles?.[0] ?? data.items?.[0] ?? null
+    const items = data.data ?? data.paddles ?? data.items ?? []
+    const requestedSlug = modelSlug.toLowerCase()
+    const matches = items.filter(
+      (item: Record<string, unknown>) =>
+        item.model_slug?.toLowerCase() === requestedSlug ||
+        item.name?.toString().toLowerCase().replace(/\s+/g, '-') === requestedSlug
+    )
+    // Prefer paddle with a real image when duplicates exist
+    const paddle = matches.find((item: Record<string, unknown>) => item.image_url) ?? matches[0] ?? null
 
     if (!paddle && /^\d+$/.test(modelSlug)) {
       const idRes = await fetch(`${FASTAPI_URL}/api/v1/paddles/${modelSlug}`)

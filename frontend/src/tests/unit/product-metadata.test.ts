@@ -108,4 +108,42 @@ describe('fetchProductData', () => {
     const result = await fetchProductData('selkirk', 'missing')
     expect(result).toBeNull()
   })
+
+  it('returns correct paddle when multiple brand paddles exist', async () => {
+    const paddleA = { ...mockPaddle, model_slug: 'other-model', name: 'Other Model' }
+    const paddleB = { ...mockPaddle, model_slug: 'vanguard-power-air' }
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ paddles: [paddleA, paddleB], total: 2 }),
+    })
+    const { fetchProductData } = await importSeo()
+    const paddle = await fetchProductData('selkirk', 'vanguard-power-air')
+    expect(paddle).toBeTruthy()
+    expect(paddle?.model_slug).toBe('vanguard-power-air')
+  })
+
+  it('returns null when no slug match found', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ paddles: [{ ...mockPaddle, model_slug: 'wrong-slug' }], total: 1 }),
+    })
+    const { fetchProductData } = await importSeo()
+    const paddle = await fetchProductData('selkirk', 'vanguard-power-air')
+    expect(paddle).toBeNull()
+  })
+
+  it('falls back to numeric ID lookup when slug is numeric', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ paddles: [], total: 0 }),
+    })
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockPaddle,
+    })
+    const { fetchProductData } = await importSeo()
+    const paddle = await fetchProductData('selkirk', '123')
+    expect(paddle).toBeTruthy()
+    expect(mockFetch).toHaveBeenCalledTimes(2)
+  })
 })
