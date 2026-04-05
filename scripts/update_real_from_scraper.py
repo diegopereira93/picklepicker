@@ -106,23 +106,36 @@ async def extract_and_update_images():
             image_url = product.get('image_url')
 
             # Try to find matching paddle
-            # Match by brand and partial name
+            # First: try exact name match (case-insensitive)
             row = await conn.fetchrow("""
                 SELECT id, name FROM paddles
-                WHERE LOWER(brand) = LOWER($1)
-                  AND image_url LIKE '%example%'
-                LIMIT 1
-            """, brand)
+                WHERE LOWER(name) = LOWER($1)
+                  AND (image_url LIKE '%example%' OR image_url IS NULL)
+            """, name)
+
+            # Fallback: fuzzy match if exact fails
+            if not row:
+                row = await conn.fetchrow("""
+                    SELECT id, name FROM paddles
+                    WHERE LOWER(brand) = LOWER($1)
+                      AND (image_url LIKE '%example%' OR image_url IS NULL)
+                      AND LOWER(name) LIKE '%' || LOWER(SPLIT_PART(LOWER($2), ' ', 1)) || '%'
+                    LIMIT 1
+                """, brand, name)
 
             if row:
                 paddle_id = row['id']
                 paddle_name = row['name']
 
+                # Safety check: verify brand matches
+                if brand and brand.lower() not in paddle_name.lower():
+                    print(f"⚠️  Brand mismatch: product brand='{brand}', matched paddle='{paddle_name}'")
+
                 await conn.execute(
                     "UPDATE paddles SET image_url = $1, updated_at = NOW() WHERE id = $2",
                     image_url, paddle_id
                 )
-                print(f"✅ Updated: {paddle_name[:40]}...")
+                print(f"✅ Updated: {name[:40]} → {paddle_name[:40]}")
                 print(f"   🖼️  {image_url[:70]}...")
                 updated += 1
             else:
