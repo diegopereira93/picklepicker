@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.4.0] - 2026-04-05
+
+### Added
+- **SafeImage Component** — New `SafeImage` UI component that gracefully handles missing/broken product images with a branded placeholder instead of blank space. Integrated into catalog and detail pages.
+- **model_slug Filter** — Backend paddles API now supports filtering by `model_slug` query parameter for precise product lookups.
+- **Regression Tests** — 142 new test lines covering paddle endpoints, product metadata, and route handler proxy edge cases.
+
+### Fixed
+- **Paddle Detail 404 on Slug Routes** — `fetchProductData` now uses slug-aware product lookup instead of matching by name, fixing 404s on `/paddles/[brand]/[model-slug]` routes.
+- **Chat budget_max=0** — Backend chat now correctly handles zero-budget queries instead of returning no results.
+- **Chat Empty Messages** — Frontend proxy validates non-empty messages before forwarding to the API.
+- **Chat Error Surfacing** — Backend chat errors are now surfaced to the user instead of returning generic fallback text.
+- **Schema-Production Mismatch** — `schema.sql` synced with production database reality (column types, constraints, defaults).
+- **Fabricated Image URLs** — Removed all placeholder/fabricated image URLs from seed data scripts, replaced with NULL values per image policy.
+
+### Changed
+- **Documentation** — Updated README, AGENTS.md, and planning docs to reflect current stack (Jina AI + Groq), completed v1.4.0 milestone, and v1.5.0 roadmap.
+
 ## [1.3.0.2] - 2026-04-04
 
 ### Fixed
