@@ -1,7 +1,9 @@
--- Phase 2 Schema Updates
+-- Phase 2+ Schema Updates
+-- These columns are now in the base schema.sql (synced 2026-04-04).
+-- Kept here for reference — do NOT re-run on fresh DBs.
 
--- Add needs_reembed flag to paddles table
-ALTER TABLE paddles ADD COLUMN needs_reembed boolean DEFAULT false;
+-- ALTER TABLE paddles ADD COLUMN needs_reembed boolean DEFAULT false;
+-- (Consolidated into base schema.sql)
 
 -- Create HNSW index for cosine similarity search
 CREATE INDEX paddles_embedding_hnsw_idx
