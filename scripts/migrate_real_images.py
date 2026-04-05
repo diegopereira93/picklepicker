@@ -97,24 +97,38 @@ def main():
         for image_url, thumbnail, product_name in source_images:
             # Prefer thumbnail if image_url is not valid
             url_to_use = image_url if validate_image_url(image_url) else thumbnail
-            
+
             if not url_to_use:
                 continue
-                
+
             if validate_image_url(url_to_use):
                 try:
-                    # Use % for LIKE pattern matching
-                    pattern = '%' + product_name.lower().replace('%', '') + '%'
-                    
+                    # First: try exact name match
                     cur.execute("""
                         UPDATE paddles SET image_url = %s, updated_at = NOW()
-                        WHERE LOWER(name) LIKE %s
-                          AND (image_url IS NULL OR image_url LIKE '%%placehold.co%%' OR image_url LIKE '%%unsplash%%')
-                    """, (url_to_use, pattern))
-                    
+                        WHERE LOWER(name) = LOWER(%s)
+                          AND (image_url IS NULL OR image_url LIKE '%%placehold.co%%' OR image_url LIKE '%%unsplash%%' OR image_url LIKE '%%example%%')
+                    """, (url_to_use, product_name.strip()))
+
+                    if cur.rowcount == 0:
+                        # Fallback: try with brand prefix removed
+                        # e.g., "Engage Core Pro" -> match "Core Pro" if brand is Engage
+                        parts = product_name.strip().split()
+                        if len(parts) > 1:
+                            # Try matching without the first word (often brand name)
+                            name_without_brand = ' '.join(parts[1:])
+                            cur.execute("""
+                                UPDATE paddles SET image_url = %s, updated_at = NOW()
+                                WHERE LOWER(name) = LOWER(%s)
+                                  AND (image_url IS NULL OR image_url LIKE '%%placehold.co%%' OR image_url LIKE '%%unsplash%%' OR image_url LIKE '%%example%%')
+                            """, (url_to_use, name_without_brand))
+
                     if cur.rowcount > 0:
                         stats['paddles_updated_source'] += cur.rowcount
-                        
+                        print(f"  ✅ Updated: {product_name[:50]}")
+                    else:
+                        print(f"  ⚠️  No match: {product_name[:50]}")
+
                 except Exception as e:
                     print(f"⚠️  Warning: Could not update paddle '{product_name}' - {e}")
         
