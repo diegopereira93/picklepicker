@@ -56,11 +56,156 @@
 
 ---
 
-## Future Milestones (Planned, Not Started)
+## Milestone v1.6.0 — UI Redesign (Design Review Implementation)
+
+**Goal:** Implement the winning design variants from the 9-variant design review (2026-04-05). Redesign Home, Catalog, and Chat screens to maximize funnel conversion.
+
+**Design review source:** `~/.gstack/projects/diegopereira93-picklepicker/designs/all-screens-20260405/`
+
+**Winning combination:**
+- Home: C (Quiz-Forward) + data stats from A
+- Catalog: A (Comparison Table) + product images from B + grid toggle
+- Chat: B (Sidebar Companion) + card responses from C
+
+| # | Phase | Goal | Requirements | Success Criteria |
+|---|-------|------|--------------|------------------|
+| 16 | DESIGN.md v3.0 + Foundation | Update design system with 6 proposed changes, add chat/widget sections | DS-01–05 | All new tokens defined, new sections documented |
+| 17 | Home-C Quiz-Forward | Quiz widget above-the-fold, data stats, feature steps | HOME-01–05 | Quiz completes → recommendation card shows → "Ver detalhes" works |
+| 18 | Chat-B Sidebar Companion | Split-panel layout, card responses, product sidebar | CHAT-01–06 | Buy button visible during chat, card responses render |
+| 19 | Catalog-A Comparison Table | Sortable table, visual grid toggle, score badges | CAT-01–06, COH-01–04, QA-01–06 | Table sorts, toggle works, responsive passes |
+
+### Phase 16: DESIGN.md v3.0 + Foundation
+
+**Goal:** Update the design system to support all 3 winning variants. This phase is the foundation — all subsequent phases depend on it.
+
+**Root causes (from Metis constraint analysis):**
+
+1. **No chat UI patterns** — DESIGN.md has minimal chat guidance. 3 of 9 variants are chat-based but DESIGN.md provides no message bubble, card response, or input area patterns.
+2. **No semantic color system** — Catalog C's segmented discovery needs level-based color coding. No beginner/intermediate/advanced/professional colors defined.
+3. **2px border radius too strict** — Conversational elements (chat bubbles, tip cards) need softer edges. Current rule makes chat feel robotic.
+4. **No widget patterns** — Quiz cards, carousels, progress indicators, toggle switches all lack guidance.
+5. **1200px max-width constrains data** — Comparison tables and split-panels need 1440px.
+
+**Tasks:**
+
+| Task | File(s) | Description |
+|------|---------|-------------|
+| 16.1 | `DESIGN.md` | Update to v3.0 header. Add "Chat Components" section (message bubbles, card responses, typing indicator, input area, streaming animation patterns). Add "Interactive Widgets" section (quiz cards with selected state, carousel arrows/dots, progress indicators, toggle switches). Add semantic level colors (--level-beginner, --level-intermediate, --level-advanced, --level-professional). |
+| 16.2 | `DESIGN.md` | Add "Full-Dark Sections" exception to layout rules: "Default: alternate dark/light. Exception: allow continuous dark for chat, dashboards, terminal aesthetics." Add `--max-width-data: 1440px` token for data-dense layouts. Add `--radius-conversational: 8px` for chat bubbles and tip cards. |
+| 16.3 | `frontend/src/app/globals.css` | Add new CSS custom properties for all v3.0 tokens (semantic levels, conversational radius, data max-width). Add base chat component styles (.chat-bubble, .chat-card, .chat-input, .typing-indicator). Add widget base styles (.quiz-pill, .carousel-arrow, .progress-dot, .toggle-switch). |
+| 16.4 | `frontend/src/app/globals.css` | Update motion system: add chat-message-enter keyframe, quiz-card-selection ripple, carousel-snap easing, card-response-enter animation. |
+| 16.5 | Design system | Verify all new DESIGN.md tokens are documented. Verify no contradictions between v2.0 and v3.0 rules. Verify existing components (nav, footer, buttons, product cards) still comply. |
+
+**Success criteria:**
+1. DESIGN.md has "Chat Components" and "Interactive Widgets" sections with complete patterns
+2. All 6 new CSS custom properties defined in globals.css
+3. New motion patterns documented in DESIGN.md
+4. No contradictions with existing design system
+
+---
+
+### Phase 17: Home-C Quiz-Forward
+
+**Goal:** Redesign the homepage with an interactive quiz widget above-the-fold that captures user intent immediately.
+
+**Root causes:**
+1. Current homepage has generic 3-column feature grid (AI slop pattern per previous audit).
+2. Quiz CTA is buried — users don't see it until scrolling past the fold.
+3. No data credibility signals on homepage — analytical users don't trust the platform immediately.
+
+**Tasks:**
+
+| Task | File(s) | Description |
+|------|---------|-------------|
+| 17.1 | `frontend/src/app/page.tsx` | Redesign hero section: dark background, centered H1 "Encontre a raquete ideal para o seu jogo" with lime underline, interactive quiz widget with pill toggle buttons (Nível: Iniciante/Intermediário/Avançado, Orçamento: <R$300/<R$500/>R$500+, Estilo de jogo: Potência/Controle/Equilíbrio). "Começar Quiz →" CTA button. Recommendation card preview below quiz. |
+| 17.2 | `frontend/src/components/quiz/` (new components) | Create QuizWidget component: pill toggle buttons with selected state (lime border + box-shadow glow), 2-col layout on tablet+, full-width on mobile. Create RecommendationCard component: image placeholder, paddle name (Instrument Sans 600), price (JetBrains Mono, data-green), key specs, "Ver detalhes" CTA. |
+| 17.3 | `frontend/src/app/page.tsx` | Add data credibility stats section (dark #1a1a1a background): 3 stat cards — "147 raquetes analisadas", "3 varejistas monitorados", "Preços atualizados diariamente". JetBrains Mono for values, data-green accent. |
+| 17.4 | `frontend/src/app/page.tsx` | Add feature steps section (light #ffffff background): numbered circles (1-2-3) with connecting lines, step titles + descriptions. Step 1: "Responda o quiz", Step 2: "Análise com IA", Step 3: "Compare preços". |
+| 17.5 | `frontend/src/components/quiz/` | Returning visitor logic: check localStorage for completed quiz, show "Continue where you left off" or recent recommendations for returning users. Use `useEffect` + localStorage key `pickleiq_quiz_completed`. |
+
+**Success criteria:**
+1. Quiz widget renders above-the-fold on desktop and mobile
+2. Quiz completes with 3 selections → recommendation card preview appears
+3. Data stats display with JetBrains Mono values in data-green
+4. Feature steps show numbered progression with connecting lines
+5. Returning users see alternative content (not the quiz again)
+
+---
+
+### Phase 18: Chat-B Sidebar Companion
+
+**Goal:** Redesign the chat screen with a split-panel layout that keeps product details visible during conversation.
+
+**Root causes:**
+1. Current chat is full-width — product information is not visible while chatting.
+2. Buy button is only accessible by scrolling through conversation history.
+3. AI responses are plain text — no structured product cards or comparison tables.
+
+**Tasks:**
+
+| Task | File(s) | Description |
+|------|---------|-------------|
+| 18.1 | `frontend/src/app/chat/page.tsx` | Redesign chat page layout: 55%/45% split-panel. Left panel (white #ffffff): product card with image, name, brand (Inter 12px, uppercase), price (JetBrains Mono 20px, data-green), specs grid, score badge, "Comprar na loja" CTA button, related paddles row. Right panel (dark #1a1a1a): chat header, messages, input. |
+| 18.2 | `frontend/src/components/chat/` | Create SidebarProductCard component: image container (180px height), paddle name (Instrument Sans 600, 20px), brand, price (JetBrains Mono, data-green), specs table, score badge with color, CTA button. Create RelatedPaddles component: horizontal row of smaller cards with name, price, brand. |
+| 18.3 | `frontend/src/components/chat/chat-widget.tsx` | Add card-structured AI responses: ProductCard (image + specs + CTA embedded in message), ComparisonCard (mini-table with 2-3 paddles, green highlights), TipCard (amber accent left border, informational content). Limit to 1 card type per AI response. |
+| 18.4 | `frontend/src/components/chat/chat-widget.tsx` | Update message styling: user messages right-aligned with lime (#84CC16) left border (2px radius), dark background (#111). AI messages left-aligned, transparent background. Max width 80% of chat container. |
+| 18.5 | `frontend/src/components/chat/` | Add suggested questions component: clickable prompt pills below chat messages. "Qual a diferença entre 13mm e 16mm?", "Melhor raquete para iniciante?", "Raquete com melhor custo-benefício". |
+| 18.6 | `frontend/src/app/chat/page.tsx` | Responsive: below 1024px, stack panels vertically (50% height each). Mobile: product panel on top, chat panel below. Full height on both. |
+
+**Success criteria:**
+1. Split-panel renders correctly at 1440px and stacks at 768px
+2. Product card shows image, name, brand, price, specs, score, and CTA
+3. Card-structured AI responses render as product cards, comparison tables, or tip cards
+4. "Comprar na loja" button is always visible (no scrolling needed)
+5. Related paddles row shows 3+ smaller product cards
+
+---
+
+### Phase 19: Catalog-A Comparison Table + Polish
+
+**Goal:** Redesign the catalog with a sortable data table and visual grid toggle, then polish cross-screen coherence.
+
+**Root causes:**
+1. Current catalog uses basic product cards — no comparison capability.
+2. Analytical persona needs sortable, scannable data — not just visual cards.
+3. No way to compare paddles side-by-side on mobile.
+
+**Tasks:**
+
+| Task | File(s) | Description |
+|------|---------|-------------|
+| 19.1 | `frontend/src/app/paddles/page.tsx` | Redesign catalog: sticky filter bar with chip filters (MARCA, NÍVEL, PREÇO) with active lime highlight. Results count display. Sort dropdown. Table/card toggle. Sticky bottom selection bar. |
+| 19.2 | `frontend/src/components/catalog/` (new components) | Create FilterBar component: filter groups with labels, chip buttons with selected state, sort dropdown, view toggle (Tabela/Cards), results count. Create ComparisonTable component: sortable 9-column table with product thumbnail, name, brand, price (JetBrains Mono), specs, score badges. Alternating row colors (white/#1a1a1a). |
+| 19.3 | `frontend/src/components/catalog/` | Create ProductGrid component (from Catalog-B): 3-col grid of polished cards with image container, hover-reveal specs overlay, compare checkbox. Used when grid toggle is active. Create SelectionBar component: sticky bottom bar showing selected count + "Comparar N raquetes" CTA. |
+| 19.4 | `frontend/src/app/paddles/page.tsx` | Score badges: color-coded — high (#76b900 bg, white text), medium (#FDE047 bg, black text), low (#B91C1C bg, white text). Product image thumbnails in first column. Row selection via checkbox. Selection state persisted to state. |
+| 19.5 | Cross-screen | Verify consistent navigation across Home/Chat/Catalog. Verify CTA styles match. Verify funnel paths work: Home → Quiz → Chat → Catalog AND Home → Catalog → Chat. Verify responsive at 375px, 768px, 1440px. |
+| 19.19.6 | `frontend/src/tests/` | New component tests: quiz widget, comparison table, sidebar chat, card responses. Integration tests: quiz completion flow, chat with sidebar, table sort. |
+| 19.7 | Quality | Run full test suite: backend 174+ pass, frontend 161+ pass. Run AI slop audit on all 3 screens. Manual smoke test: quiz → recommendation → chat → compare → affiliate click. Verify responsive at 3 breakpoints. |
+
+**Success criteria:**
+1. Comparison table sorts by any column (price, score, name)
+2. Table/card toggle switches views without page reload
+3. Score badges color-coded correctly
+4. Bottom selection bar appears on selection with correct count
+5. All 3 funnel paths work end-to-end
+6. All existing tests pass + new tests pass
+7. AI slop checklist passes on all screens
+
+---
+
+## Deferred Milestones (Planned, Not Started)
+
+### v1.5.0 — Production Readiness
+
+**Goal:** Provision production infrastructure, deploy to Railway + Vercel + Supabase.
+
+| # | Phase | Goal |
+|---|-------|------|
+| 15 | Production Deploy | Provision infra, deploy, health checks, embedding fallback |
+
+See existing v1.5 roadmap for full details.
 
 ### v1.5.1 — Monitoring & Resilience
-
-**Goal:** Make production reliable with load testing, eval automation, and enhanced monitoring.
 
 | Task | Description | Priority |
 |------|-------------|----------|
@@ -72,8 +217,6 @@
 
 ### v1.5.2 — Legal & Compliance
 
-**Goal:** Unblock public launch with legal sign-off.
-
 | Task | Description | Priority |
 |------|-------------|----------|
 | T3 | Legal review of BR retailer scraping | P1 (external) |
@@ -83,4 +226,4 @@
 
 ---
 *Roadmap created: 2026-04-05*
-*Last updated: 2026-04-05 after Metis pre-planning analysis*
+*Last updated: 2026-04-05 — v1.6.0 UI Redesign phases 16-19 added*
