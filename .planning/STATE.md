@@ -2,17 +2,17 @@
 
 ## Current Position
 
-Phase: v1.5 — Production Readiness (planning)
+Phase: v1.6 — UI Redesign (planning)
 Plan: TBD
-Status: Phase 14 complete. Oracle assessed. v1.5 requirements gathering.
-Last activity: 2026-04-05 — Doc debt cleanup + Oracle assessment
+Status: v1.4.0 complete. Design review completed (9 variants, 3 screens). v1.6.0 milestone created. Ready for /gsd:plan-phase 16.
+Last activity: 2026-04-05 — Design review complete, v1.6.0 milestone planned
 
 ## Project Reference
 
 See: .planning/PROJECT.md (updated 2026-04-05)
 
 **Core value:** Users can confidently choose the right pickleball paddle through AI-powered recommendations backed by real-time pricing and technical specs
-**Current focus:** v1.5 Production Readiness — infrastructure, legal, reliability
+**Current focus:** v1.6 UI Redesign — implement winning design variants from design review
 
 ## Accumulated Context
 
@@ -25,49 +25,34 @@ See: .planning/PROJECT.md (updated 2026-04-05)
 | Core Web Vitals | v1.2.0 | 11 | ✅ Complete |
 | Hybrid UI Redesign | v1.3.0 | 13 | ✅ Complete |
 | Launch Readiness | v1.4.0 | 14 | ✅ Complete |
+| Design Review | — | — | ✅ Complete (9 variants, 3 screens, approved combo saved) |
 
-### Phase 14 Completion Summary
+### Design Review Summary (2026-04-05)
 
-All 10 tasks verified:
+**Experts consulted:** Oracle (conversion + coherence), Metis (constraint analysis), Designer-eye (plan-design-review principles)
+**Visual inspection:** Playwright browser, 1440x900 viewport, 9 full-page screenshots taken and evaluated
+**Approved combination:**
+- Home: C (Quiz-Forward) + data stats from A — score 8/10
+- Catalog: A (Comparison Table) + product images from B + grid toggle — score 8/10
+- Chat: B (Sidebar Companion) + card responses from C — score 8/10
 
-| Task | Description | Status |
-|------|-------------|--------|
-| 14.1 | Backend model_slug filter | ✅ In code |
-| 14.2a | Schema sync (schema.sql) | ✅ In code |
-| 14.2b | Image migration script | ✅ In code |
-| 14.2c | Seed data cleanup (NULL images) | ✅ In code |
-| 14.3 | Frontend slug match verification | ✅ In code |
-| 14.4 | Catalog SafeImage component | ✅ In code |
-| 14.5 | Detail SafeImage component | ✅ In code |
-| 14.6 | Chat proxy edge cases | ✅ In code |
-| 14.7 | Product card verification | ✅ No change needed |
-| 14.8 | Backend regression tests (4 tests) | ✅ In code |
-| 14.9 | Frontend regression tests (7 tests) | ✅ In code |
-| 14.10 | Full verification | ✅ Passed |
+**6 DESIGN.md changes proposed:**
+1. Allow full-dark sections for immersive flows
+2. Add Chat UI section
+3. Add semantic level colors
+4. Relax border radius for conversational elements
+5. Add interactive widget patterns
+6. Widen max-width for data-dense layouts
+
+**Files:**
+- `~/.gstack/projects/diegopereira93-picklepicker/designs/all-screens-20260405/approved.json`
+- `~/.gstack/projects/diegopereira93-picklepicker/designs/all-screens-20260405/design-review-report.md`
+- 9 screenshots in same directory
 
 ### Test Results (Phase 14 Verification)
 
 - **Backend:** 174 passed, 2 pre-existing failures (Jina/HuggingFace API 401 — not Phase 14 related)
 - **Frontend:** 161/161 passed
-- **Fabricated images:** Zero in source code (legacy scripts with unsplash URLs deleted)
-
-### Oracle Assessment (2026-04-05)
-
-**Verdict:** v1.4.0 technically shippable, 3 operational risks before full production launch.
-
-**v1.5 Priorities (Oracle recommended):**
-1. T1: Provision Supabase/Railway production infrastructure
-2. T3: Legal assessment of BR retailer scraping
-3. T2: Eval gate as monthly CI job
-4. Local embedding fallback (SentenceTransformers) for Jina/HuggingFace outages
-5. Basic uptime/error monitoring for /chat + scrapers
-6. T5: Load test /chat (after infra stable)
-7. T7: Firecrawl self-hosted runbook (upgrade to P2)
-
-**Top 3 Risks (30 days):**
-1. Embedding API outages (Jina/HuggingFace 401s)
-2. Legal/compliance exposure (unvetted scraping)
-3. Infrastructure gaps (no production DB/hosting)
 
 ### Pending TODOS (from TODOS.md)
 
@@ -89,6 +74,7 @@ All 10 tasks verified:
 - Chat proxy at `frontend/src/app/api/chat/route.ts` transforms Vercel AI SDK format → FastAPI format.
 - Embeddings: Jina AI (primary) + Hugging Face (fallback). OpenAI removed.
 - LLM: Groq (Mixtral 8x7B). Anthropic removed.
+- Design review HTML mockups at `picklepicker/designs/variant-*.html` (9 files) + `picklepicker/designs/board-*.html` (3 comparison boards).
 
 ---
-*State updated: 2026-04-05*
+*State updated: 2026-04-05 — v1.6.0 UI Redesign milestone ready for planning*

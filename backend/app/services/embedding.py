@@ -1,11 +1,9 @@
 """Embedding manager with multi-provider fallback strategy.
 
-Provider priority:
-1. Gemini (if GEMINI_API_KEY set) — gemini-embedding-001 (768 dims)
-2. Local sentence-transformers — all-MiniLM-L6-v2 (384 dims padded to 768)
-3. Jina AI (if JINA_API_KEY set) — jina-embeddings-v2-base-en (768 dims)
-4. Hugging Face (if HUGGINGFACE_API_KEY set) — all-MiniLM-L6-v2 (384 dims padded to 768)
-5. Zero vector fallback (768 dims)
+Provider priority (based on EMBEDDING_PROVIDER env var):
+- When EMBEDDING_PROVIDER=jina: use Jina → HF → zero vector (DEFAULT behavior)
+- When EMBEDDING_PROVIDER=gemini: use Gemini → Jina → HF → zero vector 
+- When EMBEDDING_PROVIDER=auto or not set: use Jina → HF → zero vector (CONSISTENT with batch_embedder.py)
 """
 
 import os
@@ -49,6 +47,8 @@ class EmbeddingManager:
         self._gemini_key = os.environ.get("GEMINI_API_KEY")
         self._jina_key = os.environ.get("JINA_API_KEY")
         self._hf_key = os.environ.get("HUGGINGFACE_API_KEY")
+        self._provider = os.environ.get("EMBEDDING_PROVIDER", "auto").lower()
+        logger.info("embedding_provider_selected", provider=self._provider)
 
     async def get_embedding(self, text: str) -> List[float]:
         """Generate embedding using best available provider.
@@ -59,6 +59,19 @@ class EmbeddingManager:
         if not text or not text.strip():
             raise ValueError("Texto vazio não pode ser processado")
 
+        # Provider selection based on EMBEDDING_PROVIDER env var
+        if self._provider == "jina":
+            # When EMBEDDING_PROVIDER=jina: skip Gemini, use Jina → HF → zero vector
+            return await self._get_embedding_jina_priority(text)
+        elif self._provider == "gemini" and self._gemini_key:
+            # When EMBEDDING_PROVIDER=gemini: use Gemini → Jina → HF → zero vector
+            return await self._get_embedding_gemini_priority(text)
+        else:
+            # When EMBEDDING_PROVIDER=auto or not set: use Jina → HF → zero vector (NEW default for consistency)
+            return await self._get_embedding_jina_priority(text)
+
+    async def _get_embedding_gemini_priority(self, text: str) -> List[float]:
+        """Generate embedding with Gemini priority (original behavior)."""
         # Provider 1: Gemini (if configured)
         if self._gemini_key:
             try:
@@ -77,6 +90,28 @@ class EmbeddingManager:
             logger.warning("jina_failed", error=str(e), falling_back="huggingface")
 
         # Provider 3: Hugging Face (FREE: works without key, 30k calls/month)
+        try:
+            embedding = await self._try_huggingface(text)
+            logger.info("embedding_provider", provider="huggingface", dimensions=self.DIMENSIONS)
+            return embedding
+        except Exception as e:
+            logger.error("huggingface_failed", error=str(e))
+
+        # Final fallback: zero vector
+        logger.warning("embedding_fallback_zero_vector")
+        return [0.0] * self.DIMENSIONS
+
+    async def _get_embedding_jina_priority(self, text: str) -> List[float]:
+        """Generate embedding with Jina priority (new default)."""
+        # Provider 1: Jina AI (FREE: works without key, 1M tokens/day)
+        try:
+            embedding = await self._try_jina(text)
+            logger.info("embedding_provider", provider="jina", dimensions=self.DIMENSIONS)
+            return embedding
+        except Exception as e:
+            logger.warning("jina_failed", error=str(e), falling_back="huggingface")
+
+        # Provider 2: Hugging Face (FREE: works without key, 30k calls/month)
         try:
             embedding = await self._try_huggingface(text)
             logger.info("embedding_provider", provider="huggingface", dimensions=self.DIMENSIONS)
