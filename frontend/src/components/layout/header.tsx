@@ -105,7 +105,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full bg-[#FAFAF8] border-b border-gray-200">
       <div className="max-w-6xl mx-auto px-4 h-14 flex items-center">
-        <Link href="/" className="text-[#2A2A2A] font-bold text-xl mr-6 flex items-center">
+        <Link href="/" className="text-[#2A2A2A] font-bold text-xl mr-6 flex items-center py-1">
           <span className="font-bold text-[#2A2A2A]">Pickle<span className="text-[#F97316]">IQ</span></span>
         </Link>
 
@@ -114,7 +114,7 @@ export function Header() {
             <Link
               key={link.href}
               href={link.href}
-              className="text-[#2A2A2A] font-semibold text-sm hover:text-[#F97316] transition-colors"
+              className="text-[#2A2A2A] font-semibold text-sm hover:text-[#F97316] transition-colors py-1"
             >
               {link.label}
             </Link>

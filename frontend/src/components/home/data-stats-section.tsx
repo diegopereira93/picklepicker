@@ -11,10 +11,10 @@ export function DataStatsSection() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
           {stats.map((stat) => (
             <div key={stat.label} className="p-6">
-              <div className="text-[#76b900]" style={{
+              <div style={{
                 fontSize: '2.5rem',
                 fontWeight: 700,
-                color: '#76b900',
+                color: '#4d8c00',
                 lineHeight: 1.1,
                 marginBottom: '8px',
                 fontFamily: 'monospace',
