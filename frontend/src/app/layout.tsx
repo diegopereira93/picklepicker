@@ -33,10 +33,10 @@ export default function RootLayout({
     <ClerkProvider>
       <ThemeProvider attribute="data-theme" defaultTheme="light" enableSystem>
         <html lang="pt-BR" className={`${inter.variable} ${jetbrainsMono.variable}`}>
-          <body className="min-h-screen bg-background text-foreground antialiased flex flex-col">
+          <body className="min-h-screen antialiased flex flex-col">
             <script
               dangerouslySetInnerHTML={{
-                __html: `(function(){var T="PickleIQ — AI Pickleball Paddle Advisor";function fix(){if(!document.querySelector("title")){var e=document.createElement("title");e.textContent=T;document.head.appendChild(e)}else if(!document.title){document.querySelector("title").textContent=T}}fix();var o=new MutationObserver(fix);o.observe(document.documentElement,{childList:true,subtree:true})})()`,
+                __html: `(function(){var T="PickleIQ — AI Pickleball Paddle Advisor";function r(){var t=document.querySelector("title");if(t){if(!t.textContent)t.textContent=T}else{var e=document.createElement("title");e.textContent=T;document.head.appendChild(e)}}r();var o=new MutationObserver(function(){r()});o.observe(document.head,{childList:true})})()`,
               }}
             />
             <Header />

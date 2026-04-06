@@ -122,25 +122,25 @@
     --max-content-width: 1200px;
 
     /* === Shadcn compatibility shims === */
-    --background: 0 0% 0%;
-    --foreground: 0 0% 100%;
-    --card: 0 0% 10%;
-    --card-foreground: 0 0% 100%;
-    --popover: 0 0% 10%;
-    --popover-foreground: 0 0% 100%;
+    --background: 60 20% 98%;
+    --foreground: 0 0% 16%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 16%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 16%;
     --primary: 78 100% 36%;
     --primary-foreground: 0 0% 0%;
-    --secondary: 0 0% 10%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 0 0% 10%;
-    --muted-foreground: 0 0% 65%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 16%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
     --accent: 78 100% 36%;
     --accent-foreground: 0 0% 0%;
     --destructive: 0 80% 50%;
     --destructive-foreground: 0 0% 100%;
-    --border: 0 0% 37%;
-    --input: 0 0% 37%;
-    --ring: 0 0% 0%;
+    --border: 0 0% 87%;
+    --input: 0 0% 87%;
+    --ring: 0 0% 16%;
     --radius: 0.125rem;
   }
 }
@@ -177,6 +177,27 @@ body {
   --gray-600: #d1d5db;
   --gray-700: #e5e7eb;
   --gray-800: #f3f4f6;
+
+  /* Shadcn dark mode shims */
+  --background: 0 0% 10%;
+  --foreground: 0 0% 96%;
+  --card: 0 0% 10%;
+  --card-foreground: 0 0% 96%;
+  --popover: 0 0% 10%;
+  --popover-foreground: 0 0% 96%;
+  --primary: 78 100% 36%;
+  --primary-foreground: 0 0% 0%;
+  --secondary: 0 0% 16%;
+  --secondary-foreground: 0 0% 96%;
+  --muted: 0 0% 16%;
+  --muted-foreground: 0 0% 65%;
+  --accent: 78 100% 36%;
+  --accent-foreground: 0 0% 0%;
+  --destructive: 0 80% 50%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 0 0% 25%;
+  --input: 0 0% 25%;
+  --ring: 0 0% 96%;
 }
 [data-theme="dark"] body {
   background-color: var(--warm-white);
