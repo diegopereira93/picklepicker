@@ -24,7 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function PaddlesPage() {
   return (
-    <div className="hy-dark-section">
+    <div className="wg-section-light">
       <div className="hy-container" style={{ maxWidth: 'var(--max-width-data)' }}>
         <nav aria-label="Breadcrumb" className="hy-breadcrumb">
           <ol className="flex gap-1">
@@ -33,8 +33,8 @@ export default async function PaddlesPage() {
             <li aria-current="page">Raquetes</li>
           </ol>
         </nav>
-        <p className="hy-section-label">CATÁLOGO</p>
-        <h1 className="hy-section-heading mb-8">Catálogo de Raquetes</h1>
+        <p className="hy-section-label" style={{ color: 'var(--color-charcoal)' }}>CATÁLOGO</p>
+        <h1 className="hy-section-heading mb-8" style={{ color: 'var(--color-charcoal)' }}>Catálogo de Raquetes</h1>
         <CatalogClient />
       </div>
     </div>
