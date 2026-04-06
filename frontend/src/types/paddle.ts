@@ -81,4 +81,48 @@ export interface UserProfile {
   level: string
   style: string
   budget_max: number
+  identity?: string
+  pain_points?: string[]
+  frequency?: string
 }
+
+export type QuizStep = 'welcome' | 'identity' | 'style' | 'pain-points' | 'frequency' | 'budget' | 'analyzing'
+
+export const QUIZ_STEPS: QuizStep[] = [
+  'welcome', 'identity', 'style', 'pain-points', 'frequency', 'budget', 'analyzing'
+]
+
+export const QUIZ_STEP_INFO: Record<QuizStep, { title: string; subtitle: string }> = {
+  'welcome': { title: '', subtitle: '' },
+  'identity': { title: 'Vamos la!', subtitle: 'Como voce se descreve como jogador?' },
+  'style': { title: 'Ja sei quem voce e...', subtitle: 'O que voce mais valoriza no jogo?' },
+  'pain-points': { title: 'Quase la!', subtitle: 'O que te frustra na sua raquete atual?' },
+  'frequency': { title: 'So mais uma...', subtitle: 'Com que frequencia voce joga?' },
+  'budget': { title: 'Ultima pergunta!', subtitle: 'Quanto voce quer investir?' },
+  'analyzing': { title: 'Analisando seu perfil...', subtitle: '' },
+}
+
+export const IDENTITY_OPTIONS = [
+  { value: 'beginner', label: 'Estou comecando', description: 'Jogo por diversao e saude', icon: '🎯' },
+  { value: 'regular', label: 'Jogo regularmente', description: 'Participo de jogos competitivos', icon: '⚡' },
+  { value: 'serious', label: 'Levo o jogo a serio', description: 'Treino e participo de torneios', icon: '🏆' },
+] as const
+
+export const PAIN_POINT_OPTIONS = [
+  'Nao tem potencia suficiente',
+  'Erro muitos tiros na rede',
+  'Braco cansa depois de jogar',
+  'Nao consigo gerar spin',
+  'E muito pesada',
+  'Nao sei, nunca prestei atencao',
+] as const
+
+export const FREQUENCY_OPTIONS = [
+  { value: 'weekly', label: 'Uma vez por semana ou menos' },
+  { value: '2-3x', label: '2-3 vezes por semana' },
+  { value: '4plus', label: '4+ vezes por semana' },
+] as const
+
+export const BUDGET_MIN = 200
+export const BUDGET_MAX = 2000
+export const BUDGET_SMART_ZONE = { min: 400, max: 800 }
