@@ -74,7 +74,7 @@ function ComparisonTable({ paddles, selected, onSelect, sortBy, onSort, userProf
           {paddles.map((p) => {
              const rowColor =
                selected.has(p.id) ? 'var(--color-white)' : 'var(--color-near-white)'
-             const textColor = selected.has(p.id) ? 'var(--color-black)' : 'var(--color-charcoal)'
+              const textColor = selected.has(p.id) ? 'var(--color-black)' : 'var(--warm-charcoal)'
              const paraVoce = getParaVoceIcon(userProfile, p.skill_level || null)
 
             return (

@@ -47,7 +47,7 @@ export function FeatureSteps() {
             <h3 className="font-semibold text-[#2A2A2A] mb-2">
               {step.title}
             </h3>
-            <p className="text-sm text-[#2A2A2A] opacity-70">
+            <p className="text-sm text-gray-600">
               {step.description}
             </p>
           </div>

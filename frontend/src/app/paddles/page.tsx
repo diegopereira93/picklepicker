@@ -26,15 +26,15 @@ export default async function PaddlesPage() {
   return (
     <div className="wg-section-light">
       <div className="hy-container" style={{ maxWidth: 'var(--max-width-data)' }}>
-        <nav aria-label="Breadcrumb" className="hy-breadcrumb">
+        <nav aria-label="Breadcrumb" className="hy-breadcrumb" style={{ color: 'var(--color-gray-600, #4B5563)' }}>
           <ol className="flex gap-1">
             <li><a href="/">Home</a></li>
             <li aria-hidden>/</li>
             <li aria-current="page">Raquetes</li>
           </ol>
         </nav>
-        <p className="hy-section-label" style={{ color: 'var(--color-charcoal)' }}>CATÁLOGO</p>
-        <h1 className="hy-section-heading mb-8" style={{ color: 'var(--color-charcoal)' }}>Catálogo de Raquetes</h1>
+        <p className="hy-section-label" style={{ color: 'var(--warm-charcoal)' }}>CATÁLOGO</p>
+        <h1 className="hy-section-heading mb-8" style={{ color: 'var(--warm-charcoal)' }}>Catálogo de Raquetes</h1>
         <CatalogClient />
       </div>
     </div>
