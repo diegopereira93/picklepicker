@@ -36,7 +36,7 @@ export const FilterBar: FC<FilterBarProps> = ({
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 bg-gray-50">
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-4">
           <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--color-gray-500)' }}>
@@ -44,7 +44,11 @@ export const FilterBar: FC<FilterBarProps> = ({
           </span>
           <div className="flex flex-wrap gap-2">
             <button
-              className={`hy-filter-chip ${activeBrand === null ? 'active' : ''}`}
+              className="px-3 py-1.5 rounded-none text-xs font-bold transition-colors"
+              style={{
+                backgroundColor: activeBrand === null ? '#FF6B6B' : 'transparent',
+                color: activeBrand === null ? '#FFFFFF' : 'var(--color-black)',
+              }}
               onClick={() => onBrandChange(null)}
               type="button"
             >
@@ -53,9 +57,11 @@ export const FilterBar: FC<FilterBarProps> = ({
             {brands.map((brand) => (
               <button
                 key={brand}
-                className={`hy-filter-chip ${
-                  activeBrand === brand ? 'active' : ''
-                }`}
+                className="px-3 py-1.5 rounded-none text-xs font-bold transition-colors"
+                style={{
+                  backgroundColor: activeBrand === brand ? '#FF6B6B' : 'transparent',
+                  color: activeBrand === brand ? '#FFFFFF' : 'var(--color-black)',
+                }}
                 onClick={() => onBrandChange(activeBrand === brand ? null : brand)}
                 type="button"
               >
@@ -73,9 +79,11 @@ export const FilterBar: FC<FilterBarProps> = ({
             {levels.map((level) => (
               <button
                 key={level}
-                className={`hy-filter-chip ${
-                  activeLevel === level ? 'active' : ''
-                }`}
+                className="px-3 py-1.5 rounded-none text-xs font-bold transition-colors"
+                style={{
+                  backgroundColor: activeLevel === level ? '#FF6B6B' : 'transparent',
+                  color: activeLevel === level ? '#FFFFFF' : 'var(--color-black)',
+                }}
                 onClick={() =>
                   onLevelChange(activeLevel === level ? null : level)
                 }
@@ -88,8 +96,8 @@ export const FilterBar: FC<FilterBarProps> = ({
         </div>
       </div>
 
-      <div className="flex items-center justify-between">
-        <span className="text-sm" style={{ color: 'var(--color-gray-300)' }}>
+      <div className="flex items-center justify-between bg-white">
+        <span className="text-sm" style={{ color: 'var(--color-gray-500)' }}>
           {resultCount} raquetes encontradas
         </span>
 
@@ -97,10 +105,10 @@ export const FilterBar: FC<FilterBarProps> = ({
           <select
             value={sortBy}
             onChange={(e) => onSortChange(e.target.value)}
-            className="font-sans bg-black text-white border border-gray-border rounded-none px-3 py-1.5 text-sm"
+            className="font-sans bg-white text-black border border-gray-border rounded-none px-3 py-1.5 text-sm"
             style={{
-              backgroundColor: 'var(--color-black)',
-              color: 'var(--color-white)',
+              backgroundColor: 'var(--color-white)',
+              color: 'var(--color-black)',
               border: '1px solid var(--color-gray-border)',
               borderRadius: 'var(--radius-sharp)',
               padding: '6px 12px',
@@ -114,32 +122,32 @@ export const FilterBar: FC<FilterBarProps> = ({
 
           <div className="flex gap-2">
             <button
-              className={`px-3 py-1.5 text-xs font-medium uppercase tracking-wider transition-all ${
-                viewMode === 'table' ? '' : 'opacity-40'
-              }`}
+              className="px-3 py-1.5 text-xs font-medium uppercase tracking-wider transition-all border rounded-none"
+              style={{
+                backgroundColor: viewMode === 'table' ? '#FF6B6B' : 'transparent',
+                color: viewMode === 'table' ? '#FFFFFF' : 'var(--color-gray-500)',
+                border: '1px solid var(--color-gray-border)',
+                borderRadius: 'var(--radius-sharp)',
+                padding: '6px 12px',
+                fontSize: '14px',
+              }}
               onClick={() => onViewModeChange('table')}
               type="button"
-              style={{
-                backgroundColor: viewMode === 'table' ? 'var(--sport-primary)' : 'transparent',
-                color: viewMode === 'table' ? 'var(--color-near-black)' : 'var(--color-gray-300)',
-                border:
-                  viewMode === 'table' ? 'none' : '1px solid var(--color-gray-border)',
-              }}
             >
               Tabela
             </button>
             <button
-              className={`px-3 py-1.5 text-xs font-medium uppercase tracking-wider transition-all ${
-                viewMode === 'grid' ? '' : 'opacity-40'
-              }`}
+              className="px-3 py-1.5 text-xs font-medium uppercase tracking-wider transition-all border rounded-none"
+              style={{
+                backgroundColor: viewMode === 'grid' ? '#FF6B6B' : 'transparent',
+                color: viewMode === 'grid' ? '#FFFFFF' : 'var(--color-gray-500)',
+                border: '1px solid var(--color-gray-border)',
+                borderRadius: 'var(--radius-sharp)',
+                padding: '6px 12px',
+                fontSize: '14px',
+              }}
               onClick={() => onViewModeChange('grid')}
               type="button"
-              style={{
-                backgroundColor: viewMode === 'grid' ? 'var(--sport-primary)' : 'transparent',
-                color: viewMode === 'grid' ? 'var(--color-near-black)' : 'var(--color-gray-300)',
-                border:
-                  viewMode === 'grid' ? 'none' : '1px solid var(--color-gray-border)',
-              }}
             >
               Cards
             </button>

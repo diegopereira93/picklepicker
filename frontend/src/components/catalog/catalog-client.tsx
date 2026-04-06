@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Paddle } from '@/types/paddle'
 import { fetchPaddles } from '@/lib/api'
+import { getProfile } from '@/lib/profile'
 import { FilterBar } from './filter-bar'
 import { ComparisonTable } from './comparison-table'
 import { ProductGrid } from './product-grid'
@@ -16,6 +17,7 @@ export function CatalogClient() {
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc')
   const [activeBrand, setActiveBrand] = useState<string | null>(null)
   const [activeLevel, setActiveLevel] = useState<string | null>(null)
+  const [userProfile, setUserProfile] = useState<import('@/types/paddle').UserProfile | null>(null)
   const [selected, setSelected] = useState<Set<number>>(new Set())
 
   useEffect(() => {
@@ -23,6 +25,7 @@ export function CatalogClient() {
       try {
         const result = await fetchPaddles({ limit: 100 })
         setPaddles(result.items)
+        setUserProfile(getProfile())
       } catch (err) {
         console.error('[CatalogClient] failed:', err)
       } finally {
@@ -103,12 +106,14 @@ export function CatalogClient() {
           onSelect={handleToggleSelect}
           sortBy={sortBy}
           onSort={handleSort}
+          userProfile={userProfile}
         />
       ) : (
         <ProductGrid
           paddles={sorted}
           selected={selected}
           onSelect={handleToggleSelect}
+          userProfile={userProfile}
         />
       )}
 

@@ -14,8 +14,11 @@ interface ChatWidgetProps {
 
 const SUGGESTED_QUESTIONS = [
   'Qual a diferenca entre 13mm e 16mm?',
-  'Melhor raquete para iniciante?',
-  'Raquete com melhor custo-beneficio?',
+  'Qual a melhor raquete pra quem ta comecando?',
+  'Quero gastar ate R$600, qual voce me recomenda?',
+  'Selkirk ou Joola? Qual vale mais a pena?',
+  'Raquete com bom spin ate R$800',
+  'Qual raquete evolui comigo?',
 ]
 
 export function ChatWidget({ profile, onRecommendations }: ChatWidgetProps) {
@@ -80,7 +83,7 @@ export function ChatWidget({ profile, onRecommendations }: ChatWidgetProps) {
                 <span style={{ color: 'var(--sport-primary)' }}>PI</span>
               </div>
               <p className="text-sm" style={{ color: 'var(--color-gray-300)' }}>
-                Oi! Sou o PickleIQ. Me conta o que voce procura e vou recomendar as melhores raquetes para voce.
+                Ola! Sou o PickleIQ. Posso te ajudar a encontrar a raquete ideal. Me conte sobre seu jogo!
               </p>
             </div>
             <SuggestedQuestions questions={SUGGESTED_QUESTIONS} onSelect={handleSuggestedQuestion} disabled={isLoading} />
@@ -115,6 +118,7 @@ export function ChatWidget({ profile, onRecommendations }: ChatWidgetProps) {
               <span style={{ color: 'var(--sport-primary)' }}>PI</span>
             </div>
             <div style={{ backgroundColor: 'transparent', borderRadius: '8px' }} className="px-4 py-3 text-sm">
+              <span className="block mb-2">Buscando as melhores opcoes para voce...</span>
               <span className="inline-flex gap-1">
                 <span className="animate-bounce [animation-delay:0ms]">.</span>
                 <span className="animate-bounce [animation-delay:150ms]">.</span>
@@ -128,7 +132,7 @@ export function ChatWidget({ profile, onRecommendations }: ChatWidgetProps) {
         {error && (
           <div className="flex justify-start mb-3">
             <div style={{ backgroundColor: 'rgba(185, 28, 28, 0.1)' }} className="text-sm rounded-lg px-4 py-2 flex items-center gap-2">
-              <span style={{ color: '#B91C1C' }}>⚠️ Erro ao carregar.</span>
+              <span style={{ color: '#B91C1C' }}>⚠️ Ops! Algo deu errado.</span>
               <button
                 type="button"
                 onClick={handleRetry}
