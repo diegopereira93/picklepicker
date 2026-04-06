@@ -3,63 +3,56 @@ export function FeatureSteps() {
     {
       number: 1,
       title: 'Responda o quiz',
-      description: 'Responda 3 perguntas sobre seu nivel, orcamento e estilo de jogo',
+      description: 'Responda 7 perguntas rapidas sobre seu jogo',
     },
     {
       number: 2,
-      title: 'Analise com IA',
-      description: 'Nosso sistema processa suas respostas e gera recomendacoes personalizadas',
+      title: 'Receba recomendacoes',
+      description: '3 raquetes selecionadas pra voce',
     },
     {
       number: 3,
       title: 'Compare precos',
-      description: 'Acesse ofertas reais das lojas brasileiras e faca sua escolha',
+      description: 'Melhores precos em tempo real',
+    },
+    {
+      number: 4,
+      title: 'Compre com confianca',
+      description: 'Links diretos para as lojas',
     },
   ]
 
   return (
-    <section className="hy-light-section hy-section">
-      <div className="hy-container">
-        <span className="hy-section-label text-center block mb-10">COMO FUNCIONA</span>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6 relative">
-          {steps.map((step, index) => (
-            <div key={step.number} className="text-center relative">
-              {index < steps.length - 1 && (
-                <div className="hidden md:block absolute top-8 left-1/2 w-full h-[2px]"
-                     style={{
-                       backgroundColor: 'var(--sport-primary)',
-                       opacity: 0.5,
-                     }} />
-              )}
-
-              <div className="relative z-10 mx-auto mb-6 w-16 h-16 rounded-full flex items-center justify-center"
-                   style={{
-                     border: '2px solid var(--sport-primary)',
-                     backgroundColor: 'var(--color-white)',
-                   }}>
-                <span className="hy-data" style={{
-                  fontSize: '1.5rem',
-                  fontWeight: 700,
-                  color: 'var(--data-green)',
-                }}>
-                  {step.number}
-                </span>
-              </div>
-
-              <h3 className="hy-heading text-center mb-3" style={{ color: '#000000' }}>
-                {step.title}
-              </h3>
-              <p style={{
-                fontSize: 'var(--font-size-link)',
-                color: 'var(--color-gray-500)',
-                lineHeight: 'var(--line-height-normal)',
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {steps.map((step, index) => (
+        <div key={step.number} className="flex gap-4">
+          <div className="flex-shrink-0 flex flex-col items-center justify-center min-w-[56px]">
+            <div className="w-14 h-14 rounded-full flex items-center justify-center"
+                 style={{
+                   border: '2px solid var(--accent-coral)',
+                   backgroundColor: 'white',
+                 }}>
+              <span className="font-bold" style={{
+                fontSize: '1.5rem',
+                color: 'var(--accent-coral)',
               }}>
-                {step.description}
-              </p>
+                {step.number}
+              </span>
             </div>
-          ))}
+            {index < steps.length - 1 && (
+              <div className="w-0.5 h-full mt-4" style={{ backgroundColor: 'var(--accent-coral)', opacity: 0.2 }}></div>
+            )}
+          </div>
+          <div>
+            <h3 className="font-semibold text-[#2A2A2A] mb-2">
+              {step.title}
+            </h3>
+            <p className="text-sm text-gray-600">
+              {step.description}
+            </p>
+          </div>
         </div>
-      </div>
-    </section>
+      ))}
+    </div>
   )
 }

@@ -1,9 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import type { ChatRecommendation, Paddle } from '@/types/paddle'
+import type { ChatRecommendation, Paddle, UserProfile } from '@/types/paddle'
 import { fetchPaddle } from '@/lib/api'
+import { getProfile } from '@/lib/profile'
 import { SafeImage } from '@/components/ui/safe-image'
+import { WhyMatchesCard } from '@/components/quiz/why-this-matches-card'
 
 interface ProductCardProps extends ChatRecommendation {
   in_stock?: boolean
@@ -43,6 +45,7 @@ export function ProductCard({
 }: ProductCardProps) {
   const [paddleDetails, setPaddleDetails] = useState<Paddle | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
 
   useEffect(() => {
     const fetchPaddleDetails = async () => {
@@ -57,13 +60,36 @@ export function ProductCard({
     }
 
     fetchPaddleDetails()
+    setUserProfile(getProfile())
   }, [paddle_id])
 
   const effectiveStockLevel: 'available' | 'low' | 'unavailable' =
     stock_level ?? (in_stock === false ? 'unavailable' : 'available')
 
-  // Fallback reason per DESIGN.md
-  const displayReason = reason || 'Recomendada para o seu perfil de jogo.'
+  const reasons: string[] = []
+  if (userProfile) {
+    if (userProfile.level === 'beginner') {
+      reasons.push('Ideal para iniciantes')
+    }
+    if (userProfile.level === 'intermediate') {
+      reasons.push('Equilibrada para jogadores intermediarios')
+    }
+    if (userProfile.level === 'advanced') {
+      reasons.push('Avancada para jogadores experientes')
+    }
+    if (userProfile.style === 'control') {
+      reasons.push('Excelente controle na rede')
+    }
+    if (userProfile.style === 'power') {
+      reasons.push('Potencia para game aggressive')
+    }
+    if (userProfile.style === 'balanced') {
+      reasons.push('Equilibrada para seu estilo de jogo')
+    }
+    if (userProfile.budget_max >= 500) {
+      reasons.push('Custo-beneficio excelente')
+    }
+  }
 
   return (
     <article
@@ -103,11 +129,7 @@ export function ProductCard({
         <div className="text-lg font-bold">{formatPrice(price_min_brl)}</div>
       </div>
 
-      {/* "Por que essa raquete?" section per DESIGN.md */}
-      <div className="space-y-1">
-        <div className="text-xs font-medium text-muted-foreground">Por que essa raquete?</div>
-        <div className="text-sm text-foreground">{displayReason}</div>
-      </div>
+      {userProfile && reasons.length > 0 && <WhyMatchesCard reasons={reasons} />}
 
       <StockIndicator level={effectiveStockLevel} />
 
