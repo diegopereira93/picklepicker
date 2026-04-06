@@ -30,6 +30,23 @@ export function HomeClient() {
     fetchFeaturedPaddles()
   }, [])
 
+  useEffect(() => {
+    const TITLE = 'PickleIQ — AI Pickleball Paddle Advisor'
+    function ensureTitle() {
+      const el = document.querySelector('title')
+      if (el && !el.textContent) el.textContent = TITLE
+      else if (!el) {
+        const t = document.createElement('title')
+        t.textContent = TITLE
+        document.head.appendChild(t)
+      }
+    }
+    ensureTitle()
+    const observer = new MutationObserver(ensureTitle)
+    observer.observe(document.head, { childList: true })
+    return () => observer.disconnect()
+  }, [])
+
   function handleQuizComplete(profile: UserProfile) {
     saveProfile(profile)
     setQuizComplete(true)
