@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0] - 2026-04-06
+
+### Changed
+- **Design system v4.0 "Warm Guide"** — Complete visual redesign from dark "Hybrid Modern Sports Tech" to light-first "Warm Guide" aesthetic. Warm whites, coral accents (#FF6B6B), rounded corners, smooth transitions. DESIGN.md rewritten as v4.0.
+- **Homepage** — Light-first hero with "Comece o Quiz" coral CTA, trust signals section, featured paddles grid (top 6), 4-step "How it works" section.
+- **Navbar** — Light warm-white background, coral "IQ" logo accent, QUIZ nav link added, dark mode toggle (sun/moon via next-themes).
+- **Footer** — Light warm-cream background.
+- **Chat tone** — Warmer PT-BR system prompt ("caloroso e prestativo"), conversational suggested questions, profile-aware "Por que pra voce" match explanations on product cards.
+- **Catalog** — Light background sections, "Para voce" badge on profile-matching paddles, coral active state on filter bar.
+- **Dark mode** — Full light/dark toggle. Chat page forces dark mode. Uses `data-theme` attribute + next-themes.
+
+### Added
+- **7-step quiz** (`/quiz`) — Welcome, Identity (4 player types), Style (4 play styles), Pain Points (multi-select), Frequency, Budget (R$200-2000 slider), Analyzing animation.
+- **Quiz results** (`/quiz/results`) — Profile summary with coral gradient, 3 recommendation cards with badges and "Por que pra voce" explanations.
+- **Gift buyer flow** (`/gift`) — 3-question gift quiz (recipient level, budget, analyzing) with gift-specific copy.
+- **Gift results** (`/gift/results`) — Single recommendation with gift-specific presentation.
+- **8 new quiz components** — QuizStepWelcome, QuizStepIdentity, QuizStepStyle, QuizStepPainPoints, QuizStepFrequency, QuizStepBudgetSlider, QuizAnalyzing, ProgressIndicator.
+- **WhyThisMatchesCard** — Reusable component for profile-aware match explanations in quiz results, gift results, and chat.
+- **UserProfile extension** — New optional fields: identity, pain_points, frequency.
+- **CSS design tokens** — `--warm-white`, `--accent-coral`, `--radius-sm/md/lg/xl`, motion tokens, `.wg-*` utility classes.
+- **Tailwind coral palette** — 50-900 color scale added to config.
+- **ARIA accessibility** — Full ARIA labels on quiz steps (radiogroup, checkbox, slider, progressbar roles), keyboard navigation, 2px coral focus indicators.
+- **ThemeProvider + ThemeToggle** — next-themes integration for light/dark mode switching.
+
+### Fixed
+- **AI slop audit** — 5 issues fixed: empty onClick handlers, `any` types, missing useEffect dependencies.
+- **Gift page background** — Fixed `bg-background` rendering black (shadcn HSL variable issue) by using `bg-[var(--warm-white)]`.
+- **Gift page hydration** — Fixed empty `<main>` in SSR by returning loading skeleton instead of null during hydration.
+
 ## [1.5.2] - 2026-04-05
 
 ### Fixed
