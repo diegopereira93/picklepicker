@@ -6,23 +6,24 @@ export function DataStatsSection() {
   ]
 
   return (
-    <section className="hy-near-black-section hy-section">
-      <div className="hy-container">
+    <section className="bg-[#F5F2EB] py-16">
+      <div className="max-w-6xl mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
           {stats.map((stat) => (
             <div key={stat.label} className="p-6">
-              <div className="hy-data" style={{
+              <div style={{
                 fontSize: '2.5rem',
                 fontWeight: 700,
-                color: 'var(--data-green)',
+                color: '#4d8c00',
                 lineHeight: 1.1,
                 marginBottom: '8px',
+                fontFamily: 'monospace',
               }}>
                 {stat.value}
               </div>
               <div style={{
-                fontSize: 'var(--font-size-body)',
-                color: 'var(--color-gray-300)',
+                fontSize: '1rem',
+                color: '#2A2A2A',
                 fontWeight: 500,
               }}>
                 {stat.label}

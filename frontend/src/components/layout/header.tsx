@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useState, createContext, useContext, ReactNode } from "react"
-import { Menu } from "lucide-react"
+import { Moon, Sun, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Sheet,
@@ -11,12 +11,13 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
+import { useTheme } from "next-themes"
 const navLinks = [
   { href: "/", label: "HOME" },
+  { href: "/quiz", label: "QUIZ" },
   { href: "/paddles", label: "CATÁLOGO" },
 ]
 
-// Check if Clerk is available by checking for the provider context
 const ClerkAvailableContext = createContext<boolean>(false)
 
 export function ClerkAvailableProvider({
@@ -37,18 +38,31 @@ function useClerkAvailable() {
   return useContext(ClerkAvailableContext)
 }
 
-// Auth buttons that only render if Clerk is available
+function ThemeToggle() {
+  const { theme, setTheme } = useTheme()
+  
+  return (
+    <button
+      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+      className="w-9 h-9 rounded-lg flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors"
+      aria-label={theme === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro'}
+    >
+      {theme === 'dark' ? (
+        <Sun className="h-5 w-5 text-[#2A2A2A]" />
+      ) : (
+        <Moon className="h-5 w-5 text-[#2A2A2A]" />
+      )}
+    </button>
+  )
+}
+
 function AuthButtons() {
   const clerkAvailable = useClerkAvailable()
-
   if (!clerkAvailable) {
     return null
   }
-
-  // Dynamically import Clerk components only when available
   const { SignInButton, UserButton, useAuth } = require("@clerk/nextjs")
   const { isSignedIn } = useAuth()
-
   return (
     <>
       {!isSignedIn && (
@@ -61,17 +75,13 @@ function AuthButtons() {
   )
 }
 
-// Mobile auth buttons
 function MobileAuth() {
   const clerkAvailable = useClerkAvailable()
-
   if (!clerkAvailable) {
     return null
   }
-
   const { SignInButton, UserButton, useAuth } = require("@clerk/nextjs")
   const { isSignedIn } = useAuth()
-
   return (
     <>
       {!isSignedIn && (
@@ -93,56 +103,54 @@ export function Header() {
   const clerkAvailable = useClerkAvailable()
 
   return (
-    <header className="hy-nav sticky top-0 z-50 w-full">
-      <div className="hy-container flex h-14 items-center">
-        {/* Logo */}
-        <Link href="/" className="hy-nav-logo mr-6 flex items-center">
-          <span className="hy-nav-brand">Pickle<span>IQ</span></span>
+    <header className="sticky top-0 z-50 w-full bg-[#FAFAF8] border-b border-gray-200">
+      <div className="max-w-6xl mx-auto px-4 h-14 flex items-center">
+        <Link href="/" className="text-[#2A2A2A] font-bold text-xl mr-6 flex items-center py-1">
+          <span className="font-bold text-[#2A2A2A]">Pickle<span className="text-[#F97316]">IQ</span></span>
         </Link>
 
-        {/* Desktop nav */}
-        <nav className="hy-nav-links hidden items-center space-x-6 flex-1">
+        <nav className="hidden md:flex items-center space-x-6 flex-1">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="hy-nav-link"
+              className="text-[#2A2A2A] font-semibold text-sm hover:text-[#F97316] transition-colors py-1"
             >
               {link.label}
             </Link>
           ))}
         </nav>
 
-        {/* Desktop CTA */}
-        <div className="hy-nav-cta hidden items-center space-x-2 ml-auto">
-          <Button asChild>
-            <Link href="/chat">Encontrar raquete</Link>
+        <div className="hidden md:flex items-center space-x-2 ml-auto">
+          <ThemeToggle />
+          <Button asChild size="sm" className="wg-button-coral">
+            <Link href="/quiz">Encontrar raquete</Link>
           </Button>
           {clerkAvailable && <AuthButtons />}
         </div>
 
-        {/* Mobile hamburger */}
-        <div className="hy-nav-mobile flex ml-auto">
+        <div className="md:hidden flex ml-auto">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" aria-label="Abrir menu">
-                <Menu className="h-5 w-5" />
+                <Menu className="h-5 w-5 text-[#2A2A2A]" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="hy-nav-overlay">
+            <SheetContent side="right" className="bg-[#FAFAF8]">
               <SheetHeader>
                 <SheetTitle>
-                  <Link href="/" onClick={() => setOpen(false)} className="hy-nav-brand">
-                    Pickle<span>IQ</span>
+                  <Link href="/" onClick={() => setOpen(false)} className="text-[#2A2A2A] font-bold text-xl">
+                    Pickle<span className="text-[#F97316]">IQ</span>
                   </Link>
                 </SheetTitle>
               </SheetHeader>
               <nav className="flex flex-col space-y-4 mt-6">
+                <ThemeToggle />
                 {navLinks.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="hy-nav-link-mobile"
+                    className="text-[#2A2A2A] font-semibold text-sm"
                     onClick={() => setOpen(false)}
                   >
                     {link.label}

@@ -102,7 +102,7 @@ export default function ChatPage() {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center bg-background px-4">
         <div className="w-full max-w-md">
-          <h1 className="text-2xl font-bold text-center mb-2">PickleIQ</h1>
+          <h1 className="text-2xl font-bold text-center mb-2" data-theme="dark">PickleIQ</h1>
           <p className="text-muted-foreground text-center mb-8">
             Vamos encontrar a raquete perfeita para voce
           </p>
@@ -117,8 +117,13 @@ export default function ChatPage() {
   }
 
   return (
-    <main className="h-screen flex flex-col" style={{ backgroundColor: 'var(--color-near-black)' }}>
+    <main 
+      className="h-screen flex flex-col" 
+      data-theme="dark"
+      style={{ backgroundColor: 'var(--color-near-black)' }}
+    >
       <header className="border-b px-4 py-3 flex items-center justify-between"
+              data-theme="dark"
               style={{ borderColor: 'var(--color-gray-border)', backgroundColor: 'var(--color-near-black)' }}>
         <h1 className="font-bold text-lg" style={{ color: 'var(--color-white)' }}>PickleIQ</h1>
         <button
@@ -135,6 +140,7 @@ export default function ChatPage() {
 
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         <aside className="lg:w-[55%] h-[50vh] lg:h-full overflow-y-auto p-4 lg:p-6 border-b lg:border-b-0 lg:border-r"
+               data-theme="dark"
                style={{ backgroundColor: 'var(--color-white)', borderColor: 'var(--color-gray-border)' }}>
           {selectedPaddle ? (
             <SidebarProductCard
@@ -145,6 +151,7 @@ export default function ChatPage() {
           ) : (
             <div className="flex flex-col items-center justify-center h-full text-center">
               <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
+                   data-theme="dark"
                    style={{ backgroundColor: 'var(--color-near-black)' }}>
                 <span className="text-2xl font-bold" style={{ color: 'var(--sport-primary)' }}>PI</span>
               </div>
@@ -156,8 +163,9 @@ export default function ChatPage() {
 
           {relatedPaddles.length > 0 && (
             <div className="mt-8">
-              <h3 className="text-sm font-bold uppercase tracking-wider mb-4"
-                  style={{ color: 'var(--color-gray-500)' }}>
+               <h3 className="text-sm font-bold uppercase tracking-wider mb-4"
+                   data-theme="dark"
+                   style={{ color: 'var(--color-gray-500)' }}>
                 Raquetes relacionadas
               </h3>
               <RelatedPaddles
@@ -173,6 +181,7 @@ export default function ChatPage() {
         </aside>
 
         <div className="lg:w-[45%] h-[50vh] lg:h-full flex flex-col"
+             data-theme="dark"
              style={{ backgroundColor: 'var(--color-near-black)' }}>
           <ChatWidget profile={profile!} onRecommendations={handleRecommendations} />
         </div>

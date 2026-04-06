@@ -1,131 +1,127 @@
 # PickleIQ — Design System
 
-**Version:** 3.0 (Hybrid Modern Sports Tech — UI Redesign, 2026-04-05)
-**Type:** APP UI — task-focused, data-dense, sporty + tech-credible
+**Version:** 4.0 (Warm Guide — UI Redesign, 2026-04-05)
+**Type:** APP UI — light-first, approachable, quiz-centric, Brazilian warmth
 
-**Changelog v2.0:**
-- Replaced sport-only aesthetic with Hybrid Modern Sports Tech
-- Added data credibility layer (green accent for charts/specs)
-- Introduced JetBrains Mono for data tables
-- Alternating dark/light sections instead of all-light
-- Sharp 2px border radius (tech edge, not rounded)
-- Section labels in uppercase with accent color
+**Changelog v4.0:**
+- Complete redesign from "Hybrid Modern Sports Tech" to "Warm Guide"
+- Light-first aesthetic with warm-white backgrounds (#FAFAF8)
+- Coral (#F97316) as primary CTA accent, lime retained for data
+- Soft corners (8-12px) replacing sharp 2px tech edges
+- 7-step quiz with emotional progression as core experience
+- Recommendation cards with "Por que pra voce" explanations
+- Dark mode optional (next-themes toggle), chat forces dark
+- WCAG 2.2 compliance with coral focus indicators
 
-**Changelog v3.0:**
-- Added Chat Components section (message bubbles, card responses, typing indicator, input area)
-- Added Interactive Widgets section (quiz cards with selected state, toggle switches, progress indicators, carousels)
-- Added semantic level colors (--level-beginner, --level-intermediate, --level-advanced, --level-professional)
-- Added conversational border radius (8px) for chat bubbles and tip cards
-- Added --max-width-data: 1440px for data-dense layouts
-- Allowed full-dark sections exception for immersive flows (chat, dashboards)
-- Updated Motion System with 4 new animation patterns
+**Changelog v3.0:** (superseded — see v4.0)
 
 ---
 
 ## Design Philosophy
 
 **Product:** PickleIQ — Brazilian pickleball paddle recommendation platform
-**Positioning:** "The smart way to buy a paddle" — sporty energy + data credibility
-**Voice:** Smart, friendly, Brazilian — not corporate, not generic
+**Positioning:** "The warm guide to your perfect paddle" — approachable, conversational, trustworthy
+**Voice:** Brazilian warmth, conversational, encouraging — like a knowledgeable friend
 
-**Core tension:** PickleIQ sits at the intersection of sports (energy, accessibility) and AI/data (trust, precision). The Hybrid design system balances both:
-- Sport energy through lime accent and bold typography
-- Data credibility through green accent, monospace specs, and sharp corners
-- Brazilian warmth through conversational copy and approachable cards
+**Core insight:** PickleIQ serves confused beginners, not data analysts. The quiz IS the product. Design must guide, not intimidate.
+
+**Design pillars:**
+- **Light-first** — Warm, approachable, not a tech dashboard
+- **Quiz-centric** — 7-step emotional journey, not a 3-step widget
+- **Brazilian warmth** — Conversational PT-BR, coral accent, generous whitespace
+- **Trust through clarity** — Explain "why", show freshness, social proof
+
+**What this is NOT:**
+- NOT a data dashboard (too cold for beginners)
+- NOT a pure sports app (too one-dimensional)
+- NOT dark-first (intimidating for new players)
 
 ---
 
 ## Aesthetic Direction
 
-**Direction:** Modern Sports Tech (Hybrid)
-**Mood:** Smart, friendly, Brazilian — sporty enough for players, techy enough for data-conscious buyers
-**Decoration:** Intentional — subtle textures on dark surfaces, clean light surfaces
-**Reference sites:** Pickleball Effect (editorial), Apple specs pages (data presentation), Duolingo (playful + educational)
+**Direction:** Warm Guide
+**Mood:** Approachable, conversational, Brazilian, trustworthy
+**Reference sites:** Duolingo (gamified guidance), Wirecutter (research-backed recommendations), Nike Run Club (sporty warmth)
 
-**What this is NOT:**
-- NOT a pure sports app (like Nike Training) — too one-dimensional
-- NOT a corporate tech dashboard — too cold for pickleball
-- NOT NVIDIA-inspired black/white — too detached from the sport
+**Decoration:** Intentional — warm textures, lifestyle photography, clean surfaces
+**Imagery:** Real paddle photography, diverse Brazilian players, white/cream product backgrounds
 
 ---
 
 ## Color System
 
-### Sport Energy (on dark backgrounds only)
-
-```css
---sport-primary: #84CC16;     /* lime-500: primary actions, accent elements */
---sport-secondary: #FCD34D;   /* amber-300: secondary highlights, CTAs */
-```
-
-**Contrast rule:** Lime (#84CC16) has 2.7:1 contrast on white — fails WCAG AA.
-- ✅ Use lime on dark backgrounds (#000000, #1a1a1a) only
-- ✅ Use lime for large text (H1, H2) where 3:1 is acceptable
-- ❌ Never use lime as small body text on white
-
-### Data Credibility (charts, specs, comparison)
-
-```css
---data-green: #76b900;        /* NVIDIA green: chart accent, comparison highlights */
---data-green-light: #bff230;  /* hover state */
-```
-
-**Usage:** Green accent for data elements: charts, table highlights, spec badges, section labels. NOT for CTAs or primary actions.
-
 ### Base Palette
 
 ```css
---white: #ffffff;             /* text on dark, light section backgrounds */
---near-black: #1a1a1a;        /* dark section backgrounds, cards */
---black: #000000;              /* navigation, hero sections */
---gray-border: #5e5e5e;       /* subtle dividers */
---gray-muted: #a7a7a7;        /* secondary text */
---gray-400: #898989;          /* tertiary text */
---gray-500: #757575;          /* placeholder text */
+:root {
+  --warm-white: #FAFAF8;      /* Primary background */
+  --warm-cream: #F5F2EB;      /* Secondary background, cards */
+  --warm-charcoal: #2A2A2A;   /* Primary text */
+}
 ```
 
-### Semantic Colors
+### Accent Colors
 
 ```css
---success: #3f8500;           /* dark green */
---error: #e52020;             /* red */
---info: #0046a4;              /* blue */
+:root {
+  --accent-coral: #F97316;        /* Primary CTA, buttons, links */
+  --accent-coral-hover: #EA580C;  /* Hover state */
+  --accent-lime: #84CC16;         /* Secondary accent, data highlights */
+  --accent-amber: #F59E0B;        /* Warnings, tips, intermediate level */
+}
 ```
 
-### Skill Level Colors
+**Contrast rule:** Coral (#F97316) has 3.5:1 on white — AA for large text only.
+- ✅ Use coral for buttons, headlines, CTAs
+- ❌ Never use coral for small body text on light backgrounds
 
---level-beginner: #4CAF50;       /* green — Iniciante */
---level-intermediate: #FCD34D;   /* amber — Intermediário */
---level-advanced: #F44336;       /* red — Avançado */
---level-professional: #8B5CF6;   /* violet — Profissional/Elite */
-
-**Usage:** Skill level badges on product cards, filter chips in catalog, quiz profile display. Background color with white text (beginner/advanced) or dark text (intermediate). Violet reserved for professional/elite only.
-
-### Interactive Colors
+### Trust & Semantic Colors
 
 ```css
---link-hover: #3860be;        /* universal link hover */
---button-hover: #1eaedb;      /* button hover state */
---button-active: #007fff;     /* button active state */
+:root {
+  --trust-blue: #0EA5E9;      /* Links, trust signals */
+  --success-green: #22C55E;   /* Success states, beginner level */
+  --error-red: #EF4444;       /* Errors, advanced level */
+}
 ```
 
-### Dark Mode Implementation
-
-In dark mode, the system remains the same (already dark-first). Light mode is the variant:
+### Neutral Scale
 
 ```css
-/* Light section (default on light pages) */
-background: #ffffff;
-color: #1a1a1a;
-
-/* Dark section (always dark) */
-background: #1a1a1a;
-color: #ffffff;
-
-/* Hero section (always black) */
-background: #000000;
-color: #ffffff;
+:root {
+  --gray-100: #F3F4F6;
+  --gray-200: #E5E7EB;
+  --gray-300: #D1D5DB;
+  --gray-400: #9CA3AF;
+  --gray-500: #6B7280;        /* Secondary text */
+  --gray-600: #4B5563;
+  --gray-700: #374151;
+  --gray-800: #1F2937;
+}
 ```
+
+### Skill Level Colors (Retained from v3.0)
+
+```css
+:root {
+  --level-beginner: #22C55E;      /* Green — Iniciante */
+  --level-intermediate: #F59E0B;  /* Amber — Intermediário */
+  --level-advanced: #EF4444;      /* Red — Avançado */
+}
+```
+
+**Usage:** Skill level badges on product cards, filter chips, quiz profile display. Background color with white text (beginner/advanced) or dark text (intermediate).
+
+### Data Credibility (Retained from v3.0)
+
+```css
+:root {
+  --data-green: #76b900;        /* Charts, specs, comparison highlights */
+}
+```
+
+**Usage:** Green accent for data elements: charts, table highlights, spec badges. NOT for CTAs.
 
 ---
 
@@ -135,93 +131,85 @@ color: #ffffff;
 
 | Role | Font | Weight | Usage |
 |------|------|--------|-------|
-| Display/Hero | Instrument Sans | 700 | Landing H1, section heroes |
-| Section Heading | Instrument Sans | 600 | Quiz questions, card titles, H2s |
+| Display/Hero | Inter | 700 | Headlines, H1, H2 |
 | Body | Inter | 400 | Paragraphs, descriptions, chat |
-| Body Bold | Inter | 700 | Button labels, emphasis |
+| Body Bold | Inter | 600-700 | Button labels, emphasis |
 | Data/Specs | JetBrains Mono | 400 | Comparison tables, spec values, prices |
-| Navigation | Inter | 700 | Nav links, step indicators |
-| Caption | Inter | 400-700 | Metadata, timestamps, tooltips |
+| Caption | Inter | 400-500 | Metadata, timestamps, tooltips |
+
+**Retained from v3.0:** Inter for display/body, JetBrains Mono for data.
 
 ### Font Loading
 
 ```html
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 ```
 
 ### Scale
 
-| Element | Size | Weight | Line Height |
-|---------|------|--------|-------------|
-| H1 (Hero) | 64px / 40px mobile | 700 | 1.1 |
-| H2 (Section) | 28px | 600 | 1.25 |
-| H3 (Card) | 20px | 600 | 1.3 |
-| Body | 16px | 400 | 1.5 |
-| Body Bold | 16px | 700 | 1.5 |
-| Data | 14px | 400 | 1.4 |
-| Navigation | 14px | 700 | — |
-| Caption | 12px | 400-700 | 1.43 |
+| Element | Desktop | Mobile | Weight | Line Height |
+|---------|---------|--------|--------|-------------|
+| H1 (Hero) | 64px | 48px | 700 | 1.1 |
+| H2 (Section) | 32px | 28px | 700 | 1.25 |
+| H3 (Card) | 20px | 18px | 600 | 1.3 |
+| Body | 16px | 16px | 400 | 1.6 |
+| Body Bold | 16px | 16px | 600-700 | 1.6 |
+| Data | 14px | 14px | 400 | 1.5 |
+| Caption | 12px | 12px | 400-500 | 1.43 |
 
-### Navigation Typography
+**Changes from v3.0:** Larger mobile headlines (48px vs 40px), increased body line-height (1.6 vs 1.5) for readability.
 
-```css
-.nav-link {
-  font-size: 14px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-```
+### Content Tone
 
-### Section Labels
-
-```css
-.section-label {
-  font-size: 14px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--data-green); /* on dark */
-  /* or var(--sport-primary) on light */
-}
-```
+- Sentence case for labels (warmer than uppercase)
+- Conversational: "Como voce se descreve?" not "Selecione seu nivel"
+- Plain language: "Facil de controlar" not "Alta controlabilidade"
 
 ---
 
 ## Spacing System
 
-**Base unit:** 8px (not 4px — hybrid needs more breathing room)
+**Base unit:** 4px (fine-grained control)
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| 2xs | 4px | Micro gaps, icon spacing |
-| xs | 8px | Tight padding |
-| sm | 16px | Default element gap |
-| md | 24px | Card padding, section internal |
-| lg | 32px | Section gaps |
-| xl | 48px | Major section breaks |
-| 2xl | 64px | Page-level padding |
-| 3xl | 80px | Hero section padding |
+| space-1 | 4px | Micro gaps, icon spacing |
+| space-2 | 8px | Tight padding, element gaps |
+| space-3 | 12px | Card internal padding |
+| space-4 | 16px | Default element gap |
+| space-6 | 24px | Card padding, section internal |
+| space-8 | 32px | Section gaps |
+| space-10 | 40px | Major section breaks |
+| space-12 | 48px | Page-level padding |
+| space-16 | 64px | Hero section padding |
 
-**Pattern:** Use `gap: 20px` for product grids, `padding: 64px 0` for section vertical spacing, `padding: 16px` for card internal padding.
+**Pattern:** Use `gap: 20px` for product grids, `padding: 64px 0` for section vertical spacing, `padding: 24px` for card internal padding.
 
 ---
 
 ## Border Radius
 
 ```css
---radius-default: 2px;   /* sharp, tech edge */
---radius-card: 4px;      /* subtle rounding for cards */
---radius-button: 2px;    /* consistent with tech aesthetic */
---radius-avatar: 50%;    /* circles only for user images */
---radius-conversational: 8px;  /* chat bubbles, tip cards, quiz pills — softer for human feel */
+:root {
+  --radius-sm: 8px;     /* Buttons, small elements */
+  --radius-md: 12px;    /* Cards, quiz options */
+  --radius-lg: 16px;    /* Chat bubbles, containers */
+  --radius-xl: 24px;    /* Large containers, profile cards */
+  --radius-full: 9999px; /* Pills, toggle switches */
+}
 ```
 
-**Why 2px?** Sharp corners signal precision and data. This is a deliberate choice: "we take specs seriously."
+**Why soft corners?** Warm, approachable, conversational. Sharp corners signal "tech dashboard" — wrong for a guidance platform.
 
-**Exception:** `--radius-conversational: 8px` for chat bubbles, tip cards, and interactive widget elements (quiz pills, toggle switches). Softer edges improve readability and reduce visual fatigue in conversation flows. The 2px default remains for all other elements.
+**Usage:**
+- Buttons: 8px
+- Product cards: 12px
+- Quiz cards: 12px
+- Chat bubbles: 16px
+- Profile summary: 24px
+- Pills/toggles: full (9999px)
 
 ---
 
@@ -230,60 +218,52 @@ color: #ffffff;
 ### Max Content Width
 
 ```css
-/* Default: content pages, marketing, product listings */
+/* Default: content pages, quiz, marketing */
 max-width: 1200px;
 margin: 0 auto;
 padding: 0 24px;
 
-/* Data-dense: comparison tables, split-panels, dashboards */
+/* Data-dense: comparison tables, dashboards */
 max-width: 1440px;
 margin: 0 auto;
 padding: 0 24px;
 ```
 
-**When to use which:** Default `1200px` for homepage, catalog cards, chat (single-panel), quiz flows. Use `--max-width-data: 1440px` for 9+ column comparison tables, chat split-panels (55%/45%), and any data-dense layout where horizontal space improves scannability.
+**When to use which:** Default `1200px` for homepage, quiz, catalog cards, chat. Use `1440px` for 9+ column comparison tables and data-dense layouts.
 
-### Section Alternation
+### Section Backgrounds
 
-Pages alternate between dark and light sections:
-- Dark sections: `background: #000000` or `#1a1a1a`, white text
-- Light sections: `background: #ffffff`, near-black text
+**Default:** Light-first aesthetic
+```css
+/* Light section (default) */
+background: var(--warm-white);
+color: var(--warm-charcoal);
 
-**Pattern:**
-```
-[Hero: Dark #000000]
-[Products: Light #ffffff]
-[Quiz: Dark #1a1a1a]
-[Comparison: Light #ffffff]
-[Chat: Dark #1a1a1a]
+/* Warm cream (secondary sections) */
+background: var(--warm-cream);
+color: var(--warm-charcoal);
 ```
 
-**Exception — Full-Dark Sections:**
-
-Chat interfaces and dashboard-style screens may use continuous dark backgrounds instead of alternating. This creates immersion for focused interaction flows.
-
-Apply to: `/chat` (split-panel layout), admin panels, data visualization screens.
-Do NOT apply to: marketing pages (`/`), product listings (`/paddles`), comparison tables.
+**Exception — Dark Sections:**
+- Chat interface: forces dark mode (immersive conversation)
+- Admin dashboard: dark mode (data-heavy)
+- Comparison tables: optional dark mode (user toggle)
 
 ```css
-/* Full-dark section (no alternation) */
-.chat-full-dark {
+/* Dark section (chat, dashboards) */
+.chat-dark {
   background: #1a1a1a;
   color: #ffffff;
-  /* No light section follows — continuous dark */
 }
 ```
 
 ### Responsive Breakpoints
 
-| Viewport | Class | Layout |
-|----------|-------|--------|
-| < 375px | compact | Single column, compact padding |
-| 375-600px | mobile | Single column, full-width cards |
-| 600-768px | tablet-sm | 2-col grids begin |
-| 768-1024px | tablet | Full card grids, horizontal nav |
-| 1024-1350px | desktop | Standard desktop, max-width container |
-| > 1350px | wide | Max-width with margins |
+| Viewport | Layout |
+|----------|--------|
+| < 768px (mobile) | Single column, full-width quiz cards, 48px touch targets |
+| 768-1024px (tablet) | 2-column grids, side-by-side quiz options |
+| > 1024px (desktop) | 3-column grids, centered quiz container (max-width 480px) |
 
 ### Grid System
 
@@ -295,276 +275,202 @@ Do NOT apply to: marketing pages (`/`), product listings (`/paddles`), compariso
 
 ## Components
 
-### Navigation Bar
+### Buttons
+
+#### Primary CTA (Coral)
 
 ```css
-.nav {
-  background: #000000;
-  position: sticky;
-  top: 0;
-  padding: 16px 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.nav-logo {
-  font-family: 'Instrument Sans', sans-serif;
-  font-size: 20px;
-  font-weight: 700;
-  color: #ffffff;
-}
-
-.nav-logo span {
-  color: #84CC16; /* lime accent on "IQ" */
-}
-
-.nav-links a {
-  color: #ffffff;
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  transition: color 150ms ease;
-}
-
-.nav-links a:hover {
-  color: #3860be;
-}
-```
-
-### Button Components
-
-```css
-/* Primary: Green border on transparent */
 .btn-primary {
-  background: transparent;
-  border: 2px solid #84CC16;
+  background: var(--accent-coral);
   color: #ffffff;
-  padding: 11px 13px;
-  font-size: 14px;
-  font-weight: 700;
-  border-radius: 2px;
+  font-weight: 600;
+  padding: 12px 24px;
+  border-radius: var(--radius-sm);
+  border: none;
   cursor: pointer;
-  transition: background 150ms ease, color 150ms ease;
+  transition: all 150ms ease;
 }
 
 .btn-primary:hover {
-  background: #1eaedb;
-  border-color: #1eaedb;
-  color: #ffffff;
+  background: var(--accent-coral-hover);
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.24);
 }
 
-/* Secondary: Thinner border */
-.btn-secondary {
-  background: transparent;
-  border: 1px solid #84CC16;
-  color: #ffffff;
-  padding: 11px 13px;
-  /* same sizing */
-}
-
-/* CTA: Solid fill */
-.btn-cta {
-  background: #84CC16;
-  border: none;
-  color: #1a1a1a;
-  padding: 11px 13px;
-  font-weight: 700;
-  border-radius: 2px;
-}
-
-.btn-cta:hover {
-  background: #FCD34D;
+.btn-primary:active {
+  transform: scale(0.98);
 }
 ```
 
-### Cards
+#### Secondary (Outline Coral)
 
 ```css
-.product-card {
-  background: #1a1a1a;
-  border-radius: 4px;
-  overflow: hidden;
-  box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 5px 0px;
-  transition: transform 150ms ease, box-shadow 150ms ease;
-}
-
-.product-card:hover {
-  transform: translateY(-2px);
-  box-shadow: rgba(0, 0, 0, 0.5) 0px 4px 12px 0px;
-}
-
-.product-card-title {
-  font-family: 'Instrument Sans', sans-serif;
-  font-size: 20px;
+.btn-secondary {
+  background: transparent;
+  border: 2px solid var(--accent-coral);
+  color: var(--accent-coral);
   font-weight: 600;
-  color: #ffffff;
-  border-bottom: 2px solid #76b900; /* green underline for data accent */
-  padding-bottom: 8px;
-  margin-bottom: 8px;
+  padding: 12px 24px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 150ms ease;
+}
+
+.btn-secondary:hover {
+  background: rgba(249, 115, 22, 0.04);
+}
+```
+
+#### Tertiary (Ghost)
+
+```css
+.btn-tertiary {
+  background: transparent;
+  color: var(--gray-500);
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: color 150ms ease;
+}
+
+.btn-tertiary:hover {
+  color: var(--accent-coral);
 }
 ```
 
 ### Quiz Cards
 
+**Default state:**
 ```css
 .quiz-card {
-  background: #1a1a1a;
-  border: 2px solid #5e5e5e;
-  border-radius: 4px;
-  padding: 24px;
+  background: #ffffff;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  padding: 20px;
   cursor: pointer;
-  transition: border-color 150ms ease, background 150ms ease;
+  transition: all 200ms ease;
 }
 
 .quiz-card:hover {
-  border-color: #84CC16;
+  border-color: var(--accent-coral);
+  background: var(--gray-100);
 }
+```
 
+**Selected state:**
+```css
 .quiz-card.selected {
-  border-color: #84CC16;
-  background: rgba(132, 204, 22, 0.1);
-  box-shadow: 0 0 0 2px #84CC16, 0 0 0 4px rgba(132, 204, 22, 0.2);
+  border-color: var(--accent-coral);
+  background: rgba(249, 115, 22, 0.04);
+  box-shadow: 0 0 0 2px var(--accent-coral);
+}
+
+.quiz-card.selected .checkmark {
+  display: flex;
+  /* Shows checkmark icon */
 }
 ```
 
-### Comparison Table
+**Structure:**
+- Icon/image on left (48x48px)
+- Label (bold) + description (regular) in center
+- Checkmark icon on right (visible when selected)
+
+### Recommendation Cards
 
 ```css
-.comparison-table {
-  width: 100%;
-  border-collapse: collapse;
+.recommendation-card {
   background: #ffffff;
-  border-radius: 4px;
-  overflow: hidden;
-  box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 5px 0px;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 200ms ease;
 }
 
-.comparison-table th {
-  background: #1a1a1a;
-  color: #ffffff;
-  padding: 16px;
-  font-family: 'Instrument Sans', sans-serif;
-  font-size: 16px;
-  font-weight: 600;
-  text-align: left;
-}
-
-.comparison-table td {
-  padding: 16px;
-  border-bottom: 1px solid #5e5e5e;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 14px;
-}
-
-.comparison-table .highlight {
-  background: rgba(118, 185, 0, 0.1);
-}
-
-.comparison-table .best {
-  color: #76b900;
-  font-weight: 700;
+.recommendation-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 ```
 
-### Links
+**Structure:**
+1. Badge (e.g., "⭐ MELHOR COMBINACAO GERAL")
+2. Product image (140x200px, rounded-lg)
+3. Brand (uppercase, lime-600, 12px)
+4. Product name (bold, 20px)
+5. Price (coral-500, 24px, bold)
+6. Stock status (gray-500, 14px)
+7. "Por que pra voce" section (lime-50 bg, lime-200 border)
+8. CTA button (full-width, coral primary)
+
+### Product Cards (Catalog)
 
 ```css
-/* On dark bg */
-a {
-  color: #ffffff;
-  text-decoration: none;
+.product-card {
+  background: #ffffff;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: transform 150ms ease, box-shadow 150ms ease;
 }
 
-a:hover {
-  color: #3860be;
-}
-
-/* On light bg */
-.light-section a {
-  color: #1a1a1a;
-  text-decoration: underline 2px solid #76b900;
-}
-
-.light-section a:hover {
-  color: #3860be;
-  text-decoration: none;
+.product-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 ```
+
+**Structure:**
+- Image container (white bg, aspect ratio 3:4)
+- Brand (uppercase, 12px, gray-500)
+- Product name (600, 16px)
+- Price (bold, coral-600, JetBrains Mono)
+- Level badge (pill, skill level colors)
+- "Para voce" badge (when profile matches)
+- [+ Comparar] button (tertiary)
 
 ### Chat Components
 
 #### Message Bubbles
 
-User messages: right-aligned, lime (#84CC16) left border (2px), dark (#111) background, 8px border-radius (--radius-conversational), white text. Max-width 80% of chat container.
-
-AI messages: left-aligned, transparent background, white text, 8px border-radius. Max-width 80% of chat container. Appears with hy-chat-message-enter animation (250ms).
-
+**User message:**
 ```css
 .chat-bubble-user {
-  background: #111111;
-  border-left: 2px solid #84CC16;
-  border-radius: 8px;
+  background: var(--accent-coral);
   color: #ffffff;
+  border-radius: var(--radius-lg);
+  padding: 12px 16px;
   max-width: 80%;
   align-self: flex-end;
-  padding: 12px 16px;
 }
+```
 
+**AI message:**
+```css
 .chat-bubble-ai {
-  background: transparent;
-  border-radius: 8px;
-  color: #ffffff;
+  background: var(--warm-cream);
+  color: var(--warm-charcoal);
+  border-radius: var(--radius-lg);
+  padding: 12px 16px;
   max-width: 80%;
   align-self: flex-start;
-  padding: 12px 16px;
-  animation: hy-chat-message-enter 250ms cubic-bezier(0, 0, 0.2, 1) forwards;
-}
-```
-
-#### Card Responses
-
-AI responses can include structured cards. Max 1 card type per response.
-
-**ProductCard:** Embedded in AI message. Image (180px height), paddle name (Instrument Sans 600, 20px), brand (Inter 12px uppercase), price (JetBrains Mono, data-green), key specs, "Ver no site →" CTA. Dark (#1a1a1a) background, 1px gray border.
-
-```css
-.chat-card-product {
-  background: #1a1a1a;
-  border: 1px solid #5e5e5e;
-  border-radius: 8px;
-  overflow: hidden;
-  animation: hy-card-response-enter 300ms cubic-bezier(0, 0, 0.2, 1) forwards;
-}
-```
-
-**ComparisonCard:** Mini-table with 2-3 paddles side-by-side. Columns: name, price, key spec, score. Green (#76b900) highlight on best values. JetBrains Mono for data cells.
-
-**TipCard:** Informational content with amber (#FCD34D) left border (3px). Used for gameplay tips, explanations. No CTA button.
-
-```css
-.chat-card-tip {
-  background: rgba(252, 211, 77, 0.08);
-  border-left: 3px solid #FCD34D;
-  border-radius: 8px;
-  padding: 12px 16px;
+  animation: message-enter 250ms ease forwards;
 }
 ```
 
 #### Typing Indicator
-
-3 animated dots (8px each, gray-muted #a7a7a7 color), left-aligned below last AI message. Staggered 150ms animation — each dot delayed by 150ms.
 
 ```css
 .typing-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #a7a7a7;
+  background: var(--gray-400);
   animation: typing-bounce 600ms ease-in-out infinite;
 }
+
 .typing-dot:nth-child(2) { animation-delay: 150ms; }
 .typing-dot:nth-child(3) { animation-delay: 300ms; }
 
@@ -574,105 +480,50 @@ AI responses can include structured cards. Max 1 card type per response.
 }
 ```
 
-#### Input Area
-
-Bottom-pinned to chat panel. Dark (#1a1a1a) background. Rounded text input (8px radius, 1px gray border). Lime (#84CC16) send button (32x32px, 2px radius). Suggested question pills above input area.
-
-```css
-.chat-input-area {
-  background: #1a1a1a;
-  border-top: 1px solid #5e5e5e;
-  padding: 12px 16px;
-  position: sticky;
-  bottom: 0;
-}
-
-.chat-input {
-  background: transparent;
-  border: 1px solid #5e5e5e;
-  border-radius: 8px;
-  color: #ffffff;
-  padding: 10px 16px;
-  width: 100%;
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
-}
-```
-
-#### Streaming Animation
-
-Cursor blink at end of streaming AI text. Lime (#84CC16) color, 1s infinite linear loop.
-
-```css
-.streaming-cursor::after {
-  content: '▊';
-  color: #84CC16;
-  animation: cursor-blink 1s linear infinite;
-  margin-left: 2px;
-}
-
-@keyframes cursor-blink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0; }
-}
-```
-
 ### Interactive Widgets
 
-#### Quiz Pill Toggle Buttons
-
-Inline selectable pills for quiz options (level, budget, play style). Used in homepage quiz widget and chat quiz flow.
-
-Default state: gray border, transparent bg, white text.
-Selected state: lime (#84CC16) border, lime tint bg, lime box-shadow glow.
+#### Quiz Pills (Inline Selection)
 
 ```css
 .quiz-pill {
   display: inline-flex;
   align-items: center;
   padding: 8px 16px;
-  border: 2px solid #5e5e5e;
-  border-radius: 8px;
-  background: transparent;
-  color: #ffffff;
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
+  border: 2px solid var(--gray-300);
+  border-radius: var(--radius-full);
+  background: #ffffff;
+  color: var(--gray-600);
   font-weight: 500;
   cursor: pointer;
-  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 150ms ease;
 }
 
 .quiz-pill:hover {
-  border-color: #84CC16;
+  border-color: var(--accent-coral);
 }
 
 .quiz-pill.selected {
-  border-color: #84CC16;
-  background: rgba(132, 204, 22, 0.1);
-  box-shadow: 0 0 0 1px #84CC16, 0 0 12px rgba(132, 204, 22, 0.15);
+  border-color: var(--accent-coral);
+  background: var(--accent-coral);
+  color: #ffffff;
 }
 ```
 
-#### Toggle Switch (Table/Card View)
-
-40x22px track with 18x18px thumb. Used for catalog view switching.
-
-Off state: gray border track, white thumb on left.
-On state: lime (#84CC16) track, white thumb translated 18px right.
+#### Toggle Switch
 
 ```css
 .toggle-track {
   width: 40px;
   height: 22px;
-  border-radius: 11px;
-  background: #5e5e5e;
+  border-radius: var(--radius-full);
+  background: var(--gray-300);
   position: relative;
   cursor: pointer;
   transition: background 150ms ease;
 }
 
 .toggle-track.active {
-  background: #84CC16;
+  background: var(--accent-coral);
 }
 
 .toggle-thumb {
@@ -691,89 +542,25 @@ On state: lime (#84CC16) track, white thumb translated 18px right.
 }
 ```
 
-#### Progress Indicators
-
-Dot style (8px circles) connected by 2px gray lines. Used in quiz flow.
-
-Active dot: lime (#84CC16) fill.
-Inactive dot: gray border (#5e5e5e) fill.
+#### Progress Dots
 
 ```css
 .progress-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #5e5e5e;
+  background: var(--gray-300);
   transition: background 150ms ease;
 }
 
 .progress-dot.active {
-  background: #84CC16;
+  background: var(--accent-coral);
 }
 
 .progress-line {
   width: 24px;
   height: 2px;
-  background: #5e5e5e;
-}
-```
-
-#### Carousel Arrows
-
-36x36px circular buttons with chevron icon. Used for product carousels and related paddles.
-
-Default: gray border, transparent bg.
-Hover: lime border, white bg.
-
-```css
-.carousel-arrow {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1px solid #5e5e5e;
-  background: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 150ms ease;
-}
-
-.carousel-arrow:hover {
-  border-color: #84CC16;
-  background: #ffffff;
-}
-```
-
-#### Filter Chips
-
-Inline selectable chips for catalog filters (MARCA, NÍVEL, PREÇO).
-
-Default: transparent bg, gray border, gray text, Inter 12px 500 uppercase.
-Active: lime border, lime tint bg, lime text.
-
-```css
-.filter-chip {
-  display: inline-flex;
-  align-items: center;
-  padding: 6px 14px;
-  border: 1px solid #5e5e5e;
-  border-radius: 4px;
-  background: transparent;
-  color: #898989;
-  font-family: 'Inter', sans-serif;
-  font-size: 12px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  cursor: pointer;
-  transition: all 150ms ease;
-}
-
-.filter-chip.active {
-  border-color: #84CC16;
-  background: rgba(132, 204, 22, 0.1);
-  color: #84CC16;
+  background: var(--gray-300);
 }
 ```
 
@@ -781,200 +568,204 @@ Active: lime border, lime tint bg, lime text.
 
 ## Motion System
 
-**Philosophy:** Intentional motion that aids comprehension, not decoration.
-
 ### Duration Scale
 
 | Token | Value | Usage |
 |-------|-------|-------|
 | instant | 50ms | Hover states, micro-feedback |
-| fast | 150ms | Button presses, toggles |
-| normal | 250ms | Card transitions, modals |
-| slow | 400ms | Page transitions, reveals |
+| fast | 150ms | Button presses, toggles, pill selection |
+| normal | 250ms | Card transitions, message enter |
+| slow | 400ms | Profile reveal, page transitions |
 
 ### Easing
 
 ```css
---ease-enter: cubic-bezier(0, 0, 0.2, 1);   /* elements entering */
---ease-exit: cubic-bezier(0.4, 0, 1, 1);      /* elements leaving */
---ease-move: cubic-bezier(0.4, 0, 0.2, 1);    /* position/size changes */
-```
-
-### Component Patterns
-
-**Chat Message Streaming:**
-```css
-@keyframes message-enter {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.chat-message.ai {
-  animation: message-enter 250ms var(--ease-enter) forwards;
+:root {
+  --ease-enter: cubic-bezier(0, 0, 0.2, 1);   /* Elements entering */
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);    /* Elements leaving */
+  --ease-move: cubic-bezier(0.4, 0, 0.2, 1);  /* Position changes */
 }
 ```
 
-**Quiz Card Selection:**
+### Animation Patterns
+
+**Quiz card selection:**
 ```css
 .quiz-card {
-  transition: all 150ms var(--ease-move);
+  transition: all 200ms var(--ease-move);
 }
 
 .quiz-card.selected {
-  border-color: #84CC16;
-  box-shadow: 0 0 0 2px #84CC16, 0 0 0 4px rgba(132, 204, 22, 0.2);
+  transform: scale(0.98);
+  border-color: var(--accent-coral);
+  box-shadow: 0 0 0 2px var(--accent-coral);
 }
 ```
 
-**Product Card Hover:**
+**Results card entrance (staggered):**
 ```css
-.product-card {
-  transition: transform 150ms var(--ease-move), box-shadow 150ms var(--ease-move);
+@keyframes results-enter {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.product-card:hover {
-  transform: translateY(-2px);
-  box-shadow: rgba(0, 0, 0, 0.5) 0px 4px 12px 0px;
+.recommendation-card {
+  animation: results-enter 300ms var(--ease-enter) forwards;
 }
+
+.recommendation-card:nth-child(1) { animation-delay: 0ms; }
+.recommendation-card:nth-child(2) { animation-delay: 150ms; }
+.recommendation-card:nth-child(3) { animation-delay: 300ms; }
 ```
 
-**Card Response Enter:**
+**Profile summary reveal:**
 ```css
-@keyframes hy-card-response-enter {
-  from { opacity: 0; transform: translateY(12px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+.profile-summary {
+  animation: profile-enter 400ms var(--ease-enter) forwards;
 }
 
-.hy-chat-card-product {
-  animation: hy-card-response-enter 300ms var(--ease-enter) forwards;
+@keyframes profile-enter {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 ```
 
-**Quiz Selection Ripple:**
+---
+
+## Quiz Specification
+
+### 7-Step Emotional Progression
+
+| Step | Question | Type | Purpose | Micro-copy |
+|------|----------|------|---------|------------|
+| 1 | Welcome splash | CTA | Set expectations | "Vamos encontrar sua raquete perfeita" |
+| 2 | "Como voce se descreve?" | Image cards (3) | Identity framing | "Vamos la!" |
+| 3 | "O que voce mais valoriza?" | Visual cards (3) | Play style | "Ja sei quem voce e..." |
+| 4 | "O que te frustra?" | Multi-select checkboxes | Pain points | "Quase la!" |
+| 5 | "Com que frequencia joga?" | Single select (3) | Context | "So mais uma..." |
+| 6 | "Qual seu orcamento?" | Slider (R$200-2000) | Budget | "Ultima pergunta!" |
+| 7 | Analyzing... | Loading animation | Personalization theater | "Analisando seu perfil..." |
+
+### Interaction Patterns
+
+- **Auto-advance:** Steps 2, 3, 5, 6 advance on selection (no "Next" button)
+- **Explicit advance:** Step 4 (multi-select) requires "Proximo →" button
+- **Progress indicator:** Animated dots with encouraging copy at each step
+- **Budget slider:** Continuous range with "smart zone" hint (R$400-800 for beginners)
+- **Loading state:** Checklist animation ("✓ Nivel identificado", "◐ Buscando raquetes...")
+
+### Results Page Structure
+
+1. **Profile summary card** (gradient coral background, 4 attributes)
+2. **3 recommendation cards** with badges:
+   - ⭐ Melhor combinacao geral
+   - 💰 Melhor custo-beneficio
+   - 🎯 Melhor para evoluir
+3. **"Por que pra voce" section** on each card (2-3 bullet points)
+4. **Secondary CTAs:** "Falar com IA", "Ver catalogo", "Refazer quiz"
+
+---
+
+## Dark Mode
+
+### Implementation
+
+- Toggle via `next-themes` (user preference)
+- **Default:** Light mode (warm, approachable)
+- **Forced dark:** `/chat` interface (immersive conversation)
+- **Optional dark:** `/paddles` comparison view, admin dashboard
+
+### Dark Mode Tokens
+
 ```css
-@keyframes hy-quiz-selection-ripple {
-  0% { box-shadow: 0 0 0 0 rgba(132, 204, 22, 0.4); }
-  70% { box-shadow: 0 0 0 8px rgba(132, 204, 22, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(132, 204, 22, 0); }
-}
-
-.hy-quiz-pill.selected {
-  animation: hy-quiz-selection-ripple 400ms ease-out;
-}
-```
-
-**Streaming Cursor:**
-```css
-.hy-streaming-cursor::after {
-  content: '▊';
-  color: #84CC16;
-  animation: hy-streaming-cursor 1s linear infinite;
+[data-theme="dark"] {
+  --warm-white: #1a1a1a;
+  --warm-cream: #111111;
+  --warm-charcoal: #f5f5f5;
+  --gray-100: #1f2937;
+  --gray-200: #374151;
+  --gray-300: #4b5563;
+  --gray-400: #6b7280;
+  --gray-500: #9ca3af;
+  --gray-600: #d1d5db;
+  --gray-700: #e5e7eb;
+  --gray-800: #f3f4f6;
 }
 ```
+
+### When to Use Dark Mode
+
+| Screen | Mode | Rationale |
+|--------|------|-----------|
+| Homepage | Light | First impression, warmth |
+| Quiz | Light | Approachable, encouraging |
+| Results | Light | Celebration, clarity |
+| Chat | Dark (forced) | Immersive conversation |
+| Catalog | Light (default) / Dark (toggle) | User preference |
+| Comparison | Light (default) / Dark (toggle) | Data density |
+| Admin | Dark | Dashboard aesthetic |
 
 ---
 
 ## Accessibility
 
-- **Touch targets:** Minimum 44×44px for all interactive elements
-- **Focus rings:** 2px solid #000000 outline on all focusable elements
-- **Contrast:** Lime (#84CC16) on dark backgrounds only; all text meets WCAG AA
-- **Quiz cards:** `role="radio"`, `aria-checked`, `aria-label` with full option text
-- **Chat message list:** `role="log"`, `aria-live="polite"`
-- **Affiliate CTAs:** `aria-label="Ver [Paddle Name] no site [Retailer]"`
-- **Keyboard navigation:** Tab order follows visual order on all screens
+### WCAG 2.2 Compliance
 
----
+| Check | Requirement | Implementation |
+|-------|-------------|----------------|
+| Color contrast | AA for text | Coral for large text only (3.5:1), charcoal for body (12.6:1) |
+| Focus indicators | Visible 2px outline | 2px coral outline on all interactive elements |
+| Touch targets | 48px minimum | All buttons, cards, pills ≥ 48px height |
+| Screen reader | ARIA labels | `aria-label` on image buttons, `role="radio"` on quiz cards |
+| Keyboard nav | Tab order | Visual order matches DOM order, Escape closes modals |
+| Error states | Clear messaging | Red border + error icon + descriptive text |
 
-## Screen Hierarchy
+### ARIA Implementation
 
-### Landing Page
+```html
+<!-- Quiz cards as radio group -->
+<div role="radiogroup" aria-label="Como voce se descreve como jogador?">
+  <div role="radio" aria-checked="true" aria-label="Iniciante - Jogo por diversao e saude" class="quiz-card selected">
+    ...
+  </div>
+</div>
 
-```
-[Hero: Dark #000000]
-  H1: "Encontre a raquete ideal para o seu jogo"
-  Subtitle: "IA que analisa specs, preços e avaliações..."
-  CTA: [Começar Quiz →] (lime border on transparent)
+<!-- Chat message list -->
+<div role="log" aria-live="polite" aria-label="Mensagens do chat">
+  ...
+</div>
 
-[Products: Light #ffffff]
-  Section Label: "RECOMENDADOS PARA VOCÊ" (lime, uppercase)
-  H2: "Raquetes em destaque"
-  Product Grid: 3-col → 2-col → 1-col
-
-[Quiz Teaser: Dark #1a1a1a]
-  Section Label: "QUIZ" (green, uppercase)
-  H2: "Descubra sua raquete ideal em 2 minutos"
-  CTA: [Começar →]
-
-[Comparison: Light #ffffff]
-  Section Label: "COMPARAÇÃO"
-  H2: "Compare raquetes lado a lado"
-  Table: JetBrains Mono for specs, green highlight for best values
+<!-- Affiliate CTAs -->
+<a href="..." aria-label="Ver Selkirk Gamma no site Brazil Store, R$ 689">
+  Ver no site →
+</a>
 ```
 
-### Quiz Flow
+### PT-BR Accessibility
 
-```
-"1 de 3" (step indicator, uppercase, green)
-H2: Question text
-[Card] [Card]         ← 2-col on tablet+, full-width on mobile
-[Card] [Card]
-● ○ ○               ← dot progress indicator (green for current)
-← Voltar            ← text link, not a button
-```
-
-**Pattern:** Large selection cards, auto-advance on selection (no "Próximo" button).
-
-### Chat Widget
-
-```
-[PickleIQ avatar]  AI message text streaming...     (left-aligned)
-                              User message          (right-aligned)
-[PickleIQ avatar]  Here are my recommendations:
-
-  +---------------------------+      +---------------------------+
-  | [img] Selkirk Luxx Control|      | [img] Joola Ben Johns     |
-  |       R$ 489 · Brazil Store|     |       R$ 529 · Drop Shot  |
-  |                           |      |                           |
-  | Por que essa raquete?     |      | Por que essa raquete?     |
-  | Ideal para iniciantes...  |      | Excelente controle para.. |
-  |                           |      |                           |
-  | [   VER NO SITE →   ]   |      | [   VER NO SITE →   ]   |
-  +---------------------------+      +---------------------------+
-
-[_________________________________] [ Enviar ]  ← bottom-pinned input
-```
-
-### Comparison Page
-
-```
-[ Buscar raquetes...                    🔍 ]
-[ Selkirk Luxx × ]  [ Joola Ben × ]  [ + Adicionar ]  ← disabled at 3
-
-| Atributo       | Selkirk Luxx | Joola Ben |
-| Preço          | R$ 489       | R$ 529    |
-| Swing Weight   | 82           | 87        |
-| ...            | ...          | ...       |
-
-[ Ver gráfico radar ▼ ]  ← accordion, hidden by default on mobile
-[RadarChart — Potência/Controle/Toque/Swing Weight/Peso/Equilíbrio]
-```
+- Plain language throughout (no jargon without explanation)
+- Descriptive button labels ("Ver minhas recomendacoes" not "Ver")
+- Alt text for all images in Portuguese
+- Sentence case for readability
 
 ---
 
 ## AI Slop Avoidance Checklist
 
 Before shipping any UI, verify:
-- [ ] No 3-column feature grid with icons in colored circles
-- [ ] No icons in colored circles as decoration
+
+- [ ] No generic "Welcome to..." / "Your all-in-one solution" copy
 - [ ] No centered-everything layout (left-align body copy)
-- [ ] No "Welcome to..." / "Your all-in-one solution" copy
 - [ ] No decorative blobs or wavy SVG dividers
 - [ ] No purple/violet gradient backgrounds
-- [ ] No rounded corners on buttons (use 2px, not 8px+)
-- [ ] Cards exist because they're functional, not decorative
-- [ ] Product grid is 3-col/2-col/1-col, not 4-col
-- [ ] Section labels are uppercase, not sentence case
+- [ ] No icons in colored circles as decoration
+- [ ] No 3-column feature grid with icons
+- [ ] Cards exist for function, not decoration
+- [ ] Section labels are sentence case, not uppercase
+- [ ] Coral used for CTAs only, not body text
+- [ ] Quiz feels like guidance, not interrogation
+- [ ] Recommendations explain "why", not just "what"
+- [ ] Brazilian Portuguese feels natural, not translated
 
 ---
 
@@ -982,17 +773,13 @@ Before shipping any UI, verify:
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
-| 2026-04-02 | Hybrid Modern Sports Tech direction | Balances sport energy with data credibility |
-| 2026-04-02 | JetBrains Mono for data tables | Signals "we take specs seriously", differentiates from competitors |
-| 2026-04-02 | 2px border radius everywhere | Sharp corners = precision/data, not "fun and bouncy" |
-| 2026-04-02 | Lime on dark backgrounds only | Contrast constraint forces dark heroes, creates drama |
-| 2026-04-02 | Green (#76b900) for section labels | Creates visual language where green = category/taxonomy |
-| 2026-04-02 | Alternating dark/light sections | Industry standard for sports + tech hybrids |
-| 2026-04-02 | Instrument Sans for display | Editorial meets tech, modern without being generic |
-| 2026-04-02 | Section labels in uppercase | Category/taxonomy visual language |
-| 2026-04-05 | 8px conversational radius exception | Chat bubbles and quiz pills need softness; 2px feels robotic in conversation |
-| 2026-04-05 | 1440px max-width for data layouts | 9-column comparison tables need horizontal space; 1200px forces truncation |
-| 2026-04-05 | Full-dark section exception for chat | Chat/terminal flows need immersion; alternation breaks conversational context |
-| 2026-04-05 | Semantic skill level colors | Visual taxonomy for paddle categorization across catalog, chat, and quiz |
-| 2026-04-05 | Chat Components + Widgets sections | Core interaction surfaces lacked documented patterns in v2.0 |
-| 2026-04-05 | Card-structured AI responses | Plain text AI answers aren't scannable; cards make recommendations actionable |
+| 2026-04-05 | "Warm Guide" aesthetic | Beginners need guidance, not data dashboard. Light-first reduces intimidation. |
+| 2026-04-05 | Coral primary accent | Warm, energetic, Brazilian sports commerce standard. Outperforms lime for CTAs. |
+| 2026-04-05 | 7-step quiz | Emotional investment increases conversion. Noom has 40+ questions with 80% completion. |
+| 2026-04-05 | Soft corners (8-12px) | Sharp corners signal "tech" — wrong for conversational guidance. |
+| 2026-04-05 | "Por que pra voce" section | Wirecutter pattern: explain recommendations, don't just list products. |
+| 2026-04-05 | Dark mode optional | Chat needs immersion; data screens benefit from dark. Light remains default for warmth. |
+| 2026-04-05 | JetBrains Mono retained | Analytical users still need credible spec tables. Keep data credibility layer. |
+| 2026-04-05 | Skill level colors retained | Intuitive visual taxonomy (green/amber/red) works across cultures. |
+
+(End of DESIGN.md v4.0 — 776 lines)
