@@ -1039,3 +1039,451 @@ Dark mode is available via toggle but NOT the default. Light mode is the primary
 - Chat interface (retains current dark aesthetic)
 - Data-heavy comparison tables
 - Admin dashboard
+
+---
+
+## Appendix D: Aesthetic Justification — Why "Warm Guide" Fits PickleIQ in Brazil
+
+### The Core Misalignment with "Hybrid Modern Sports Tech"
+
+The current DESIGN.md v3.0 chose "Hybrid Modern Sports Tech" to balance "sport energy + data credibility." This works for platforms like Tennis Warehouse or Golf Galaxy where users are **already knowledgeable** and want specs. PickleIQ's situation is fundamentally different:
+
+1. **Pickleball is new in Brazil.** The sport is growing from zero, not from an established base. Most visitors have never bought a paddle before. They don't need data credibility — they need guidance.
+
+2. **The primary persona is a confused beginner**, not an analytical expert. The PRD's Persona 1 (Iniciante Entusiasmado, 35-55 years) is explicitly described as someone who "doesn't understand swingweight or twistweight." A dark, tech-dashboard aesthetic signals "this is for engineers" and creates intimidation before the user even starts.
+
+3. **The product IS the quiz.** PickleIQ's value proposition is personalized recommendation via profiling. The current design treats the quiz as a widget. The new design must treat the quiz as the product. "Warm Guide" puts the quiz experience at the center, not the data.
+
+### Why Not "Sporty"?
+
+Brazilian sports e-commerce (Netshoes, Centauro, Mercado Livre esportes) uses vibrant, energetic, accessible design — not dark tech dashboards. The Brazilian sports consumer expects:
+- **Warmth and approachability** (Brazilian commerce culture is relationship-driven)
+- **Clear CTAs** (not hidden behind data exploration)
+- **Trust through simplicity** (not trust through complexity)
+- **Social proof** (reviews, "most popular", ratings — not raw specs)
+
+A dark, sharp-cornered, lime-on-black aesthetic is closer to a Bloomberg terminal than a Brazilian sports store. It signals "analyze this data" when the user wants "help me choose."
+
+### Why "Warm Guide" Specifically
+
+"Warm Guide" draws from three proven patterns:
+
+1. **Duolingo's approachability**: Gamified progression, encouraging micro-copy, colorful but not childish, makes learning feel achievable. PickleIQ's quiz uses the same pattern: make the confusing (choosing a paddle) feel achievable through guided steps.
+
+2. **Wirecutter's trust**: Research-backed recommendations with clear "why we picked this" explanations. Not affiliate link spam, but genuine guidance. PickleIQ's recommendation cards with "Por que pra voce" follow this pattern.
+
+3. **Nike Run Club's energy**: Sport-specific without being intimidating. Uses coral/orange as primary accent (not coincidentally), warm photography, and progress tracking. Proves that sports platforms don't need dark themes to feel athletic.
+
+### The Counterargument — What About the Analytical Persona?
+
+Persona 2 (Jogador Intermediário Analítico) wants data. The design doesn't abandon them:
+- **JetBrains Mono retained** for all spec/comparison tables
+- **Dark mode toggle** available for data-heavy screens
+- **Catalog page** retains dense data layout option
+- **Comparison mode** shows full spec tables with radar charts
+- **Lime accent retained** as the data color (charts, tables, section labels)
+
+The key insight: light mode for the **journey** (quiz, results, homepage), dark mode for the **analysis** (comparison, specs, data tables). The default should serve the majority persona (beginners), not the minority (analysts).
+
+### Brazilian Cultural Context
+
+Brazilian e-commerce UX research shows:
+- Brazilian consumers respond better to **warm, human** interfaces than cold, technical ones
+- **"Voce"** (informal) outperforms formal register in conversion
+- **Social proof** (ratings, review counts) matters more than technical specs
+- **Price transparency** (showing real prices from multiple stores) builds more trust than data density
+- **Coral/orange** is culturally associated with energy and commerce (used by Mercado Livre, Magalu, iFood)
+
+### Decision: This Is Not Generic "Make It Friendly"
+
+"Warm Guide" is specifically calibrated for:
+- A **new sport in Brazil** where most visitors need education, not data
+- A **quiz-first product** where the experience IS the value
+- A **beginner-majority audience** (70%+ of pickleball players in Brazil have < 1 year experience)
+- **Brazilian commerce expectations** (warm, social, price-transparent)
+
+It is NOT a generic customer service aesthetic. It is a deliberate choice to match the product's actual user base and market context.
+
+---
+
+## Appendix E: Migration Strategy — DESIGN.md v3.0 → v4.0
+
+### Migration Philosophy
+
+This is not a "rip and replace." The migration must be **incremental, reversible, and measurable.** Each phase has clear rollback criteria.
+
+### Phase 0: Baseline Measurement (Week 0)
+
+**Before any code changes**, capture current metrics:
+
+| Metric | How to Measure | Tool |
+|--------|---------------|------|
+| Homepage bounce rate | Google Analytics / Vercel Analytics | GA4 |
+| Quiz completion rate | Custom event: `quiz_step_completed` / `quiz_completed` | GA4 |
+| Quiz → affiliate click rate | Custom event: `affiliate_link_clicked` with `source=quiz` | GA4 |
+| Time on quiz | Average session duration on / path | GA4 |
+| Chat usage | Messages per session | Backend logs |
+| Catalog usage | Pageviews, filter usage | GA4 |
+| NPS | In-app survey (post-recommendation) | Custom |
+
+**Set up these events BEFORE migration begins.** Without baselines, success metrics are meaningless.
+
+### Phase 1: CSS Token Migration (Non-Breaking)
+
+**Goal**: Replace design tokens without changing component structure.
+
+**Steps**:
+1. Add new CSS custom properties alongside existing ones (dual-token approach)
+2. Example: Add `--accent-coral` without removing `--sport-primary`
+3. Create new utility classes: `.btn-coral-primary` alongside existing `.hy-button-primary`
+4. No visual changes yet — just preparation
+
+**QA**: Existing tests pass, no visual regression, build succeeds.
+
+**Rollback**: Delete new tokens (zero risk).
+
+### Phase 2: Component Migration (Controlled Rollout)
+
+**Goal**: Update components to use new tokens, one at a time.
+
+**Order** (lowest risk first):
+1. **Button component** — New `.btn-coral-primary` class, used in new features only
+2. **Card component** — New border radius (12px), soft shadows
+3. **Quiz components** — Full redesign (this is the biggest change)
+4. **Homepage hero** — Light background, quiz-first CTA
+5. **Catalog page** — Light background, larger cards
+6. **Chat interface** — Retain dark, warmer tone
+7. **Navigation** — Light navbar
+
+**A/B Testing Approach**:
+- Use Vercel Edge Middleware or LaunchDarkly for feature flags
+- 10% of traffic sees new design, 90% sees current
+- Monitor: bounce rate, quiz completion, affiliate clicks
+- If new design wins by >5% on any metric → increase to 50%
+- If new design loses by >10% on any metric → rollback
+
+**Rollback Criteria**:
+- Bounce rate increases by >15%
+- Quiz completion drops by >20%
+- Affiliate click-through drops by >25%
+
+### Phase 3: Dark Mode Toggle Implementation
+
+**Goal**: Add theme toggle without removing dark mode.
+
+**Steps**:
+1. Create `ThemeProvider` using `next-themes` library
+2. Add toggle to navbar (sun/moon icon)
+3. Default to light, respect system preference
+4. Chat page forces dark mode regardless of toggle
+5. Admin page forces dark mode regardless of toggle
+
+**CSS Strategy**:
+```css
+/* Light mode (default) */
+:root {
+  --bg-primary: var(--warm-white);
+  --bg-card: #ffffff;
+  --text-primary: var(--warm-charcoal);
+}
+
+/* Dark mode */
+[data-theme="dark"] {
+  --bg-primary: #1a1a1a;
+  --bg-card: #111111;
+  --text-primary: #f5f5f5;
+}
+```
+
+### Phase 4: Quiz Redesign (Staged)
+
+**Goal**: Replace 3-step quiz with 7-step quiz.
+
+**Staged Rollout**:
+1. **Week 1**: Deploy new quiz to `/quiz` (new route). Old quiz stays on homepage.
+2. **Week 2**: Homepage CTA changes to link to `/quiz` instead of inline widget.
+3. **Week 3**: Remove inline quiz widget from homepage entirely.
+4. **Week 4**: Add `/quiz/results` as dedicated page.
+
+**Data Migration**:
+- `UserProfile` type expands: add `pain_points`, `frequency`, `identity`
+- localStorage key stays the same (`pickleiq-profile`)
+- New fields are optional (backward compatible with existing profiles)
+- Old profiles trigger "Complete seu perfil" prompt on next visit
+
+**Rollback**: Revert homepage CTA to inline quiz widget. `/quiz` route can remain as an experiment.
+
+### Phase 5: DESIGN.md Update
+
+**Goal**: Replace DESIGN.md v3.0 with v4.0 only AFTER visual migration is complete.
+
+**Timing**: After Phase 4 is verified in production (all metrics stable or improving).
+
+**Content**:
+- Archive v3.0 to `DESIGN-v3.md` (reference only)
+- Write new DESIGN.md with "Warm Guide" as the canonical system
+- Update CLAUDE.md design system section
+- Update AI slop checklist for new aesthetic
+
+### Migration Risk Matrix
+
+| Phase | Risk | Impact | Rollback Time |
+|-------|------|--------|---------------|
+| Phase 0 (Baseline) | Events not firing | Can't measure | N/A — fix before proceeding |
+| Phase 1 (Tokens) | CSS conflicts | Visual glitches | 5 min (delete tokens) |
+| Phase 2 (Components) | User confusion | Metric drops | 15 min (revert feature flag) |
+| Phase 3 (Dark Mode) | Theme flash on load | Poor UX | 10 min (remove toggle) |
+| Phase 4 (Quiz) | Lower completion | Revenue impact | 30 min (revert CTA link) |
+| Phase 5 (Docs) | Confusion for contributors | PR quality drops | 5 min (revert file) |
+
+---
+
+## Appendix F: Edge Case & State Design
+
+### F1. Empty States
+
+**Empty Catalog** (`/paddles` with 0 results):
+```
+┌─────────────────────────────────────────────┐
+│                                             │
+│            🏓                               │
+│                                             │
+│   Nenhuma raquete encontrada                │
+│   com esses filtros.                        │
+│                                             │
+│   Tente:                                    │
+│   · Ampliar faixa de preco                  │
+│   · Remover filtro de nivel                 │
+│   · Limpar todos os filtros                 │
+│                                             │
+│   [LIMPAR FILTROS]    [VER TUDO]            │
+│                                             │
+└─────────────────────────────────────────────┘
+```
+
+**Empty Chat** (no messages yet):
+```
+┌─────────────────────────────────────────────┐
+│                                             │
+│  🤖 Ola! Sou o PickleIQ.                    │
+│                                             │
+│  Posso te ajudar a encontrar a raquete       │
+│  ideal. Me conte sobre seu jogo!            │
+│                                             │
+│  Sugestoes:                                 │
+│  · "Qual raquete para iniciante?"           │
+│  · "Melhor raquete ate R$600"              │
+│  · "Comparar Selkirk e Joola"               │
+│                                             │
+└─────────────────────────────────────────────┘
+```
+
+**Zero Recommendations** (quiz complete but no matching paddles):
+```
+┌─────────────────────────────────────────────┐
+│                                             │
+│   😕 Nenhuma raquete encontrada             │
+│   no seu orcamento.                         │
+│                                             │
+│   Tente aumentar seu orcamento para          │
+│   R$ {next_tier_price} ou mais.             │
+│                                             │
+│   [AJUSTAR ORCAMENTO]    [VER TUDO]         │
+│                                             │
+└─────────────────────────────────────────────┘
+```
+
+### F2. Error States
+
+**API Error** (fetch paddles fails):
+```
+┌─────────────────────────────────────────────┐
+│                                             │
+│   Ops! Algo deu errado.                     │
+│                                             │
+│   Nao conseguimos carregar as recomendacoes  │
+│   no momento. Tente novamente em instantes. │
+│                                             │
+│   [TENTAR NOVAMENTE]                        │
+│                                             │
+│   Se o problema persistir, entre em          │
+│   contato pelo chat.                         │
+│                                             │
+└─────────────────────────────────────────────┘
+```
+
+**Network Offline**:
+```
+┌─────────────────────────────────────────────┐
+│                                             │
+│   📡 Sem conexao com a internet             │
+│                                             │
+│   Verifique sua conexao e tente novamente.  │
+│                                             │
+│   [TENTAR NOVAMENTE]                        │
+│                                             │
+└─────────────────────────────────────────────┘
+```
+
+**Chat Streaming Error** (mid-response failure):
+```
+  🤖 PickleIQ (streaming stops)
+
+  ┌─ ⚠️ Resposta interrompida ──────────────┐
+  │ A conexao foi perdida. Clique abaixo    │
+  │ para tentar gerar a resposta novamente. │
+  │                                         │
+  │ [GERAR NOVAMENTE]                        │
+  └─────────────────────────────────────────┘
+```
+
+### F3. Loading States
+
+**Skeleton Loading** (catalog page, paddle cards):
+```
+┌────────────┐  ┌────────────┐  ┌────────────┐
+│ ████████    │  │ ████████    │  │ ████████    │
+│            │  │            │  │            │
+│ ██████████ │  │ ██████████ │  │ ██████████ │
+│ ████       │  │ ████       │  │ ████       │
+│ ██████     │  │ ██████     │  │ ██████     │
+│            │  │            │  │            │
+│ ████████   │  │ ████████   │  │ ████████   │
+└────────────┘  └────────────┘  └────────────┘
+```
+
+**Quiz Step Transition** (between steps):
+- Current step fades out + slides left (300ms)
+- Next step fades in + slides right (300ms)
+- Progress dots update simultaneously
+- No full-page loading indicator
+
+**Debounced Search** (catalog filters):
+- Show skeleton grid immediately when filter changes
+- Replace with real results after 300ms debounce
+- If results identical to previous, skip skeleton
+
+### F4. Validation States
+
+**Budget Slider**:
+- Min: R$200 (hard floor, slider can't go below)
+- Max: R$3.000 (hard ceiling, slider can't go above)
+- No invalid state possible (continuous slider)
+- Smart zone indicator: R$400-800 highlighted for beginners
+
+**Multi-select Quiz Step** (Step 4: Pain Points):
+- Minimum: 0 selections allowed (user can skip)
+- Maximum: all 6 options
+- "Proximo" button always enabled (no minimum selection)
+- If 0 selected: results include broader recommendations
+
+**Form Validation** (if any text inputs added):
+- Real-time validation on blur (not on every keystroke)
+- Error message appears below field with coral accent
+- Focus returns to invalid field
+- Screen reader announces error via aria-live region
+
+### F5. Mobile-Specific States
+
+**Keyboard Open** (quiz budget slider):
+- Slider sticks to bottom of viewport when keyboard opens
+- Step content scrolls to keep current question visible
+- "Proximo" button remains accessible above keyboard
+
+**Pull-to-Refresh** (catalog):
+- Standard browser pull-to-refresh behavior
+- Shows loading spinner during refresh
+- Skeleton cards during data fetch
+
+**Back Navigation** (quiz):
+- Browser back button goes to previous quiz step
+- Quiz state preserved in URL hash (/quiz#step-3)
+- Deep-linking: /quiz#step-5 resumes at step 5
+- Exiting quiz mid-flow: "Deseja salvar seu progresso?" prompt
+
+### F6. Offline / Slow Network
+
+**Slow Connection** (>3s API response):
+- Show skeleton loading immediately
+- After 3s: show "Aguenta so um instante..." message
+- After 10s: show retry prompt with "Tentar novamente" button
+- After 30s: show error state
+
+**Image Loading** (product cards):
+- Use `SafeImage` component (already exists)
+- Blur-up placeholder (low-res) → full-res
+- If image fails: show paddle icon placeholder with brand initial
+- Never show broken image icon
+
+---
+
+## Appendix G: Measurement Methodology
+
+### G1. Baseline Collection (Before Migration)
+
+Implement these custom events in GA4:
+
+```typescript
+// Quiz events
+gtag('event', 'quiz_started', { method: 'homepage_widget' | 'quiz_page' })
+gtag('event', 'quiz_step_completed', { step: 1-7, step_name: 'identity' | 'style' | ... })
+gtag('event', 'quiz_completed', { duration_ms: number, steps_skipped: number })
+gtag('event', 'quiz_abandoned', { last_step: 1-7, total_time_ms: number })
+
+// Recommendation events
+gtag('event', 'recommendation_viewed', { paddle_count: number })
+gtag('event', 'affiliate_link_clicked', {
+  paddle_name: string,
+  source: 'quiz_results' | 'chat' | 'catalog',
+  price_brl: number
+})
+
+// Catalog events
+gtag('event', 'catalog_filtered', { filter_type: string, filter_value: string })
+gtag('event', 'comparison_started', { paddle_count: number })
+gtag('event', 'comparison_completed', { paddle_count: number })
+
+// Chat events
+gtag('event', 'chat_message_sent', { message_length: number })
+gtag('event', 'chat_product_card_clicked', { paddle_name: string })
+```
+
+### G2. Success Metrics with Measurement Plan
+
+| Metric | Baseline Source | Target | How to Verify |
+|--------|----------------|--------|---------------|
+| Quiz completion rate | `quiz_completed` / `quiz_started` | 75% (30d), 85% (90d) | GA4 funnel report |
+| Results → affiliate click | `affiliate_link_clicked` (source=quiz) / `recommendation_viewed` | 5% (30d), 7% (90d) | GA4 custom report |
+| Time on quiz | Avg `quiz_completed.duration_ms` | 90-180s (30d), 90-180s (90d) | GA4 avg duration |
+| NPS | Post-recommendation survey (1-10 scale) | 40 (30d), 60 (90d) | In-app survey, weekly aggregation |
+| Homepage → quiz start | `quiz_started` / homepage pageviews | 25% (30d), 35% (90d) | GA4 funnel report |
+| Chat messages/session | Avg `chat_message_sent` per session | 3+ (30d) | GA4 avg per session |
+| Bounce rate (homepage) | GA4 standard | <40% (30d) | GA4 standard report |
+
+### G3. A/B Test Framework
+
+**Tool**: Vercel Edge Middleware with cookie-based bucketing.
+
+```typescript
+// middleware.ts
+export function middleware(request: NextRequest) {
+  const response = NextResponse.next()
+  const bucket = getBucket(request.cookies) // 'control' or 'warm-guide'
+  response.cookies.set('design-bucket', bucket, { maxAge: 86400 * 30 })
+  response.headers.set('x-design-bucket', bucket)
+  return response
+}
+
+function getBucket(cookies: RequestCookies): string {
+  const existing = cookies.get('design-bucket')?.value
+  if (existing) return existing
+  return Math.random() < 0.1 ? 'warm-guide' : 'control'
+}
+```
+
+**Experiment Duration**: Minimum 14 days, minimum 1,000 sessions per bucket.
+
+**Decision Criteria**:
+- **Ship**: Warm guide wins on quiz completion AND affiliate clicks with p < 0.05
+- **Iterate**: Mixed results (wins one, loses other) → adjust and re-test
+- **Rollback**: Loses on both metrics with p < 0.05
