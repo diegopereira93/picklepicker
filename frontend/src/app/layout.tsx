@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
@@ -33,12 +34,12 @@ export default function RootLayout({
     <ClerkProvider>
       <ThemeProvider attribute="data-theme" defaultTheme="light" enableSystem>
         <html lang="pt-BR" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+          <head>
+            <Script id="clerk-title-guard" strategy="afterInteractive">
+              {`(function(){var T="PickleIQ — AI Pickleball Paddle Advisor";function r(){var t=document.querySelector("title");if(t){if(!t.textContent)t.textContent=T}else{var e=document.createElement("title");e.textContent=T;document.head.appendChild(e)}}r();var o=new MutationObserver(r);o.observe(document.head,{childList:true})})()`}
+            </Script>
+          </head>
           <body className="min-h-screen antialiased flex flex-col">
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `(function(){var T="PickleIQ — AI Pickleball Paddle Advisor";function r(){var t=document.querySelector("title");if(t){if(!t.textContent)t.textContent=T}else{var e=document.createElement("title");e.textContent=T;document.head.appendChild(e)}}r();var o=new MutationObserver(function(){r()});o.observe(document.head,{childList:true})})()`,
-              }}
-            />
             <Header />
             <main className="flex-1">{children}</main>
             <Footer />
