@@ -8,6 +8,20 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  async redirects() {
+    return [
+      {
+        source: '/paddles',
+        destination: '/catalog',
+        permanent: true,
+      },
+      {
+        source: '/paddles/:brand/:model-slug',
+        destination: '/catalog/:model-slug',
+        permanent: true,
+      },
+    ]
+  },
   images: {
     remotePatterns: [
       {

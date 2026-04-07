@@ -1,21 +1,21 @@
 import { Metadata } from 'next'
-import { HomeClient } from '@/components/home/home-client'
+import { LandingClient } from '@/components/home/landing-client'
 
 export const metadata: Metadata = {
-  title: 'PickleIQ — Conselheiro de Raquetes com IA',
+  title: 'PickleIQ — Encontre a Raquete Perfeita com IA',
   description:
-    'Encontre a raquete de pickleball perfeita com ajuda de IA. Comparador de precos, especificacoes tecnicas e recomendacoes personalizadas para jogadores brasileiros.',
+    'Plataforma de inteligência para pickleball. Quiz personalizado, comparador de raquetes e recomendações IA para jogadores brasileiros.',
   alternates: {
     canonical: 'https://pickleiq.com',
   },
   openGraph: {
     type: 'website',
     url: 'https://pickleiq.com',
-    title: 'PickleIQ — Conselheiro de Raquetes com IA',
-    description: 'Encontre a raquete de pickleball perfeita com ajuda de IA.',
+    title: 'PickleIQ — Encontre a Raquete Perfeita com IA',
+    description: 'Plataforma de inteligência para pickleball. Quiz personalizado, comparador de raquetes e recomendações IA para jogadores brasileiros.',
   },
 }
 
 export default function Home() {
-  return <HomeClient />
+  return <LandingClient />
 }
