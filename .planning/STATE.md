@@ -2,16 +2,39 @@
 
 ## Current Position
 
-Phase: v1.6 — UI Redesign — ALL PHASES COMPLETE
-Status: Phase 16 ✅, Phase 17 ✅, Phase 18 ✅, Phase 19 ✅
-Last activity: 2026-04-05 — All 4 phases implemented, build passes, 161/161 tests pass.
+Milestone: v1.7.0 — Backend API for Frontend Redesign
+Phase: 21 — Price Alerts CRUD (in planning)
+Status: Planning complete, awaiting `/gsd/plan-phase 20` to begin execution
+Last activity: 2026-04-07 — Phase 20 committed, Phase 21 planning complete
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-05)
+See: .planning/PROJECT.md (updated 2026-04-07)
 
 **Core value:** Users can confidently choose the right pickleball paddle through AI-powered recommendations backed by real-time pricing and technical specs
-**Current focus:** v1.6 UI Redesign — COMPLETE
+**Current focus:** v1.7.0 Backend API — endpoint additions for frontend redesign v2.1.0
+
+## Context
+
+Frontend redesign v2.1.0 shipped successfully (PR #18 merged). The new UI features require 4 backend endpoints:
+
+1. **Similar Paddles** (`GET /paddles/{id}/similar`) — Product detail pages need similar paddle recommendations
+2. **Price Alerts** (`POST /price-alerts`) — Price alerts modal needs backend persistence
+3. **Affiliate Tracking** (`POST /api/affiliate-clicks`) — Analytics requires DB logging instead of console.log
+4. **Quiz Profile** (`POST/GET /quiz/profile`) — Cross-device profile persistence (optional)
+
+**Implementation priority:** Similar Paddles → Price Alerts → Affiliate Tracking → Quiz Profile
+**Estimated effort:** ~4.5 hours total
+
+## Prerequisites (Complete ✅)
+
+- [x] Frontend redesign v2.1.0 shipped (PR #18 merged)
+- [x] 182/182 frontend tests passing
+- [x] 174+ backend tests passing (2 pre-existing Jina/HF API 401 failures)
+- [x] Build passes (0 errors, 21/21 pages)
+- [x] Token audit clean (23 files verified)
+- [x] Oracle APPROVED (v1.7 redesign complete)
+- [x] Backend analyzed for integration points (4 gaps identified)
 
 ## Accumulated Context
 
@@ -24,64 +47,62 @@ See: .planning/PROJECT.md (updated 2026-04-05)
 | Core Web Vitals | v1.2.0 | 11 | ✅ Complete |
 | Hybrid UI Redesign | v1.3.0 | 13 | ✅ Complete |
 | Launch Readiness | v1.4.0 | 14 | ✅ Complete |
-| Design Review | — | — | ✅ Complete |
-| DESIGN.md v3.0 + Foundation | v1.6.0 | 16 | ✅ Complete |
-| Home-C Quiz-Forward | v1.6.0 | 17 | ✅ Complete |
-| Chat-B Sidebar Companion | v1.6.0 | 18 | ✅ Complete |
-| Catalog-A Comparison Table | v1.6.0 | 19 | ✅ Complete |
+| UI Redesign | v1.6.0 | 16–19 | ✅ Complete |
+| Frontend Redesign v2.1.0 | v2.1.0 | — | ✅ Complete |
+| **Backend API Updates** | **v1.7.0** | **20–23** | **⏳ Planning** |
 
-### Phase 18 Implementation Summary
+### Key Files for v1.7.0 Implementation
 
-**Files created:**
-- `frontend/src/components/chat/sidebar-product-card.tsx` — Large product display with image, specs, score badge, CTA
-- `frontend/src/components/chat/related-paddles.tsx` — Horizontal row of smaller product cards
-- `frontend/src/components/chat/comparison-card.tsx` — Mini-table comparing 2+ paddles with green highlights
-- `frontend/src/components/chat/tip-card.tsx` — Amber-bordered informational card
-- `frontend/src/components/chat/suggested-questions.tsx` — Clickable prompt pills
+| File | Purpose | Phase |
+|------|---------|-------|
+| `backend/app/api/paddles.py` | Add `GET /paddles/{id}/similar` endpoint | 20 |
+| `backend/app/agents/rag_agent.py` | Contains `_get_similar_paddle_ids()` — reference for endpoint | 20 |
+| `pipeline/db/schema.sql` | Add `price_alerts`, `affiliate_clicks`, `quiz_profiles` tables | 21-23 |
+| `backend/app/api/price_alerts.py` | New file for POST endpoint | 21 |
+| `backend/app/routers/affiliate.py` | Add POST tracking endpoint | 22 |
+| `backend/app/api/quiz.py` | New file for profile endpoints | 23 |
+| `backend/app/schemas.py` | Add Pydantic models for all new endpoints | 20-23 |
 
-**Files modified:**
-- `frontend/src/app/chat/page.tsx` — Split-panel layout (55%/45%), sidebar + chat
-- `frontend/src/components/chat/chat-widget.tsx` — v3.0 styling, onRecommendations callback, SuggestedQuestions
-- `frontend/src/components/chat/message-bubble.tsx` — v3.0 styling (8px radius, lime border, transparent AI bg)
+### Backend Analysis Summary
 
-**Verification:** Build passes ✅, 161/161 tests pass ✅
+**Similar Paddles:**
+- RAG Agent has `_get_similar_paddle_ids()` method ready to expose
+- Need to add endpoint to existing `paddles.py` router
+- Return full paddle objects, not just IDs
 
-### Phase 19 Implementation Summary (complete)
+**Price Alerts:**
+- New table required (`price_alerts`)
+- Worker `price_alert_check.py` exists but has no data
+- Email validation via Pydantic `EmailStr`
 
-**Files created:**
-- `frontend/src/components/catalog/filter-bar.tsx` — Brand/level filter chips, sort dropdown, view toggle
-- `frontend/src/components/catalog/selection-bar.tsx` — Fixed bottom bar for comparison selection
-- `frontend/src/components/catalog/comparison-table.tsx` — Sortable table with score badges
-- `frontend/src/components/catalog/product-grid.tsx` — 3-col card grid with selection checkboxes
-- `frontend/src/components/catalog/catalog-client.tsx` — Client component assembling catalog
+**Affiliate Tracking:**
+- New table required (`affiliate_clicks`)
+- Add POST to existing `affiliate.py` router (GET already exists)
+- Optional fields for analytics: session_id, user_agent
 
-**Files modified:**
-- `frontend/src/app/paddles/page.tsx` — Server component wrapper with CatalogClient
-
-**Verification:** Build passes ✅, 161/161 tests pass ✅
-
-### Design Review Summary (2026-04-05)
-
-**Experts consulted:** Oracle (conversion + coherence), Metis (constraint analysis), Designer-eye (plan-design-review principles)
-**Visual inspection:** Playwright browser, 1440x900 viewport, 9 full-page screenshots taken and evaluated
-**Approved combination:**
-- Home: C (Quiz-Forward) + data stats from A — score 8/10
-- Catalog: A (Comparison Table) + product images from B + grid toggle — score 8/10
-- Chat: B (Sidebar Companion) + card responses from C — score 8/10
-
-### Test Results
-
-- **Backend:** 174 passed, 2 pre-existing failures (Jina/HuggingFace API 401 — not Phase 14 related)
-- **Frontend:** 161/161 passed (verified after Phase 18 + Phase 19)
+**Quiz Profile:**
+- New table required (`quiz_profiles`)
+- New file `quiz.py` for endpoints
+- UUID profile_id for cross-device persistence
 
 ### Key Technical Notes
 
-- Backend uses raw SQL (no ORM). Column names must match `pipeline/db/schema.sql`.
-- Two separate Python venvs: `backend/venv/` and `pipeline/.venv/`.
-- Frontend uses native `<img>` via `SafeImage` component (not next/image) for retailer CDN compat.
-- Chat proxy at `frontend/src/app/api/chat/route.ts` transforms Vercel AI SDK format → FastAPI format.
-- Embeddings: Jina AI (primary) + Hugging Face (fallback). OpenAI removed.
-- LLM: Groq (Mixtral 8x7B). Anthropic removed.
+- **No ORM:** Raw psycopg with parameterized queries — validate column names against `pipeline/db/schema.sql`
+- **Async:** All DB queries via `psycopg_pool.AsyncConnectionPool`
+- **Tests:** pytest-asyncio, 80%+ coverage required
+- **Locale:** PT-BR for user-facing error messages
+- **Frontend:** Already shipped — 56 files changed in v2.1.0
+- **DB migrations:** Run `schema.sql` updates against PostgreSQL
+
+### Active Deferred Items (T1-T7)
+
+From eng review (TODOS.md):
+- T1: Provision Supabase/Railway production infrastructure → v1.5.0
+- T2: Eval gate as monthly CI job → v1.5.1
+- T3: Legal assessment of scraping BR retailer data → v1.5.2
+- T5: Load test /chat endpoint (P95 < 3s) → v1.5.1
+- T6: Zero-paddle alert in crawler GitHub Actions → v1.5.0
+- T7: Embedding provider reliability (local fallback) → v1.5.0 (Phase 15.5-15.6)
 
 ---
-*State updated: 2026-04-05 — v1.6.0 UI Redesign milestone COMPLETE*
+*State updated: 2026-04-07 — v1.7.0 Backend API Updates milestone ready to start*
