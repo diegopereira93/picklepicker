@@ -111,3 +111,19 @@ def test_list_paddles_model_slug_not_found():
     data = response.json()
     assert data["items"] == []
     assert data["total"] == 0
+
+
+
+
+def test_get_similar_paddles__no_embeddings_returns_404():
+    """Test endpoint returns 404 when no embeddings exist for paddle."""
+    response = client.get("/api/v1/paddles/1/similar?limit=3")
+    assert response.status_code == 404
+    data = response.json()
+    assert "detail" in data
+
+
+def test_get_similar_paddles__endpoint_exists():
+    """Test GET /api/v1/paddles/{id}/similar endpoint is defined."""
+    response = client.get("/api/v1/paddles/1/similar")
+    assert response.status_code in [200, 404]

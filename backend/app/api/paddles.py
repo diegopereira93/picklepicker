@@ -12,11 +12,65 @@ from app.schemas import (
     HealthResponse,
     SpecsResponse,
     PriceSnapshot,
+    SimilarPaddleResponse,
+    SimilarPaddlesResponse,
 )
 from app.db import get_connection
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/paddles", tags=["paddles"])
+
+
+async def _get_similar_paddle_ids(paddle_id: int, top_k: int = 5, threshold: float = 0.2) -> list[int]:
+    async with get_connection() as conn:
+        async with conn.cursor(row_factory=dict_row) as cur:
+            await cur.execute("SELECT pe.embedding FROM paddle_embeddings pe WHERE pe.paddle_id = %s", [paddle_id])
+            row = await cur.fetchone()
+            if not row:
+                logger.warning(f"No embedding found for paddle {paddle_id}")
+                return []
+
+            embedding = row.get("embedding")
+            if not embedding:
+                logger.warning(f"No embedding found for paddle {paddle_id}")
+                return []
+
+            await cur.execute(
+                """
+                SELECT pe.paddle_id, (pe.embedding <-> %s::vector) AS distance
+                FROM paddle_embeddings pe
+                INNER JOIN latest_prices lp ON pe.paddle_id = lp.paddle_id
+                WHERE pe.paddle_id != %s
+                  AND (pe.embedding <-> %s::vector) <= (1 - %s)
+                ORDER BY distance
+                LIMIT %s
+                """,
+                (embedding, paddle_id, embedding, threshold, top_k),
+            )
+            results = await cur.fetchall()
+            return [r[0] for r in results]
+
+
+async def _get_paddle_details(paddle_ids: list[int]) -> list[dict]:
+    if not paddle_ids:
+        return []
+
+    async with get_connection() as conn:
+        async with conn.cursor(row_factory=dict_row) as cur:
+            await cur.execute(
+                """
+                SELECT
+                    p.id, p.name, p.brand, p.manufacturer_sku as sku, p.image_url,
+                    p.model_slug, p.skill_level, p.in_stock, lp.price_brl, lp.affiliate_url
+                FROM paddles p
+                JOIN latest_prices lp ON p.id = lp.paddle_id
+                WHERE p.id = ANY(%s)
+                ORDER BY lp.price_brl DESC
+                """,
+                [paddle_ids],
+            )
+            rows = await cur.fetchall()
+            return [dict(row) for row in rows]
 
 
 @router.get("", response_model=PaddleListResponse, status_code=status.HTTP_200_OK)
@@ -219,6 +273,34 @@ async def get_paddle_latest_prices(paddle_id: int):
         paddle_name=paddle.get("name", ""),
         latest_prices=price_items,
     )
+
+
+@router.get("/{paddle_id}/similar", response_model=SimilarPaddlesResponse, status_code=status.HTTP_200_OK)
+async def get_similar_paddles(paddle_id: int, limit: int = Query(5, ge=1, le=10)):
+    similar_ids = await _get_similar_paddle_ids(paddle_id, top_k=limit)
+    similar_ids = [id for id in similar_ids if id != paddle_id]
+
+    if not similar_ids:
+        raise HTTPException(status_code=404, detail="No similar paddles found")
+
+    paddle_details = await _get_paddle_details(similar_ids)
+    items = [
+        PaddleResponse(
+            id=p.get("id", 0),
+            name=p.get("name", ""),
+            brand=p.get("brand", ""),
+            sku=p.get("sku"),
+            image_url=p.get("image_url"),
+            model_slug=p.get("model_slug"),
+            skill_level=p.get("skill_level"),
+            in_stock=p.get("in_stock"),
+            price_min_brl=p.get("price_brl"),
+            specs=None,
+        )
+        for p in paddle_details
+    ]
+
+    return SimilarPaddlesResponse(similar_paddles=items, query_paddle_id=paddle_id, limit=limit)
 
 
 @router.get("/health", response_model=HealthResponse, status_code=status.HTTP_200_OK)
