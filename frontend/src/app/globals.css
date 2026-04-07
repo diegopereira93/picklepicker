@@ -432,14 +432,7 @@ a.hy-link-sport:hover {
   color: var(--sport-secondary);
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-}
+
 
 /* === Navigation === */
 .hy-nav {
