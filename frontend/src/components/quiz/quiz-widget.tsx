@@ -39,18 +39,17 @@ export function QuizWidget({ onComplete }: QuizWidgetProps) {
 
   return (
     <div className="quiz-widget">
-      <div className="mx-auto max-w-2xl p-8 md:p-10 rounded-sm"
-           style={{ backgroundColor: 'var(--color-near-black)', border: '2px solid var(--color-gray-border)' }}>
+      <div className="mx-auto max-w-2xl p-8 md:p-10 rounded-[var(--radius-md)] bg-white border border-gray-200 shadow-sm">
 
         <div className="mb-8">
-          <span className="hy-section-label block mb-4">SEU NIVEL</span>
+          <span className="text-sm font-bold text-[var(--accent-coral)] uppercase tracking-widest block mb-4">SEU NIVEL</span>
           <div className="flex flex-wrap justify-center gap-3">
             {LEVEL_OPTIONS.map(opt => (
               <button
                 key={opt.value}
                 type="button"
                 onClick={() => setLevel(opt.value)}
-                className={`hy-quiz-pill ${level === opt.value ? 'selected hy-animate-quiz-ripple' : ''}`}
+                className={`wg-quiz-card inline-flex items-center px-4 py-2 ${level === opt.value ? 'wg-quiz-card-selected' : ''}`}
               >
                 {opt.label}
               </button>
@@ -59,14 +58,14 @@ export function QuizWidget({ onComplete }: QuizWidgetProps) {
         </div>
 
         <div className="mb-8">
-          <span className="hy-section-label block mb-4">SEU ORCAMENTO</span>
+          <span className="text-sm font-bold text-[var(--accent-coral)] uppercase tracking-widest block mb-4">SEU ORCAMENTO</span>
           <div className="flex flex-wrap justify-center gap-3">
             {BUDGET_OPTIONS.map(opt => (
               <button
                 key={opt.value}
                 type="button"
                 onClick={() => setBudget(opt.value)}
-                className={`hy-quiz-pill ${budget === opt.value ? 'selected hy-animate-quiz-ripple' : ''}`}
+                className={`wg-quiz-card inline-flex items-center px-4 py-2 ${budget === opt.value ? 'wg-quiz-card-selected' : ''}`}
               >
                 {opt.label}
               </button>
@@ -75,14 +74,14 @@ export function QuizWidget({ onComplete }: QuizWidgetProps) {
         </div>
 
         <div className="mb-0">
-          <span className="hy-section-label block mb-4">ESTILO DE JOGO</span>
+          <span className="text-sm font-bold text-[var(--accent-coral)] uppercase tracking-widest block mb-4">ESTILO DE JOGO</span>
           <div className="flex flex-wrap justify-center gap-3">
             {STYLE_OPTIONS.map(opt => (
               <button
                 key={opt.value}
                 type="button"
                 onClick={() => setStyle(opt.value)}
-                className={`hy-quiz-pill ${style === opt.value ? 'selected hy-animate-quiz-ripple' : ''}`}
+                className={`wg-quiz-card inline-flex items-center px-4 py-2 ${style === opt.value ? 'wg-quiz-card-selected' : ''}`}
               >
                 {opt.label}
               </button>
@@ -96,7 +95,7 @@ export function QuizWidget({ onComplete }: QuizWidgetProps) {
           type="button"
           onClick={handleComplete}
           disabled={!isComplete}
-          className="hy-button hy-button-cta px-8 py-3 text-base disabled:opacity-40 disabled:cursor-not-allowed"
+          className="wg-button-coral px-8 py-3 text-base disabled:opacity-40 disabled:cursor-not-allowed"
         >
           Comecar Quiz →
         </button>
