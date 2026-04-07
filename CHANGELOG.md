@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.1] - 2026-04-06
+
+### Fixed
+- **Hydration errors** — Extracted ClerkProvider into ClerkWrapper component. Moved `<html>` and `<body>` outside of providers and added `suppressHydrationWarning` to prevent React 18 hydration mismatch warnings.
+- **Quiz light-mode styling** — Migrated quiz-widget and recommendation-card from dark inline styles to light-first Tailwind classes matching the Warm Guide design system (v4.0).
+- **Layout cleanup** — Removed unused `@layer base` shadcn CSS reset and inline `<Script>` title guard from layout.tsx.
+
 ## [2.0.0] - 2026-04-06
 
 ### Changed
