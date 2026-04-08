@@ -19,13 +19,15 @@ Update the design system (DESIGN.md + globals.css) to support all 3 winning desi
 - Catalog: A (Comparison Table) + product images from B + grid toggle
 - Chat: B (Sidebar Companion) + card responses from C
 
-**Current State (v2.0):**
-- DESIGN.md: 630 lines, no Chat Components section, no Interactive Widgets section, strict 2px radius, 1200px max-width
-- globals.css: 73 CSS custom properties, 81 hy-* classes, 1 @keyframes (hy-skeleton-shimmer)
-- No semantic level colors defined
-- No conversational radius token
-- No widget pattern styles (toggle switches, progress dots, carousel arrows)
-- Chat component classes exist (.hy-chat-*) but have no DESIGN.md documentation
+**Current State (DESIGN.md v4.0 — Warm Guide):**
+- DESIGN.md updated April 5, 2026 to v4.0 Warm Guide aesthetic
+- Has Chat Components section (message bubbles, card responses, typing indicator, input area)
+- Has Interactive Widgets section (quiz pills, toggle switch, progress dots, carousel arrows, filter chips)
+- Already has conversational border radius (radius-sm: 8px, radius-md: 12px, radius-lg: 16px, radius-xl: 24px)
+- Already documents `max-width: 1440px` for data-dense layouts
+- Has semantic colors (beginner: #22C55E, intermediate: #F59E0B, advanced: #EF4444)
+- Uses Tailwind CSS tokens (`wg-*` classes) instead of `hy-*` CSS custom properties
+- `design-tokens.css` contains only dark mode setup; Tailwind config handles design tokens
 
 ## Requirements Coverage
 

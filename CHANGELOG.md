@@ -16,7 +16,7 @@ All notable changes to this project will be documented in this file.
 - **Landing** (`/`) — Hero, How It Works, Social Proof (count-up), Feature Highlights, Final CTA.
 - **Header** — Glass effect (bg-surface/95 backdrop-blur-md), no ThemeToggle, nav updated to /catalog, Clerk preserved.
 - **Footer** — Dark theme (bg-surface, border-border), text-text-muted, /paddles→/catalog link updated.
-- **Route redirects** — /paddles→/catalog, /paddles/[brand]/[model-slug]→/catalog/[slug] (permanent 301).
+- **Route redirects** — /paddles→/catalog, /paddles/[brand]/[model-slug]→/catalog/[slug] (server-side redirect via Next.js redirect()).
 
 ### Added
 - **15 new UI components** — price-tag, price-delta-badge, price-chart, attribute-badge, match-score-badge, product-card, typing-indicator, ai-message, player-profile-sidebar, compare-row, radar-chart, quiz-progress-bar, quiz-option-card, price-alert-modal, affiliate-cta.
