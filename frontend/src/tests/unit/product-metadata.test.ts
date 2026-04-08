@@ -50,14 +50,14 @@ describe('generateProductMetadata', () => {
     expect(ogImages[0].url).toBe('https://example.com/selkirk-vanguard.jpg')
   })
 
-  it('sets canonical URL with brand and model-slug', async () => {
+  it('sets canonical URL with model-slug', async () => {
     const { generateProductMetadata } = await importSeo()
     const metadata = await generateProductMetadata('selkirk', 'vanguard-power-air', mockPaddle)
     // canonical can be in alternates.canonical or metadata.canonical
     const canonical =
       (metadata as any).canonical ||
       (metadata.alternates as any)?.canonical
-    expect(canonical).toContain('selkirk')
+    expect(canonical).toContain('catalog')
     expect(canonical).toContain('vanguard-power-air')
   })
 

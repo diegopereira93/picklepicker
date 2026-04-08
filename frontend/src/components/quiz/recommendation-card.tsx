@@ -9,9 +9,9 @@ interface RecommendationCardProps {
 }
 
 export function RecommendationCard({ paddle }: RecommendationCardProps) {
-  const detailUrl = paddle.model_slug && paddle.brand
-    ? `/paddles/${encodeURIComponent(paddle.brand.toLowerCase())}/${encodeURIComponent(paddle.model_slug)}`
-    : `/paddles`
+  const detailUrl = paddle.model_slug
+    ? `/catalog/${encodeURIComponent(paddle.model_slug)}`
+    : `/catalog`
 
   return (
     <div className="mx-auto max-w-2xl mt-8 hy-animate-card-enter wg-recommendation-card">

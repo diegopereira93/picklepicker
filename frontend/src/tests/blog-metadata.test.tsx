@@ -61,8 +61,8 @@ describe('FTC Disclosure', () => {
 describe('Blog Content Structure', () => {
   it('pillar page includes product recommendation links', () => {
     const content =
-      '["/paddles/brand/model-popular", "/paddles/brand/model-control", "/paddles/brand/model-versatile"]'
-    expect(content).toMatch(/\/paddles\//)
+      '["/catalog/model-popular", "/catalog/model-control", "/catalog/model-versatile"]'
+    expect(content).toMatch(/\/catalog\//)
     expect(content).toContain('model-popular')
     expect(content).toContain('model-control')
     expect(content).toContain('model-versatile')
