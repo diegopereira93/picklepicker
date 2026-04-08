@@ -77,7 +77,7 @@ export default function PillarPage() {
         controle superior e conforto garantido.
       </p>
       <p>
-        <Link href="/paddles/brand/model-popular" className="text-blue-600 hover:underline">
+        <Link href="/catalog/model-popular" className="text-blue-600 hover:underline">
           Ver esta raquete no PickleIQ
         </Link>
       </p>
@@ -88,7 +88,7 @@ export default function PillarPage() {
         macia proporcionam máximo toque na bola.
       </p>
       <p>
-        <Link href="/paddles/brand/model-control" className="text-blue-600 hover:underline">
+        <Link href="/catalog/model-control" className="text-blue-600 hover:underline">
           Ver esta raquete no PickleIQ
         </Link>
       </p>
@@ -99,7 +99,7 @@ export default function PillarPage() {
         durável. Uma excelente escolha para desenvolver sua técnica.
       </p>
       <p>
-        <Link href="/paddles/brand/model-versatile" className="text-blue-600 hover:underline">
+        <Link href="/catalog/model-versatile" className="text-blue-600 hover:underline">
           Ver esta raquete no PickleIQ
         </Link>
       </p>
@@ -198,7 +198,7 @@ export default function PillarPage() {
 
       <p>
         Para comparações mais detalhadas entre modelos específicos, visite nosso{' '}
-        <Link href="/paddles" className="text-blue-600 hover:underline">
+        <Link href="/catalog" className="text-blue-600 hover:underline">
           Comparador de Raquetes
         </Link>
         .

@@ -196,7 +196,7 @@ export default function GiftPage() {
             setRecommendedPaddle(null)
           }}
           onViewMore={() => {
-            window.location.href = '/paddles'
+            window.location.href = '/catalog'
           }}
           onPersonalQuiz={() => {
             window.location.href = '/quiz'

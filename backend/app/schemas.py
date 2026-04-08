@@ -70,3 +70,27 @@ class LatestPriceResponse(BaseModel):
 class HealthResponse(BaseModel):
     """Health check response."""
     status: str
+
+
+class SimilarPaddleResponse(BaseModel):
+    
+    id: int
+    name: str
+    brand: str
+    sku: Optional[str] = None
+    image_url: Optional[str] = None
+    specs: Optional[SpecsResponse] = None
+    price_min_brl: Optional[float] = None
+    created_at: Optional[datetime] = None
+    model_slug: Optional[str] = None
+    skill_level: Optional[str] = None
+    in_stock: Optional[bool] = None
+
+    model_config = {"from_attributes": True}
+
+
+class SimilarPaddlesResponse(BaseModel):
+    
+    similar_paddles: List[SimilarPaddleResponse]
+    query_paddle_id: int
+    limit: int

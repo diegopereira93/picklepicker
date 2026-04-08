@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.0] - 2026-04-07
+
+### Changed
+- **Design system v5.0 "Premium Sports Analytics"** — Complete visual redesign from light-first "Warm Guide" to dark-only premium sports aesthetic. Dark backgrounds (#0a0a0a base), lime green brand (#84CC16), orange secondary (#F97316). Bebas Neue display font, Source Sans 3 body, JetBrains Mono for data. MASTER.md + 6 page specs in design-system/pickleiq/.
+- **Tailwind config** — New token system: base/surface/elevated backgrounds, brand-primary/secondary, text hierarchy (primary/secondary/muted/disabled), price-up/down semantics, sharp/rounded radii, glow shadows, fadeInRight/fadeInLeft keyframes.
+- **Layout** — Dark theme as absolute default. New font stack. Toaster (sonner) for notifications. Minimal CSS (design-tokens.css: color-scheme dark, focus ring, reduced-motion).
+- **Quiz** (`/quiz`) — 7-step wizard with slide transitions (fadeInRight/fadeInLeft). Step 7 is free-text target paddle input with Skip option. Auto-advances on selection.
+- **Chat** (`/chat`) — Desktop sidebar (PlayerProfileSidebar 280px) + ChatWidget. Mobile overlay. QuizProfile→UserProfile mapping. No-profile redirects to quiz.
+- **Catalog** (`/catalog`) — Filter sidebar (brand, price, stock), sort dropdown, product grid, mobile bottom-sheet. ProductCard with onCompare/onAlert toast callbacks.
+- **Compare** (`/compare`) — Side-by-side specs with CompareRow winner highlighting, RadarChart, AI Verdict section (streaming via /api/chat with quiz profile personalization), buy CTAs via affiliate.ts.
+- **Product detail** (`/catalog/[slug]`) — Product image, specs table, price history chart, similar paddles, "Ideal For" profile chips, Buy + Compare + Alert CTAs.
+- **Landing** (`/`) — Hero, How It Works, Social Proof (count-up), Feature Highlights, Final CTA.
+- **Header** — Glass effect (bg-surface/95 backdrop-blur-md), no ThemeToggle, nav updated to /catalog, Clerk preserved.
+- **Footer** — Dark theme (bg-surface, border-border), text-text-muted, /paddles→/catalog link updated.
+- **Route redirects** — /paddles→/catalog, /paddles/[brand]/[model-slug]→/catalog/[slug] (server-side redirect via Next.js redirect()).
+
+### Added
+- **15 new UI components** — price-tag, price-delta-badge, price-chart, attribute-badge, match-score-badge, product-card, typing-indicator, ai-message, player-profile-sidebar, compare-row, radar-chart, quiz-progress-bar, quiz-option-card, price-alert-modal, affiliate-cta.
+- **affiliate.ts** — resolveAffiliateUrl() with store configs (Brazil Store, Dropshot, Mercado Livre) and UTM params. trackAffiliateClick() for analytics. All buy links route through this module.
+- **quiz-profile.ts** — QuizProfile type + localStorage persistence for quiz state.
+- **sonner** — Toast notification library installed and configured.
+- **12 regenerated shadcn/ui components** — button, card, badge, input, label, select, dialog, tabs, separator, dropdown-menu, skeleton, sheet.
+
+### Removed
+- **ThemeToggle** — Dark mode is the absolute default, no toggle in v2.1.
+- **Old design tokens** — All wg-button-*, hy-*, text-warm-*, bg-near-black, bg-warm-white, text-[#2A2A2A], bg-[#FAFAF8] removed from in-scope files.
+
 ## [2.0.1] - 2026-04-06
 
 ### Fixed

@@ -1,106 +1,113 @@
-# Requirements: PickleIQ v1.6 — UI Redesign (Design Review Implementation)
+# Requirements: PickleIQ v1.7.0 — Backend API for Frontend Redesign
 
-**Defined:** 2026-04-05
+**Defined:** 2026-04-07
 **Core Value:** Users can confidently choose the right pickleball paddle through AI-powered recommendations backed by real-time pricing and technical specs
-**Design review source:** `~/.gstack/projects/diegopereira93-picklepicker/designs/all-screens-20260405/`
+**Source:** Frontend redesign v2.1.0 shipped (PR #18), backend needs 4 new endpoints
 
 ## Context
 
-A comprehensive design review evaluated 9 HTML mockup variants across 3 screens (Home, Catalog, Chat). Three winning variants were selected with hybrid enhancements. The approved combination maximizes funnel conversion for the "intermediário analítico" persona while remaining accessible to beginners.
+Frontend redesign v2.1.0 (Premium Sports Analytics dark-only design) shipped with 56 files changed. The new UI features require backend endpoints that don't exist yet:
 
-**Winning combination:**
-- Home: C (Quiz-Forward) + data credibility stats from A
-- Catalog: A (Comparison Table) + product images from B + grid toggle
-- Chat: B (Sidebar Companion) + card-structured responses from C
+1. **Product detail "Similar Paddles"** — Frontend shows placeholder, needs `GET /paddles/{id}/similar`
+2. **Price alerts modal** — Frontend posts to `/price-alerts`, returns 404
+3. **Affiliate click tracking** — Frontend logs to console, should POST to DB
+4. **Quiz profile persistence** — Optional, for cross-device profile storage
 
-**6 DESIGN.md changes proposed** by Metis analysis (to be applied as foundation):
+**Implementation priority:** Similar Paddles (high) → Price Alerts (medium) → Affiliate Tracking (low) → Quiz Profile (optional)
 
-| ID | Change | Rationale |
-|----|--------|-----------|
-| DS-001 | Allow full-dark sections for immersive flows | Chat/terminal/dashboard need continuous dark |
-| DS-002 | Add Chat UI section to DESIGN.md | Chat is a core surface, needs patterns |
-| DS-003 | Add semantic level colors | Beginner/intermediate/advanced/professional |
-| DS-004 | Relax border radius for conversational elements | 8px for chat bubbles, not 2px |
-| DS-005 | Add interactive widget patterns section | Quiz cards, carousels, progress indicators |
-| DS-006 | Widen max-width for data-dense layouts | 1440px for tables, split-panels |
+**Estimated total effort:** ~4.5 hours across 4 phases
 
-## v1.6 Requirements
+## v1.7.0 Requirements
 
-### Design System Foundation
+### Phase 20: Similar Paddles Endpoint
 
-- [ ] **DS-01**: Update DESIGN.md to v3.0 with all 6 proposed changes (DS-001 through DS-006)
-- [ ] **DS-02**: Add CSS custom properties for new tokens (--level-beginner, --level-intermediate, --level-advanced, --level-professional, --max-width-data: 1440px, --radius-conversational: 8px)
-- [ ] **DS-03**: Add new "Chat Components" section to DESIGN.md (message bubbles, card responses, typing indicator, input area, streaming animation)
-- [ ] **DS-04**: Add new "Interactive Widgets" section to DESIGN.md (quiz cards, carousels, progress indicators, toggle switches)
-- [ ] **DS-05**: Update "Motion System" section with new patterns (card response enter, quiz card selection ripple, carousel snap)
+- [ ] **SIM-01**: Endpoint `GET /paddles/{id}/similar` returns 200 with array of paddle objects
+- [ ] **SIM-02**: Similar paddles exclude the queried paddle (no self-reference)
+- [ ] **SIM-03**: Limit query parameter works (default 5, max 10)
 
-### Home Screen — Quiz-Forward (Variant C)
+**Implementation notes:**
+- RAG Agent already has `_get_similar_paddle_ids()` method — minimal new code
+- Return full paddle objects (not just IDs) — include name, brand, price, specs, image_url, affiliate_url
+- Add to existing `backend/app/api/paddles.py` router
 
-- [ ] **HOME-01**: Quiz widget rendered above-the-fold on homepage with interactive pill toggle buttons (level, budget, play style)
-- [ ] **HOME-02**: Recommendation card preview shown below quiz — displays sample paddle with image, name, price (JetBrains Mono), specs, and "Ver detalhes" CTA
-- [ ] **HOME-03**: Data credibility stats section below quiz — 3 stat cards showing "147 raquetes analisadas", "3 varejistas monitorados", "Preços atualizados diariamente" with JetBrains Mono values
-- [ ] **HOME-04**: Feature steps section (light background) with numbered circles, connecting lines, and 3-step process explanation
-- [ ] **HOME-05**: Returning visitor support — show "Continue where you left off" or recent recommendations instead of quiz for users who already completed it
+### Phase 21: Price Alerts CRUD
 
-### Chat Screen — Sidebar Companion (Variant B)
+- [ ] **PRICE-01**: Table `price_alerts` created with proper schema (id, paddle_id, target_price, email, created_at, notified_at)
+- [ ] **PRICE-02**: Endpoint `POST /price-alerts` creates alert and returns 201
+- [ ] **PRICE-03**: Duplicate alerts (same email + paddle + target_price) return 409 Conflict
+- [ ] **PRICE-04**: Worker can query unprocessed alerts: `SELECT * FROM price_alerts WHERE notified_at IS NULL`
 
-- [ ] **CHAT-01**: Split-panel layout — 55% left panel (white product card) + 45% right panel (dark chat area)
-- [ ] **CHAT-02**: Left panel contains: breadcrumb navigation, product card (image, name, brand, price in JetBrains Mono, specs grid, score badge), "Comprar na loja" CTA button, related paddles horizontal row
-- [ ] **CHAT-03**: Right panel contains: chat header with "Assistente IA" + online indicator, scrollable message area, suggested questions, bottom-pinned input area with send button
-- [ ] **CHAT-04**: Card-structured AI responses embedded in chat panel — product recommendation cards (image + specs + CTA), comparison mini-tables (2-3 paddles), tip cards (amber accent, informational)
-- [ ] **CHAT-05**: User messages right-aligned with lime (#84CC16) left border; AI messages left-aligned with transparent background
-- [ ] **CHAT-06**: Responsive: panels stack vertically below 1024px (50/50 height split on mobile)
+**Implementation notes:**
+- New file: `backend/app/api/price_alerts.py`
+- Add index on `(paddle_id, target_price)` for efficient worker queries
+- Email validation required (Pydantic `EmailStr`)
+- Existing worker `price_alert_check.py` will process these alerts
 
-### Catalog Screen — Comparison Table (Variant A)
+### Phase 22: Affiliate Click Tracking
 
-- [ ] **CAT-01**: Sticky filter bar with chip filters (MARCA, NÍVEL, PREÇO) — active filters highlighted in lime, results count displayed
-- [ ] **CAT-02**: Sortable 9-column comparison table with: product image thumbnail, name, brand, price (JetBrains Mono, data-green), key specs, score badge (green/yellow/red)
-- [ ] **CAT-03**: Table/card view toggle — default is table, toggle switches to 3-col visual grid (from Catalog-B variant)
-- [ ] **CAT-04**: Sticky bottom selection bar — appears when items selected, shows count + "Comparar N raquetes" CTA
-- [ ] **CAT-05**: Score badges with color coding: high (#76b900 bg, white text), medium (#FDE047 bg, black text), low (#B91C1C bg, white text)
-- [ ] **CAT-06**: Responsive: table becomes stacked card view on mobile, filter bar collapses vertically
+- [ ] **AFF-01**: Table `affiliate_clicks` created with proper schema (id, paddle_id, retailer_id, clicked_at, session_id, user_agent)
+- [ ] **AFF-02**: Endpoint `POST /api/affiliate-clicks` logs click and returns 204 No Content
+- [ ] **AFF-03**: Clicks queryable for analytics: aggregation by paddle_id, retailer_id, date ranges
 
-### Cross-Screen Coherence
+**Implementation notes:**
+- Add to existing `backend/app/routers/affiliate.py` (GET exists, add POST)
+- Optional fields: `session_id`, `user_agent` (for analytics)
+- Forward-compatible with future authentication (Clerk user_id)
+- Add index on `(paddle_id, clicked_at)` for time-series queries
 
-- [ ] **COH-01**: Consistent navigation bar across all 3 screens — black sticky nav, "PickleIQ" logo with lime accent, uppercase nav links
-- [ ] **COH-02**: Consistent CTA style — primary: lime outline on transparent, hover: lime background; secondary: thinner border
-- [ ] **COH-03**: Dual funnel flow supported — Home → Chat → Catalog AND Home → Catalog → Chat, with clear navigation paths between screens
-- [ ] **COH-04**: Affiliate links use consistent pattern — "Ver no site →" CTA with retailer name, opens in new tab, tracked via existing affiliate system
+### Phase 23: Quiz Profile Persistence (Optional)
 
-### Quality Assurance
+- [ ] **QUIZ-01**: Table `quiz_profiles` created with proper schema (id, profile_id, skill_level, budget_brl, style, created_at, updated_at)
+- [ ] **QUIZ-02**: Endpoint `POST /quiz/profile` creates/updates profile and returns 200
+- [ ] **QUIZ-03**: Endpoint `GET /quiz/profile/{profile_id}` returns profile or 404
 
-- [ ] **QA-01**: All existing backend tests pass (174+) with no regressions
-- [ ] **QA-02**: All existing frontend tests pass (161+) with no regressions
-- [ ] **QA-03**: New component tests for quiz widget, comparison table, sidebar chat, card responses
-- [ ] **QA-04**: Manual smoke test: complete quiz → view recommendation → open chat → compare paddles → click affiliate link
-- [ ] **QA-05**: AI slop audit passes on all 3 screens — verify against DESIGN.md checklist
-- [ ] **QA-06**: Responsive test at 375px (mobile), 768px (tablet), 1440px (desktop) — no layout breaks
+**Implementation notes:**
+- `profile_id` should be a UUID (generate if not provided)
+- Cross-device persistence — same profile_id across sessions/browsers
+- Chat endpoint already accepts `UserProfile` parameter — connect the two
+- Optional: can be deferred to later milestone if time-constrained
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| v1.5 Production Readiness | Separate milestone — infrastructure, legal, reliability |
-| Real product images | Requires scraper re-run — separate effort |
-| Clerk auth integration | Not blocking UI redesign |
+| Frontend changes | Complete in v2.1.0 |
+| Price alert notifications | Worker exists, just needs data — emails come later |
+| Analytics dashboard | Affiliate click data stored, dashboard is v1.8+ |
+| Authentication (Clerk) | Deferred v1.5.0 |
 | Performance optimization | Already addressed in v1.2 |
-| New paddle data/scraping | Separate effort |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DS-01..DS-05 | Phase 16 | ⏳ |
-| HOME-01..HOME-05 | Phase 17 | ⏳ |
-| CHAT-01..CHAT-06 | Phase 18 | ⏳ |
-| CAT-01..CAT-06 | Phase 19 | ⏳ |
-| COH-01..COH-04 | Phase 19 | ⏳ |
-| QA-01..QA-06 | Phase 19 | ⏳ |
+| SIM-01..SIM-03 | Phase 20 | ⏳ |
+| PRICE-01..PRICE-04 | Phase 21 | ⏳ |
+| AFF-01..AFF-03 | Phase 22 | ⏳ |
+| QUIZ-01..QUIZ-03 | Phase 23 | ⏳ (Optional) |
 
 **Coverage:**
-- v1.6 requirements: 33 total
-- Mapped to phases: 33
+- v1.7.0 requirements: 13 total
+- Mapped to phases: 13
 - Unmapped: 0 ✓
 
+## Constraints
+
+1. **No ORM:** Use raw psycopg with parameterized queries. Validate column names against `pipeline/db/schema.sql`.
+2. **Tests:** pytest-asyncio with 80%+ coverage. No regressions in existing 174+ backend tests.
+3. **Locale:** PT-BR for all user-facing error messages.
+4. **Async:** All DB queries must be async (psycopg_pool.AsyncConnectionPool).
+5. **Schemas:** Pydantic models for all request/response bodies.
+
+## Success Metrics
+
+| Metric | Target |
+|--------|--------|
+| Backend tests passing | 174+ (no regressions) |
+| Test coverage | ≥80% for new files |
+| Endpoint latency (P95) | Similar Paddles: <500ms, Price Alerts: <200ms, Affiliate: <100ms, Quiz: <200ms |
+| New endpoints | 4 total (3 required, 1 optional) |
+| DB migrations | 3 tables (price_alerts, affiliate_clicks, quiz_profiles) |
+
 ---
-*Requirements defined: 2026-04-05*
+*Requirements defined: 2026-04-07 — v1.7.0 Backend API for Frontend Redesign*
