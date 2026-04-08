@@ -200,7 +200,7 @@ export default function QuizResultsPage() {
               <div className="mt-4">
                 <Link
                   href={{
-                    pathname: `/paddles/${encodeURIComponent((paddle.brand || 'unknown').toLowerCase())}/${encodeURIComponent(paddle.model_slug || String(paddle.id))}`,
+                    pathname: `/catalog/${encodeURIComponent(paddle.model_slug || String(paddle.id))}`,
                   }}
                   className="wg-button-coral inline-flex items-center justify-center w-full py-2.5 px-4 text-sm font-semibold rounded hover:bg-[#EA580C] transition-colors"
                 >

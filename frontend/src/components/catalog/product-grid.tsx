@@ -96,7 +96,7 @@ function ProductGrid({ paddles, selected, onSelect, userProfile }: ProductGridPr
 
             <div className="p-4">
               <Link
-                href={`/paddles/${encodeURIComponent((p.brand || 'unknown').toLowerCase())}/${encodeURIComponent(p.model_slug || p.id.toString())}`}
+                href={`/catalog/${encodeURIComponent(p.model_slug || p.id.toString())}`}
                 className="block no-underline hover:no-underline"
               >
                 <h3
