@@ -13,23 +13,10 @@ from tenacity import (
 from pipeline.db.connection import get_connection
 from pipeline.alerts.telegram import send_telegram_alert
 from pipeline.utils.security import scrub_sensitive_data, SensitiveDataFilter
+from pipeline.crawlers.utils import normalize_paddle_name, validate_image_belongs_to_product
 
 logger = logging.getLogger(__name__)
 logger.addFilter(SensitiveDataFilter())
-
-
-def normalize_paddle_name(name: str) -> str:
-    if not name:
-        return ""
-    normalized = name.lower().strip()
-    normalized = re.sub(r'\s+', ' ', normalized)
-    for prefix in ['raquete ', 'raquete']:
-        if normalized.startswith(prefix):
-            normalized = normalized[len(prefix):].strip()
-    for old in ['pickleball', 'de pickleball', 'para pickleball']:
-        normalized = normalized.replace(old, '')
-    normalized = re.sub(r'\s+', ' ', normalized).strip()
-    return normalized
 
 ML_SEARCH_URL = "https://api.mercadolibre.com/sites/MLB/search"
 MAX_ITEMS = 1000  # Prevent unbounded memory growth
