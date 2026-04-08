@@ -4,15 +4,49 @@ import * as React from "react"
 import { Dialog as SheetPrimitive } from "@base-ui/react/dialog"
 
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
 import { XIcon } from "lucide-react"
 
 function Sheet({ ...props }: SheetPrimitive.Root.Props) {
   return <SheetPrimitive.Root data-slot="sheet" {...props} />
 }
 
-function SheetTrigger({ ...props }: SheetPrimitive.Trigger.Props) {
-  return <SheetPrimitive.Trigger data-slot="sheet-trigger" {...props} />
+function SheetTrigger({ 
+  className,
+  variant = 'default',
+  size = 'default',
+  ...props 
+}: SheetPrimitive.Trigger.Props & {
+  variant?: 'default' | 'ghost' | 'outline' | 'secondary' | 'destructive' | 'link'
+  size?: 'default' | 'sm' | 'lg' | 'icon'
+}) {
+  const sizeClasses = {
+    default: 'h-8 w-8',
+    sm: 'h-7 w-7',
+    lg: 'h-9 w-9',
+    icon: 'h-8 w-8'
+  }
+  
+  const variantClasses = {
+    default: 'bg-primary text-primary-foreground',
+    ghost: 'hover:bg-muted hover:text-foreground',
+    outline: 'border-border bg-background hover:bg-muted',
+    secondary: 'bg-secondary text-secondary-foreground',
+    destructive: 'bg-destructive/10 text-destructive',
+    link: 'text-primary underline-offset-4 hover:underline'
+  }
+  
+  return (
+    <SheetPrimitive.Trigger
+      data-slot="sheet-trigger"
+      className={cn(
+        'inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent text-sm font-medium whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50',
+        sizeClasses[size],
+        variantClasses[variant],
+        className
+      )}
+      {...props}
+    />
+  )
 }
 
 function SheetClose({ ...props }: SheetPrimitive.Close.Props) {
@@ -62,16 +96,11 @@ function SheetContent({
         {showCloseButton && (
           <SheetPrimitive.Close
             data-slot="sheet-close"
-            render={
-              <Button
-                variant="ghost"
-                className="absolute top-3 right-3"
-                size="icon-sm"
-              />
-            }
+            className={cn(
+              "absolute top-3 right-3 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-transparent text-sm font-medium whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 hover:bg-muted hover:text-foreground"
+            )}
           >
-            <XIcon
-            />
+            <XIcon />
             <span className="sr-only">Close</span>
           </SheetPrimitive.Close>
         )}
