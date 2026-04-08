@@ -25,7 +25,7 @@ export async function revalidatePaddlePages(paddleId?: number): Promise<void> {
     await safeRevalidateTag(`paddle:${paddleId}`)
   } else {
     // Bulk revalidation (used by scheduled workers)
-    await safeRevalidatePath('/paddles')
+    await safeRevalidatePath('/catalog')
   }
 }
 
