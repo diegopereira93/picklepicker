@@ -8,6 +8,7 @@ from firecrawl import FirecrawlApp
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 from pipeline.db.connection import get_connection
 from pipeline.alerts.telegram import send_telegram_alert
+from pipeline.crawlers.utils import normalize_paddle_name, validate_image_belongs_to_product
 
 logger = logging.getLogger(__name__)
 
@@ -42,15 +43,66 @@ FIRECRAWL_SCHEMA = {
     reraise=True,
 )
 def extract_products(app: FirecrawlApp, url: str) -> dict:
-    """Extract paddle products from URL using Firecrawl /extract endpoint."""
-    return app.extract(
-        urls=[url],
-        prompt=(
-            "Extract all pickleball paddle products with name, price in BRL, "
-            "availability, image URL, product URL, brand, and technical specs"
-        ),
-        schema=FIRECRAWL_SCHEMA,
-    )
+    """Extract paddle products from URL using Firecrawl /scrape + manual markdown parsing."""
+    result = app.scrape(url)
+
+    if hasattr(result, 'markdown'):
+        markdown = result.markdown
+    elif isinstance(result, dict):
+        markdown = result.get('markdown', '')
+    else:
+        markdown = str(result)
+
+    lines = markdown.split('\n')
+    products = []
+
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+
+        if line.startswith('[Raquete'):
+            name = line[9:].rstrip('\\').strip()
+            full_name = 'Raquete ' + name
+
+            price = None
+            for j in range(i+1, min(i+20, len(lines))):
+                if lines[j].startswith('R$') and '\\\\n\\\\n' not in lines[j]:
+                    price_match = re.search(r'R\$([\d\.,]+)', lines[j])
+                    if price_match:
+                        price_str = price_match.group(1)
+                        price = float(price_str.replace('.', '').replace(',', '.'))
+                        break
+
+            url = ''
+            for j in range(max(0, i-10), i):
+                prev_line = lines[j]
+                if 'brazilpickleballstore.com.br/produtos/' in prev_line:
+                    url_match = re.search(r'\]\((https?://[^\)]+)\s*"', prev_line)
+                    if url_match:
+                        url = url_match.group(1).rstrip('"')
+                        break
+                    url_match2 = re.search(r'https?://[^\s\)]+produtos[^\s\)]+', prev_line)
+                    if url_match2:
+                        url = url_match2.group(0)
+                        break
+
+            if price:
+                products.append({
+                    "name": full_name,
+                    "price_brl": price,
+                    "product_url": url,
+                    "url": url,
+                    "image_url": "",
+                    "brand": name.split()[0] if name else "",
+                    "in_stock": True,
+                    "specs": {},
+                })
+
+        i += 1
+
+    logger.info("Parsed %d products from markdown", len(products))
+
+    return {"data": {"products": products}}
 
 
 def extract_image_from_markdown(markdown: str) -> Optional[str]:
@@ -138,11 +190,11 @@ async def save_products_to_db(products: list[dict], retailer_id: int, conn) -> i
             )
             continue
 
-        name = product.get("name", "")
+        raw_name = product.get("name", "")
+        name = normalize_paddle_name(raw_name)
         brand = product.get("brand", "")
         image_url = product.get("image_url", "")
 
-        # Atomic upsert: insert or update paddle, always return id
         result = await conn.execute(
             """
             INSERT INTO paddles (name, brand, model, image_url, in_stock, price_min_brl)
@@ -191,33 +243,6 @@ async def save_products_to_db(products: list[dict], retailer_id: int, conn) -> i
         saved += 1
 
     return saved
-
-
-def validate_image_belongs_to_product(image_url: str, product_name: str) -> bool:
-    """Validate that an image URL likely belongs to the specified product.
-
-    Returns True if the image is likely correct, False if uncertain.
-    Handles both descriptive URLs and UUID-based CDN filenames.
-    """
-    if not image_url or not product_name:
-        return False
-
-    skip_words = {'the', 'and', 'or', 'de', 'do', 'da', 'em', 'um', 'uma'}
-    keywords = [w.lower() for w in product_name.split() if w.lower() not in skip_words and len(w) > 2]
-
-    image_lower = image_url.lower()
-    matching_keywords = [kw for kw in keywords if kw in image_lower]
-
-    if matching_keywords:
-        return True
-
-    # UUID-based CDN URLs won't contain product name keywords.
-    # Accept if URL is from a known product CDN and has a valid image extension.
-    cdn_domains = ['mitiendanube.com', 'cloudfront.net', 'amazonaws.com', 'dropshotbrasil.com.br']
-    has_valid_extension = any(ext in image_lower for ext in ['.jpg', '.jpeg', '.png', '.webp'])
-    is_known_cdn = any(domain in image_lower for domain in cdn_domains)
-
-    return is_known_cdn and has_valid_extension
 
 
 async def run_brazil_store_crawler(app: FirecrawlApp | None = None) -> int:

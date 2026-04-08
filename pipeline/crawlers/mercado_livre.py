@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+import re
 import httpx
 from tenacity import (
     retry,
@@ -12,6 +13,7 @@ from tenacity import (
 from pipeline.db.connection import get_connection
 from pipeline.alerts.telegram import send_telegram_alert
 from pipeline.utils.security import scrub_sensitive_data, SensitiveDataFilter
+from pipeline.crawlers.utils import normalize_paddle_name, validate_image_belongs_to_product
 
 logger = logging.getLogger(__name__)
 logger.addFilter(SensitiveDataFilter())
@@ -138,14 +140,13 @@ async def save_ml_items_to_db(items: list[dict], affiliate_tag: str, conn) -> in
             )
             continue
 
-        title = item.get("title", "")
+        raw_title = item.get("title", "")
+        title = normalize_paddle_name(raw_title)
         permalink = item.get("permalink", "")
         affiliate_url = build_affiliate_url(permalink, affiliate_tag)
         
-        # Extract image URL - prefer official_image_url if available, fallback to thumbnail
         image_url = item.get("official_image_url") or item.get("thumbnail", "")
 
-        # Atomic upsert: insert or update, always return id
         result = await conn.execute(
             """
             INSERT INTO paddles (name, brand, model, images, image_url)

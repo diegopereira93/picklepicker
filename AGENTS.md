@@ -117,18 +117,26 @@ Scrapers → paddle_embeddings (pgvector)
  
 - **vercel.json security headers** — Root `vercel.json` has extensive security headers. `frontend/vercel.json` has a minimal subset. Duplicate purpose.
 
-## COMPLETED FIXES (MVP + v1.4 Launch)
+## COMPLETED FIXES (MVP + v1.4 Launch + v2.1 Redesign)
 
 - ✅ **RAG Agent** — Integrated with real pgvector (Jina AI embeddings + semantic search, OpenAI removed)
 - ✅ **Chat LLM** — Integrated with Groq (Mixtral 8x7B, streaming SSE, real responses)
 - ✅ **Backend Tests** — 174 passing (2 pre-existing Jina/HF API 401 failures)
-- ✅ **Frontend Tests** — 161/161 passing
+- ✅ **Frontend Tests** — 182/182 passing (v2.1.0)
 - ✅ **Dropshot Retailer** — Added to schema (id=3)
 - ✅ **Scraper.yml** — Module paths corrected
 - ✅ **Embeddings** — Jina AI (v2-base, 768d) + Hugging Face fallback (OpenAI removed)
 - ✅ **Schema** — Migrated to vector(768) for Jina/HF compatibility
 - ✅ **RAG Tests** — Embedding generation, vector search, price filtering validated
 - ✅ **Phase 14** — Launch readiness: SafeImage component, model_slug filter, chat proxy edge cases, regression tests
+- ✅ **Phase 16-19** — v2.1.0 Premium Sports Analytics redesign (DESIGN.md v5.0, Home, Chat, Catalog)
+- ✅ **Phase 20** — Similar Paddles Endpoint (GET /paddles/{id}/similar)
+
+## PENDING WORK
+
+- 📋 **Phase 21** — Price Alerts CRUD (table + POST endpoint)
+- 📋 **Phase 22** — Affiliate Click Tracking (DB persistence)
+- 📋 **Phase 23** — Quiz Profile Persistence (optional, cross-device)
 
 ## COMMANDS
 
