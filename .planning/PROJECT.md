@@ -24,6 +24,7 @@ Users can confidently choose the right pickleball paddle through AI-powered reco
 - ✓ FIX-03: Chat endpoint accepts all valid frontend payloads (no 422s) — v1.4
 - ✓ FIX-04: Zero console errors on core user flows (catalog, detail, chat) — v1.4
 - ✓ FIX-05: Existing tests pass + new regression tests for fixed bugs — v1.4
+- ✓ Frontend redesign v2.1.0 Premium Sports Analytics — dark-only design, 6 pages, 15 components — v2.1
 
 ### Active
 
@@ -36,14 +37,15 @@ Users can confidently choose the right pickleball paddle through AI-powered reco
 
 ### Out of Scope
 
-- New features or UX changes — this milestone is bug-fix only
+- Frontend changes (complete in v2.1.0)
 - Performance optimization (addressed in v1.2)
 - Data pipeline quality improvements (addressed in v1.1)
+- Production deployment (v1.5.0)
 - TODOS T1-T7 from eng review (deferred, not launch-blocking)
 
 ## Context
 
-**Current state (v1.4.0):** All launch-blocking bugs fixed. Core flows work without errors. 174 backend + 161 frontend tests passing. v1.5 (Production Readiness) planned but not started. v1.6 (UI Redesign) next — based on 9-variant design review completed 2026-04-05.
+**Current state (v2.1.0):** Frontend redesign shipped (PR #18). Dark-only Premium Sports Analytics design system complete. Backend needs 4 new endpoints to support new frontend features: similar paddles, price alerts, affiliate tracking, and quiz profile persistence.
 
 ## Constraints
 
@@ -51,8 +53,7 @@ Users can confidently choose the right pickleball paddle through AI-powered reco
 - **No ORM:** Raw psycopg with parameterized queries — must validate column names against `pipeline/db/schema.sql`
 - **Tests:** pytest-asyncio (backend) + Vitest (frontend) — must not introduce regressions
 - **Locale:** PT-BR for all user-facing text
-- **Design system:** Follow DESIGN.md (updating to v3.0 this milestone based on design review)
-- **Design review:** Follow approved.json decisions from `all-screens-20260405/`
+- **Design system:** Follow DESIGN.md v5.0 (Premium Sports Analytics, dark-only)
 
 ## Key Decisions
 
@@ -62,30 +63,21 @@ Users can confidently choose the right pickleball paddle through AI-powered reco
 | Groq over Claude | Cost optimization | ✓ Working for chat |
 | Jina AI over OpenAI | Free embeddings | ✓ Working for RAG |
 | placehold.co for seed data | Quick prototyping | ⚠️ Causes image errors in production |
-| Quiz-Forward (Home-C) | Max funnel conversion (score 9/10) | 🆕 v1.6 — approved variant |
-| Sidebar Companion (Chat-B) | Buy button always visible (score 9/10) | 🆕 v1.6 — approved variant |
-| Comparison Table (Catalog-A) | Data density for analytical persona (score 9/10) | 🆕 v1.6 — approved variant |
-| DESIGN.md v3.0 updates | 6 changes from design review (Metis analysis) | 🆕 v1.6 — planned |
+| Similar paddles via pgvector | Already have `_get_similar_paddle_ids()` in RAG Agent | ✓ Minimal code needed |
+| Price alerts table | New DB table, simple CRUD | 🆕 v1.7 — planned |
+| Affiliate tracking via POST | Replace console.log with DB insert | 🆕 v1.7 — planned |
 
-## Current Milestone: v1.6 UI Redesign
+## Current Milestone: v1.7.0 Backend API Updates
 
-**Goal:** Implement the winning design variants from the 9-variant design review (2026-04-05). Redesign Home, Catalog, and Chat screens to maximize funnel conversion and cross-screen coherence.
-
-**Design review source:** `~/.gstack/projects/diegopereira93-picklepicker/designs/all-screens-20260405/`
-
-**Winning combination:**
-- **Home**: C (Quiz-Forward) + data stats from A — quiz above-the-fold captures intent immediately
-- **Catalog**: A (Comparison Table) + product images from B + grid toggle — sortable data for analytical persona
-- **Chat**: B (Sidebar Companion) + card responses from C — split-panel keeps buy button accessible
+**Goal:** Add 4 backend endpoints required by the frontend redesign (v2.1.0). Support similar paddles on product detail, price alerts modal, affiliate click tracking, and quiz profile persistence.
 
 **Target features:**
-- DESIGN.md v3.0 with 6 proposed updates (chat UI, semantic colors, border radius, widgets, max-width, full-dark sections)
-- Home page redesigned with quiz widget above-the-fold
-- Chat redesigned with sidebar companion layout + card-structured AI responses
-- Catalog redesigned with comparison table + visual grid toggle
-- Cross-screen coherence (consistent visual language, shared components)
+1. `GET /paddles/{id}/similar` — Product detail shows similar paddles (currently placeholder)
+2. `POST /price-alerts` — Price alerts modal posts to backend (currently 404)
+3. `POST /api/affiliate-clicks` — Affiliate tracking logs to DB (currently console.log only)
+4. `POST/GET /quiz/profile` — Quiz profile persistence across devices (optional)
 
-**Implementation order:** DESIGN.md → Home-C → Chat-B → Catalog-A → Polish
+**Implementation order:** Similar Paddles → Price Alerts → Affiliate Tracking → Quiz Persistence
 
 ## Evolution
 
@@ -105,4 +97,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-05 — v1.6.0 UI Redesign milestone created from design review*
+*Last updated: 2026-04-07 — v1.7.0 Backend API Updates milestone created from frontend redesign integration needs*

@@ -216,7 +216,7 @@ export default function QuizResultsPage() {
             Nenhuma raquete encontrada para seu nivel.
           </p>
           <Link
-            href="/paddles"
+            href="/catalog"
             className="wg-button-coral inline-block px-6 py-2"
           >
             VER CATALOGO COMPLETO
@@ -232,7 +232,7 @@ export default function QuizResultsPage() {
           Falar com nossa IA
         </Link>
         <Link
-          href="/paddles"
+          href="/catalog"
           className="wg-button-ghost inline-flex items-center justify-center px-6 py-2.5 rounded hover:text-[#F97316] transition-colors"
         >
           Ver catalogo completo

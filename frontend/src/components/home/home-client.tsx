@@ -120,7 +120,7 @@ export function HomeClient() {
                     <Link href="/chat">Falar com o PickleIQ</Link>
                   </Button>
                   <Button asChild variant="outline" size="lg" className="wg-button-outline">
-                    <Link href="/paddles">Ver catalogo</Link>
+                    <Link href="/catalog">Ver catalogo</Link>
                   </Button>
                 </div>
               </div>
@@ -185,7 +185,7 @@ export function HomeClient() {
             </h2>
             
             <div className="flex items-center gap-2 mb-8">
-              <Link href="/paddles" className="text-sm font-semibold text-coral-600 hover:text-coral-700 transition-colors">
+              <Link href="/catalog" className="text-sm font-semibold text-coral-600 hover:text-coral-700 transition-colors">
                 Ver todas →
               </Link>
             </div>

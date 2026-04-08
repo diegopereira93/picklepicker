@@ -193,6 +193,119 @@
 
 ---
 
+## Milestone v1.7.0 — Backend API for Frontend Redesign
+
+**Goal:** Add 4 backend endpoints required by frontend redesign v2.1.0. Support similar paddles on product detail, price alerts modal, affiliate click tracking, and quiz profile persistence.
+
+| # | Phase | Goal | Requirements | Success Criteria |
+|---|-------|------|--------------|------------------|
+| 20 | Similar Paddles Endpoint | Expose existing RAG `_get_similar_paddle_ids()` as API | SIM-01–03 | 3 |
+| 21 | Price Alerts CRUD | Create price_alerts table + POST endpoint for modal | PRICE-01–04 | 4 |
+| 22 | Affiliate Tracking | POST endpoint to log clicks to DB | AFF-01–03 | 3 |
+| 23 | Quiz Profile Persistence | POST/GET endpoints for cross-device profile | QUIZ-01–03 | 3 |
+
+### Phase 20: Similar Paddles Endpoint
+
+**Goal:** Expose the existing RAG Agent method `_get_similar_paddle_ids()` as a REST API endpoint for product detail pages.
+
+**Root causes:**
+1. Frontend product detail page shows "Similar Paddles" placeholder — data exists in RAG agent but not exposed via API.
+2. RAG Agent already has `_get_similar_paddle_ids()` method that returns paddle IDs for semantic similarity.
+3. No endpoint exists at `/paddles/{id}/similar` despite frontend calling it.
+
+**Tasks:**
+
+| Task | File(s) | Description |
+|------|---------|-------------|
+| 20.1 | `backend/app/api/paddles.py` | Add `GET /paddles/{id}/similar` endpoint. Accept `limit` query param (default 5, max 10). Call `rag_agent._get_similar_paddle_ids()` with paddle ID. Return JSON array of paddle objects (not just IDs — full paddle data including price, specs, image). |
+| 20.2 | `backend/tests/test_paddles_api.py` | Add tests: (a) Existing paddle returns 200 with similar paddles array, (b) Non-existent paddle returns 404, (c) Limit param works, (d) Similar paddles have required fields (name, brand, price, specs, image_url, affiliate_url). |
+| 20.3 | `backend/app/schemas.py` | Verify `PaddleSimilarResponse` schema exists (or create if missing). Must include all fields returned by endpoint. |
+
+**Success criteria:**
+1. `GET /paddles/123/similar?limit=5` returns 200 with array of paddle objects
+2. Similar paddles exclude the queried paddle (no self-reference)
+3. All tests pass (backend 174+)
+
+---
+
+### Phase 21: Price Alerts CRUD
+
+**Goal:** Create database table and POST endpoint for price alerts modal. Users can subscribe to price drop notifications.
+
+**Root causes:**
+1. Frontend has price alerts modal UI — posts to `/price-alerts` but backend returns 404.
+2. Worker `price_alert_check.py` exists but has no data to process (no alerts table).
+3. No persistence mechanism for user alert subscriptions.
+
+**Tasks:**
+
+| Task | File(s) | Description |
+|------|---------|-------------|
+| 21.1 | `pipeline/db/schema.sql` | Add `price_alerts` table: `id SERIAL PRIMARY KEY`, `paddle_id INT REFERENCES paddles(id)`, `target_price DECIMAL(10,2)`, `email VARCHAR(255)`, `created_at TIMESTAMP DEFAULT NOW()`, `notified_at TIMESTAMP NULL`. Add index on `paddle_id, target_price`. |
+| 21.2 | `backend/app/api/price_alerts.py` (new) | Create `POST /price-alerts` endpoint. Accept JSON body: `{paddle_id, target_price, email}`. Validate email format, paddle exists, target_price > 0. Insert into `price_alerts` table. Return 201 with alert object. |
+| 21.3 | `backend/app/schemas.py` | Add `PriceAlertCreate` and `PriceAlertResponse` schemas. |
+| 21.4 | `backend/tests/test_price_alerts_api.py` (new) | Add tests: (a) Valid alert creates successfully, (b) Invalid email returns 422, (c) Non-existent paddle returns 404, (d) Duplicate alert (same email + paddle + price) returns 409 Conflict. |
+| 21.5 | `backend/app/main.py` | Register `/price-alerts` router. |
+
+**Success criteria:**
+1. `POST /price-alerts` creates alert and returns 201
+2. Duplicate alerts return 409 Conflict (not duplicate insert)
+3. Worker can query table: `SELECT * FROM price_alerts WHERE notified_at IS NULL`
+4. All tests pass (backend 174+)
+
+---
+
+### Phase 22: Affiliate Click Tracking
+
+**Goal:** Replace frontend console.log affiliate tracking with database persistence for analytics.
+
+**Root causes:**
+1. Frontend logs affiliate clicks to console — no server-side tracking.
+2. No analytics on which retailers/paddles generate most clicks.
+3. Affiliate revenue optimization requires click data.
+
+**Tasks:**
+
+| Task | File(s) | Description |
+|------|---------|-------------|
+| 22.1 | `pipeline/db/schema.sql` | Add `affiliate_clicks` table: `id SERIAL PRIMARY KEY`, `paddle_id INT REFERENCES paddles(id)`, `retailer_id INT REFERENCES retailers(id)`, `clicked_at TIMESTAMP DEFAULT NOW()`, `session_id VARCHAR(255)`, `user_agent TEXT`. Add index on `paddle_id, clicked_at`. |
+| 22.2 | `backend/app/routers/affiliate.py` | Add `POST /api/affiliate-clicks` endpoint. Accept JSON body: `{paddle_id, retailer_id, session_id?, user_agent?}`. Insert into `affiliate_clicks`. Return 204 No Content. |
+| 22.3 | `backend/tests/test_affiliate_api.py` | Add tests: (a) Valid click logs successfully, (b) Optional fields accepted, (c) Non-existent paddle returns 404, (d) Non-existent retailer returns 404. |
+
+**Success criteria:**
+1. `POST /api/affiliate-clicks` logs click to database
+2. Clicks can be queried for analytics: `SELECT paddle_id, COUNT(*) FROM affiliate_clicks GROUP BY paddle_id`
+3. All tests pass (backend 174+)
+
+---
+
+### Phase 23: Quiz Profile Persistence (Optional)
+
+**Goal:** Persist quiz answers across devices/sessions via POST/GET endpoints.
+
+**Root causes:**
+1. Quiz answers stored in localStorage — lost on device switch.
+2. No cross-device profile for returning users.
+3. Chat endpoint accepts `user_profile` but frontend has no way to persist it server-side.
+
+**Tasks:**
+
+| Task | File(s) | Description |
+|------|---------|-------------|
+| 23.1 | `pipeline/db/schema.sql` | Add `quiz_profiles` table: `id SERIAL PRIMARY KEY`, `profile_id VARCHAR(255) UNIQUE`, `skill_level VARCHAR(50)`, `budget_brl DECIMAL(10,2)`, `style VARCHAR(50)`, `created_at TIMESTAMP DEFAULT NOW()`, `updated_at TIMESTAMP DEFAULT NOW()`. Add index on `profile_id`. |
+| 23.2 | `backend/app/api/quiz.py` (new) | Create `POST /quiz/profile` endpoint (create/update) and `GET /quiz/profile/{profile_id}` endpoint (read). Accept/return JSON body matching `{skill_level, budget_brl, style}`. Return 200 with profile object. |
+| 23.3 | `backend/app/schemas.py` | Add `QuizProfileRequest` and `QuizProfileResponse` schemas. |
+| 23.4 | `backend/tests/test_quiz_api.py` (new) | Add tests: (a) POST creates new profile, (b) POST updates existing profile, (c) GET returns profile or 404, (d) Invalid skill_level returns 422. |
+| 23.5 | `backend/app/main.py` | Register `/quiz` router. |
+
+**Success criteria:**
+1. `POST /quiz/profile` creates/updates profile and returns 200
+2. `GET /quiz/profile/{profile_id}` returns profile or 404
+3. Profile persists across sessions/devices
+4. All tests pass (backend 174+)
+
+---
+
 ## Deferred Milestones (Planned, Not Started)
 
 ### v1.5.0 — Production Readiness
