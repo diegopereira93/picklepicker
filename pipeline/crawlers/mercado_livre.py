@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+import re
 import httpx
 from tenacity import (
     retry,
@@ -15,6 +16,20 @@ from pipeline.utils.security import scrub_sensitive_data, SensitiveDataFilter
 
 logger = logging.getLogger(__name__)
 logger.addFilter(SensitiveDataFilter())
+
+
+def normalize_paddle_name(name: str) -> str:
+    if not name:
+        return ""
+    normalized = name.lower().strip()
+    normalized = re.sub(r'\s+', ' ', normalized)
+    for prefix in ['raquete ', 'raquete']:
+        if normalized.startswith(prefix):
+            normalized = normalized[len(prefix):].strip()
+    for old in ['pickleball', 'de pickleball', 'para pickleball']:
+        normalized = normalized.replace(old, '')
+    normalized = re.sub(r'\s+', ' ', normalized).strip()
+    return normalized
 
 ML_SEARCH_URL = "https://api.mercadolibre.com/sites/MLB/search"
 MAX_ITEMS = 1000  # Prevent unbounded memory growth
@@ -138,14 +153,13 @@ async def save_ml_items_to_db(items: list[dict], affiliate_tag: str, conn) -> in
             )
             continue
 
-        title = item.get("title", "")
+        raw_title = item.get("title", "")
+        title = normalize_paddle_name(raw_title)
         permalink = item.get("permalink", "")
         affiliate_url = build_affiliate_url(permalink, affiliate_tag)
         
-        # Extract image URL - prefer official_image_url if available, fallback to thumbnail
         image_url = item.get("official_image_url") or item.get("thumbnail", "")
 
-        # Atomic upsert: insert or update, always return id
         result = await conn.execute(
             """
             INSERT INTO paddles (name, brand, model, images, image_url)

@@ -15,6 +15,20 @@ logger.addFilter(SensitiveDataFilter())
 
 DROPSHOT_BRASIL_URL = "https://www.dropshotbrasil.com.br/raquetes"
 
+
+def normalize_paddle_name(name: str) -> str:
+    if not name:
+        return ""
+    normalized = name.lower().strip()
+    normalized = re.sub(r'\s+', ' ', normalized)
+    for prefix in ['raquete ', 'raquete']:
+        if normalized.startswith(prefix):
+            normalized = normalized[len(prefix):].strip()
+    for old in ['pickleball', 'de pickleball', 'para pickleball']:
+        normalized = normalized.replace(old, '')
+    normalized = re.sub(r'\s+', ' ', normalized).strip()
+    return normalized
+
 FIRECRAWL_SCHEMA = {
     "type": "object",
     "properties": {
@@ -122,7 +136,8 @@ async def save_products_to_db(products: list[dict], retailer_id: int, conn) -> i
             )
             continue
 
-        name = product.get("name", "")
+        raw_name = product.get("name", "")
+        name = normalize_paddle_name(raw_name)
         brand = product.get("brand", "")
         image_url = product.get("image_url", "")
 
@@ -177,30 +192,23 @@ async def save_products_to_db(products: list[dict], retailer_id: int, conn) -> i
 
 
 def validate_image_belongs_to_product(image_url: str, product_name: str) -> bool:
-    """Validate that an image URL likely belongs to the specified product.
-
-    Returns True if the image is likely correct, False if uncertain.
-    Handles both descriptive URLs and UUID-based CDN filenames.
-    """
     if not image_url or not product_name:
         return False
 
-    skip_words = {'the', 'and', 'or', 'de', 'do', 'da', 'em', 'um', 'uma'}
+    skip_words = {'the', 'and', 'or', 'de', 'do', 'da', 'em', 'um', 'uma', 'raquete', 'pickleball'}
     keywords = [w.lower() for w in product_name.split() if w.lower() not in skip_words and len(w) > 2]
-
+    
     image_lower = image_url.lower()
     matching_keywords = [kw for kw in keywords if kw in image_lower]
-
     if matching_keywords:
         return True
-
-    # UUID-based CDN URLs won't contain product name keywords.
-    # Accept if URL is from a known product CDN and has a valid image extension.
+    
     cdn_domains = ['mitiendanube.com', 'cloudfront.net', 'amazonaws.com', 'dropshotbrasil.com.br']
     has_valid_extension = any(ext in image_lower for ext in ['.jpg', '.jpeg', '.png', '.webp'])
     is_known_cdn = any(domain in image_lower for domain in cdn_domains)
-
-    return is_known_cdn and has_valid_extension
+    has_reasonable_length = len(image_url) > 60
+    
+    return is_known_cdn and has_valid_extension and has_reasonable_length
 
 
 async def run_dropshot_brasil_crawler(app: FirecrawlApp | None = None) -> int:

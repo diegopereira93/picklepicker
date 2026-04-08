@@ -123,7 +123,7 @@ async def list_paddles(
                 FROM paddles p
                 LEFT JOIN paddle_specs ps ON p.id = ps.paddle_id
                 WHERE {where}
-                ORDER BY p.created_at DESC
+                ORDER BY p.name ASC, p.id ASC
                 LIMIT %s OFFSET %s
             """
             await cur.execute(data_query, params + [limit, offset])
