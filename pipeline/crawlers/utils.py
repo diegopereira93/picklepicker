@@ -5,36 +5,20 @@ import unicodedata
 
 
 def normalize_paddle_name(name: str) -> str:
-    """Normaliza nomes de raquetes para matching consistente.
-    
-    Remove acentos, converte para minúsculas, remove palavras irrelevantes
-    e normaliza espaços para garantir consistência entre fontes.
-    """
     if not name:
         return ""
     
-    # Remove acentos
     normalized = ''.join(
         c for c in unicodedata.normalize('NFD', name)
         if unicodedata.category(c) != 'Mn'
     )
-    
-    # Converte para minúsculas e trim
     normalized = normalized.lower().strip()
     
-    # Remove palavras irrelevantes e prefixos
     stop_words = {'raquete', 'raquetes', 'de', 'pickleball', 'para', 
                   'com', 'sem', 'the', 'and', 'or'}
     words = [w for w in normalized.split() if w not in stop_words]
     normalized = ' '.join(words)
-    
-    # Remove caracteres especiais mantendo apenas alfanuméricos, espaços e hífens
-    normalized = re.sub(r'[^a-z0-9\s-]', '', normalized)
-    
-    # Normaliza versões (v2 -> v2, v.2 -> v2)
-    normalized = re.sub(r'\bv\.?\s*(\d+)\b', r'v\1', normalized)
-    
-    # Remove espaços extras
+    normalized = re.sub(r'[^a-z0-9\s-]', ' ', normalized)
     normalized = re.sub(r'\s+', ' ', normalized).strip()
     
     return normalized
@@ -86,7 +70,8 @@ def validate_image_belongs_to_product(image_url: str, product_name: str) -> bool
     # Para URLs de CDN conhecidos sem palavras-chave, valida por domínio
     cdn_domains = [
         'mitiendanube.com', 'cloudfront.net', 'amazonaws.com',
-        'dropshotbrasil.com.br', 'mercadolivre.com', 'mlcdn.com'
+        'dropshotbrasil.com.br', 'mercadolivre.com', 'mlcdn.com',
+        'cdn.', 'images.', 'img.', 'products.', 'produtos.'
     ]
     is_known_cdn = any(domain in url_lower for domain in cdn_domains)
     
