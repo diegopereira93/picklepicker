@@ -3,9 +3,19 @@
 ## Current Position
 
 Milestone: v1.7.0 — Backend API for Frontend Redesign
-Phase: 21 — Price Alerts CRUD (in planning)
-Status: Planning complete, awaiting `/gsd/plan-phase 20` to begin execution
-Last activity: 2026-04-07 — Phase 20 committed, Phase 21 planning complete
+Phase: 21 — Price Alerts CRUD
+Status: Planning complete, awaiting `/gsd:execute-phase 21` to begin execution
+Last activity: 2026-04-08 — Documentation cleanup: Phases 16-20 marked complete
+
+## Recently Completed
+
+| Phase | Description | Date | Commit |
+|-------|-------------|------|--------|
+| 16 | DESIGN.md v3.0 + Foundation | 2026-04-05 | 6853154 |
+| 17 | Home-C Quiz-Forward | 2026-04-05 | 6853154 |
+| 18 | Chat-B Sidebar Companion | 2026-04-05 | 6853154 |
+| 19 | Catalog-A Comparison Table | 2026-04-05 | 6853154 |
+| 20 | Similar Paddles Endpoint | 2026-04-07 | ccfd7c7 |
 
 ## Project Reference
 

@@ -103,18 +103,19 @@ export function Header() {
         </nav>
 
         <div className="hidden md:flex items-center space-x-2 ml-auto">
-          <Button asChild size="sm" variant="default">
-            <Link href="/quiz">Encontrar raquete</Link>
-          </Button>
+          <Link
+            href="/quiz"
+            className="inline-flex h-8 shrink-0 items-center justify-center rounded-lg bg-primary px-2.5 text-sm font-medium text-primary-foreground whitespace-nowrap transition-all outline-none select-none hover:bg-primary/80 focus-visible:ring-2 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50"
+          >
+            Encontrar raquete
+          </Link>
           {clerkAvailable && <AuthButtons />}
         </div>
 
         <div className="md:hidden flex ml-auto">
           <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Abrir menu">
-                <Menu className="h-5 w-5 text-text-primary" />
-              </Button>
+            <SheetTrigger variant="ghost" size="icon" aria-label="Abrir menu">
+              <Menu className="h-5 w-5 text-text-primary" />
             </SheetTrigger>
             <SheetContent side="right" className="bg-surface border-border">
               <SheetHeader>

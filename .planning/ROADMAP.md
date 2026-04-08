@@ -56,9 +56,11 @@
 
 ---
 
-## Milestone v1.6.0 — UI Redesign (Design Review Implementation)
+## Milestone v1.6.0 — UI Redesign (Design Review Implementation) ✅ COMPLETE
 
 **Goal:** Implement the winning design variants from the 9-variant design review (2026-04-05). Redesign Home, Catalog, and Chat screens to maximize funnel conversion.
+
+**Status:** Complete — All phases executed (2026-04-05)
 
 **Design review source:** `~/.gstack/projects/diegopereira93-picklepicker/designs/all-screens-20260405/`
 
@@ -67,12 +69,14 @@
 - Catalog: A (Comparison Table) + product images from B + grid toggle
 - Chat: B (Sidebar Companion) + card responses from C
 
-| # | Phase | Goal | Requirements | Success Criteria |
-|---|-------|------|--------------|------------------|
-| 16 | DESIGN.md v3.0 + Foundation | Update design system with 6 proposed changes, add chat/widget sections | DS-01–05 | All new tokens defined, new sections documented |
-| 17 | Home-C Quiz-Forward | Quiz widget above-the-fold, data stats, feature steps | HOME-01–05 | Quiz completes → recommendation card shows → "Ver detalhes" works |
-| 18 | Chat-B Sidebar Companion | Split-panel layout, card responses, product sidebar | CHAT-01–06 | Buy button visible during chat, card responses render |
-| 19 | Catalog-A Comparison Table | Sortable table, visual grid toggle, score badges | CAT-01–06, COH-01–04, QA-01–06 | Table sorts, toggle works, responsive passes |
+| # | Phase | Goal | Requirements | Status |
+|---|---|-------|------|--------------|
+| 16 | DESIGN.md v3.0 + Foundation | Update design system with 6 proposed changes, add chat/widget sections | DS-01–05 | ✅ Complete |
+| 17 | Home-C Quiz-Forward | Quiz widget above-the-fold, data stats, feature steps | HOME-01–05 | ✅ Complete |
+| 18 | Chat-B Sidebar Companion | Split-panel layout, card responses, product sidebar | CHAT-01–06 | ✅ Complete |
+| 19 | Catalog-A Comparison Table | Sortable table, visual grid toggle, score badges | CAT-01–06, COH-01–04, QA-01–06 | ✅ Complete |
+
+**Commit:** 6853154 — Phases 16-19 implemented together
 
 ### Phase 16: DESIGN.md v3.0 + Foundation
 
@@ -197,16 +201,19 @@
 
 **Goal:** Add 4 backend endpoints required by frontend redesign v2.1.0. Support similar paddles on product detail, price alerts modal, affiliate click tracking, and quiz profile persistence.
 
-| # | Phase | Goal | Requirements | Success Criteria |
-|---|-------|------|--------------|------------------|
-| 20 | Similar Paddles Endpoint | Expose existing RAG `_get_similar_paddle_ids()` as API | SIM-01–03 | 3 |
-| 21 | Price Alerts CRUD | Create price_alerts table + POST endpoint for modal | PRICE-01–04 | 4 |
-| 22 | Affiliate Tracking | POST endpoint to log clicks to DB | AFF-01–03 | 3 |
-| 23 | Quiz Profile Persistence | POST/GET endpoints for cross-device profile | QUIZ-01–03 | 3 |
+| # | Phase | Goal | Requirements | Status |
+|---|---|-------|------|--------------|
+| 20 | Similar Paddles Endpoint | Expose existing RAG `_get_similar_paddle_ids()` as API | SIM-01–03 | ✅ Complete |
+| 21 | Price Alerts CRUD | Create price_alerts table + POST endpoint for modal | PRICE-01–04 | 📋 Planning (Current) |
+| 22 | Affiliate Tracking | POST endpoint to log clicks to DB | AFF-01–03 | 📋 Not Started |
+| 23 | Quiz Profile Persistence | POST/GET endpoints for cross-device profile | QUIZ-01–03 | 📋 Not Started |
 
-### Phase 20: Similar Paddles Endpoint
+### Phase 20: Similar Paddles Endpoint ✅ COMPLETE
 
 **Goal:** Expose the existing RAG Agent method `_get_similar_paddle_ids()` as a REST API endpoint for product detail pages.
+
+**Status:** Complete — 2026-04-07  
+**Commit:** ccfd7c7
 
 **Root causes:**
 1. Frontend product detail page shows "Similar Paddles" placeholder — data exists in RAG agent but not exposed via API.
@@ -338,5 +345,5 @@ See existing v1.5 roadmap for full details.
 | Affiliate disclosure | Required by BR consumer law | P1 (external) |
 
 ---
-*Roadmap created: 2026-04-05*
-*Last updated: 2026-04-05 — v1.6.0 UI Redesign phases 16-19 added*
+*Roadmap created: 2026-04-05*  
+*Last updated: 2026-04-08 — Phases 16-20 marked complete, Phase 21 current*

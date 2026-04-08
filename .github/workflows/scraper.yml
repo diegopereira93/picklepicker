@@ -6,7 +6,7 @@ on:
     - cron: '0 2 * * *'
     - cron: '5 2 * * *'
     - cron: '10 2 * * *'
-  workflow_dispatch:  # Manual trigger
+  workflow_dispatch:
 
 jobs:
   crawl:
@@ -21,10 +21,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python 3.11
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
           cache: 'pip'
 
       - name: Install dependencies
@@ -35,7 +35,6 @@ jobs:
 
       - name: Add jitter delay
         run: |
-          # Random sleep 0-120 seconds to prevent thundering herd
           echo "Adding jitter delay to prevent resource contention..."
           sleep $((RANDOM % 120))
 
@@ -46,51 +45,51 @@ jobs:
           max_attempts: 3
           retry_on: error
           command: |
-            echo "Running Brazil Store crawler (attempt $GITHUB_RUN_ATTEMPT)..."
+            echo "Running Brazil Store crawler..."
             python -m pipeline.crawlers.brazil_store
-            echo "Running Mercado Livre crawler (attempt $GITHUB_RUN_ATTEMPT)..."
+            echo "Running Mercado Livre crawler..."
             python -m pipeline.crawlers.mercado_livre
-            echo "Running Dropshot Brasil crawler (attempt $GITHUB_RUN_ATTEMPT)..."
+            echo "Running Dropshot Brasil crawler..."
             python -m pipeline.crawlers.dropshot_brasil
 
       - name: Verify crawl results
         run: |
           python -c "
-import asyncio
-from pipeline.db.connection import get_pool
+          import asyncio
+          from pipeline.db.connection import get_pool
 
-async def count_paddles():
-    try:
-        pool = await get_pool()
-        async with pool.acquire() as conn:
-            result = await conn.fetchval('SELECT COUNT(*) FROM paddles')
-            print(f'Total paddles indexed: {result}')
-            if result < 200:
-                print(f'WARNING: Expected >= 200 paddles, got {result}')
-    except Exception as e:
-        print(f'Database check failed: {e}')
+          async def count_paddles():
+              try:
+                  pool = await get_pool()
+                  async with pool.acquire() as conn:
+                      result = await conn.fetchval('SELECT COUNT(*) FROM paddles')
+                      print(f'Total paddles indexed: {result}')
+                      if result < 200:
+                          print(f'WARNING: Expected >= 200 paddles, got {result}')
+              except Exception as e:
+                  print(f'Database check failed: {e}')
 
-asyncio.run(count_paddles())
+          asyncio.run(count_paddles())
           "
 
       - name: Check data freshness
         if: always()
         run: |
           python -c "
-import asyncio
-import sys
-from pipeline.alerts.freshness import check_data_freshness
+          import asyncio
+          import sys
+          from pipeline.alerts.freshness import check_data_freshness
 
-async def main():
-    results = await check_data_freshness()
-    stale_sources = [s for s, fresh in results.items() if not fresh]
-    if stale_sources:
-        print(f'WARNING: Stale data detected for: {stale_sources}')
-        sys.exit(0)  # Don't fail workflow, just alert
-    else:
-        print('All data sources are fresh')
+          async def main():
+              results = await check_data_freshness()
+              stale_sources = [s for s, fresh in results.items() if not fresh]
+              if stale_sources:
+                  print(f'WARNING: Stale data detected for: {stale_sources}')
+                  sys.exit(0)
+              else:
+                  print('All data sources are fresh')
 
-asyncio.run(main())
+          asyncio.run(main())
           "
         continue-on-error: true
 

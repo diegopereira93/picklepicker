@@ -56,6 +56,29 @@ PickleIQ resolve ambos os problemas:
 
 A plataforma é desenvolvida em fases organizadas em milestones:
 
+### v2.1.0 — Premium Sports Analytics Redesign (2026-04-07)
+
+| Fase | Objetivo | Status |
+|------|----------|--------|
+| **16** | DESIGN.md v5.0 + Foundation — dark-only design system, tokens, animations | ✅ Concluído |
+| **17** | Home-C Quiz-Forward — quiz above-the-fold, data stats, trust signals | ✅ Concluído |
+| **18** | Chat-B Sidebar Companion — split-panel, product sidebar, card responses | ✅ Concluído |
+| **19** | Catalog-A Comparison Table — sortable table, grid toggle, filters | ✅ Concluído |
+| **20** | Similar Paddles Endpoint — GET /paddles/{id}/similar API | ✅ Concluído |
+| **21** | Price Alerts CRUD — database + POST endpoint for price alerts | 📋 Pendente |
+
+### v2.0.0 — Warm Guide Redesign (2026-04-06)
+
+| Fase | Objetivo | Status |
+|------|----------|--------|
+| **—** | Light-first "Warm Guide" aesthetic, coral accents, full dark mode toggle | ✅ Concluído |
+
+### v1.6.0 — NVIDIA Design System (2026-04-05)
+
+| Fase | Objetivo | Status |
+|------|----------|--------|
+| **—** | Hybrid Modern Sports Tech v2.0 with NVIDIA-inspired UI | ✅ Concluído |
+
 ### v1.4 — Launch Readiness & Bug Fixes (2026-04-04)
 
 | Fase | Objetivo | Status |
@@ -93,7 +116,7 @@ A plataforma é desenvolvida em fases organizadas em milestones:
 | **5** | Autenticação Clerk, SEO, alertas de preço, blog, admin | ✅ Concluído |
 | **6** | Deploy produção, beta launch com 50 usuários | ✅ Concluído |
 
-**Status atual:** v1.3 Hybrid UI Redesign completo.
+**Status atual:** v2.1.0 Premium Sports Analytics — redesign completo, Phase 21 (Price Alerts) pendente.
 
 ---
 
@@ -279,7 +302,11 @@ picklepicker/
 
 ## Próximas Ações
 
-v1.4 Launch Readiness completo. Planejando v1.5 — Production Readiness (infra, legal, reliability).
+v2.1.0 Redesign completo. Próximos passos:
+1. Phase 21: Price Alerts CRUD — endpoint POST /price-alerts
+2. Phase 22: Affiliate Click Tracking — persistir clicks no banco
+3. Phase 23: Quiz Profile Persistence — cross-device (opcional)
+4. v1.5 Production Readiness — infra, legal, reliability (deferred)
 
 ---
 
@@ -289,5 +316,5 @@ v1.4 Launch Readiness completo. Planejando v1.5 — Production Readiness (infra,
 
 ---
 
-**Status do Projeto:** v1.4.0 — 5 milestones entregues
-**Última atualização:** 2026-04-05
+**Status do Projeto:** v2.1.0 — 7 milestones entregues, v1.7.0 em progresso
+**Última atualização:** 2026-04-08
