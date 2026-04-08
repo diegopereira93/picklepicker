@@ -1,189 +1,112 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
-import type { UserProfile } from '@/types/paddle'
-import { getProfile, saveProfile } from '@/lib/profile'
-import type { Paddle, ChatRecommendation } from '@/types/paddle'
-import { fetchPaddles, fetchPaddle } from '@/lib/api'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { Menu } from 'lucide-react'
+import { loadQuizProfile, clearQuizProfile, type QuizProfile } from '@/lib/quiz-profile'
+import { PlayerProfileSidebar } from '@/components/ui/player-profile-sidebar'
 import dynamic from 'next/dynamic'
-const QuizFlow = dynamic(
-  () => import('@/components/quiz/quiz-flow').then((mod) => mod.QuizFlow),
-  {
-    loading: () => (
-      <div className="animate-pulse space-y-4">
-        <div className="h-4 bg-muted rounded w-3/4"></div>
-        <div className="h-10 bg-muted rounded"></div>
-      </div>
-    ),
-  }
-)
 
 const ChatWidget = dynamic(
   () => import('@/components/chat/chat-widget').then((mod) => mod.ChatWidget),
-  {
-    loading: () => (
-      <div className="animate-pulse space-y-4 p-4">
-        <div className="h-12 bg-muted rounded"></div>
-        <div className="h-12 bg-muted rounded"></div>
-        <div className="h-12 bg-muted rounded"></div>
-      </div>
-    ),
-  }
-)
-
-const SidebarProductCard = dynamic(
-  () => import('@/components/chat/sidebar-product-card').then((mod) => mod.SidebarProductCard),
-  { loading: () => <div className="animate-pulse"><div className="h-[400px]" style={{ backgroundColor: 'var(--color-gray-border)' }} /></div> }
-)
-
-const RelatedPaddles = dynamic(
-  () => import('@/components/chat/related-paddles').then((mod) => mod.RelatedPaddles),
-  { loading: () => <div className="animate-pulse flex gap-3"><div className="h-24 w-32" style={{ backgroundColor: 'var(--color-gray-border)' }} /></div> }
+  { loading: () => <div className="flex-1 bg-base animate-pulse" /> }
 )
 
 export default function ChatPage() {
-  const [profile, setProfile] = useState<UserProfile | null>(null)
-  const [editingProfile, setEditingProfile] = useState(false)
+  const router = useRouter()
+  const [profile, setProfile] = useState<QuizProfile | null>(null)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const [hydrated, setHydrated] = useState(false)
-  const [selectedPaddle, setSelectedPaddle] = useState<Paddle | null>(null)
-  const [selectedScore, setSelectedScore] = useState<number | undefined>(undefined)
-  const [selectedAffiliateUrl, setSelectedAffiliateUrl] = useState<string | undefined>(undefined)
-  const [relatedPaddles, setRelatedPaddles] = useState<Paddle[]>([])
 
   useEffect(() => {
-    setProfile(getProfile())
+    setProfile(loadQuizProfile())
     setHydrated(true)
   }, [])
 
-  function handleQuizComplete(p: UserProfile) {
-    saveProfile(p)
-    setProfile(p)
-    setEditingProfile(false)
+  function handleEditProfile() {
+    router.push('/quiz')
   }
 
-  const handleRecommendations = useCallback(async (recs: ChatRecommendation[]) => {
-    if (recs.length === 0) return
-    const rec = recs[0]
-    setSelectedScore(rec.similarity_score)
-    setSelectedAffiliateUrl(rec.affiliate_url)
-    try {
-      const fullPaddle = await fetchPaddle(rec.paddle_id)
-      if (fullPaddle) {
-        setSelectedPaddle(fullPaddle)
-      }
-    } catch (err) {
-      console.error('[fetchPaddle] failed:', err)
-      setSelectedPaddle({
-        id: rec.paddle_id,
-        name: rec.name,
-        brand: rec.brand,
-        price_min_brl: rec.price_min_brl,
-      })
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!selectedPaddle) return
-    async function fetchRelated() {
-      try {
-        const result = await fetchPaddles({ limit: 10 })
-        const related = result.items.filter(p => p.id !== selectedPaddle.id).slice(0, 4)
-        setRelatedPaddles(related)
-      } catch (err) {
-        console.error('[fetchRelated] failed:', err)
-      }
-    }
-    fetchRelated()
-  }, [selectedPaddle])
+  function handleStartOver() {
+    clearQuizProfile()
+    setProfile(null)
+    router.push('/quiz')
+  }
 
   if (!hydrated) return null
 
-  if (!profile || editingProfile) {
+  if (!profile) {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center bg-background px-4">
-        <div className="w-full max-w-md">
-          <h1 className="text-2xl font-bold text-center mb-2" data-theme="dark">PickleIQ</h1>
-          <p className="text-muted-foreground text-center mb-8">
-            Vamos encontrar a raquete perfeita para voce
+      <main className="min-h-screen bg-base flex flex-col items-center justify-center px-4">
+        <div className="text-center max-w-md">
+          <h1 className="font-display text-3xl text-text-primary tracking-wide mb-4">PICKLEIQ</h1>
+          <p className="font-sans text-text-secondary mb-8">
+            Precisamos conhecer seu perfil para recomendar as melhores raquetes.
           </p>
-          <QuizFlow
-            onComplete={handleQuizComplete}
-            onEditCancel={editingProfile ? () => setEditingProfile(false) : undefined}
-            editMode={editingProfile}
-          />
+          <button
+            type="button"
+            onClick={() => router.push('/quiz')}
+            className="px-8 py-3 bg-brand-primary text-base font-semibold rounded-rounded hover:shadow-glow-green transition-all"
+          >
+            Fazer Quiz
+          </button>
         </div>
       </main>
     )
   }
 
   return (
-    <main 
-      className="h-screen flex flex-col" 
-      data-theme="dark"
-      style={{ backgroundColor: 'var(--color-near-black)' }}
-    >
-      <header className="border-b px-4 py-3 flex items-center justify-between"
-              data-theme="dark"
-              style={{ borderColor: 'var(--color-gray-border)', backgroundColor: 'var(--color-near-black)' }}>
-        <h1 className="font-bold text-lg" style={{ color: 'var(--color-white)' }}>PickleIQ</h1>
-        <button
-          type="button"
-          onClick={() => setEditingProfile(true)}
-          className="text-sm underline transition-colors"
-          style={{ color: 'var(--color-gray-300)' }}
-          onMouseEnter={(e) => { (e.target as HTMLElement).style.color = 'var(--color-white)' }}
-          onMouseLeave={(e) => { (e.target as HTMLElement).style.color = 'var(--color-gray-300)' }}
-        >
-          Editar perfil
-        </button>
-      </header>
+    <main className="h-screen bg-base flex overflow-hidden">
+      <div className="hidden md:block">
+        <PlayerProfileSidebar
+          profile={profile}
+          onEditProfile={handleEditProfile}
+          onStartOver={handleStartOver}
+        />
+      </div>
 
-      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
-        <aside className="lg:w-[55%] h-[50vh] lg:h-full overflow-y-auto p-4 lg:p-6 border-b lg:border-b-0 lg:border-r"
-               data-theme="dark"
-               style={{ backgroundColor: 'var(--color-white)', borderColor: 'var(--color-gray-border)' }}>
-          {selectedPaddle ? (
-            <SidebarProductCard
-              paddle={selectedPaddle}
-              score={selectedScore}
-              affiliateUrl={selectedAffiliateUrl}
+      {sidebarOpen && (
+        <>
+          <div
+            className="md:hidden fixed inset-0 bg-base/80 z-40"
+            onClick={() => setSidebarOpen(false)}
+          />
+          <div className="md:hidden fixed inset-y-0 left-0 z-50">
+            <PlayerProfileSidebar
+              profile={profile}
+              onEditProfile={() => { setSidebarOpen(false); handleEditProfile() }}
+              onStartOver={() => { setSidebarOpen(false); handleStartOver() }}
             />
-          ) : (
-            <div className="flex flex-col items-center justify-center h-full text-center">
-              <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
-                   data-theme="dark"
-                   style={{ backgroundColor: 'var(--color-near-black)' }}>
-                <span className="text-2xl font-bold" style={{ color: 'var(--sport-primary)' }}>PI</span>
-              </div>
-              <p style={{ color: 'var(--color-gray-500)', fontSize: 'var(--font-size-body)' }}>
-                Envie uma mensagem para ver recomendacoes aqui.
-              </p>
-            </div>
-          )}
+          </div>
+        </>
+      )}
 
-          {relatedPaddles.length > 0 && (
-            <div className="mt-8">
-               <h3 className="text-sm font-bold uppercase tracking-wider mb-4"
-                   data-theme="dark"
-                   style={{ color: 'var(--color-gray-500)' }}>
-                Raquetes relacionadas
-              </h3>
-              <RelatedPaddles
-                paddles={relatedPaddles}
-                onSelect={(p) => {
-                  setSelectedPaddle(p)
-                  setSelectedScore(undefined)
-                  setSelectedAffiliateUrl(undefined)
-                }}
-              />
+      <div className="flex-1 flex flex-col min-w-0">
+        <header className="flex items-center justify-between px-4 md:px-8 py-4 border-b border-border bg-base">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(true)}
+              className="md:hidden p-2 text-text-secondary hover:text-text-primary transition-colors"
+              aria-label="Toggle sidebar"
+            >
+              <Menu size={20} />
+            </button>
+            <div>
+              <h1 className="font-display text-xl text-text-primary tracking-wide">PICKLEIQ ASSISTANT</h1>
+              <p className="font-sans text-xs text-text-muted">Pergunte qualquer coisa sobre raquetes</p>
             </div>
-          )}
-        </aside>
+          </div>
+        </header>
 
-        <div className="lg:w-[45%] h-[50vh] lg:h-full flex flex-col"
-             data-theme="dark"
-             style={{ backgroundColor: 'var(--color-near-black)' }}>
-          <ChatWidget profile={profile!} onRecommendations={handleRecommendations} />
+        <div className="flex-1 bg-base">
+          <ChatWidget
+            profile={{
+              level: profile.level === 'competitive' ? 'advanced' : profile.level,
+              style: profile.style === 'baseline-grinder' ? 'power' : profile.style === 'dink-control' ? 'control' : profile.style === 'power-hitter' ? 'spin' : 'all-court',
+              budget_max: profile.budget === 'under-80' ? 200 : profile.budget === '80-150' ? 400 : profile.budget === '150-250' ? 600 : 2000,
+            }}
+          />
         </div>
       </div>
     </main>

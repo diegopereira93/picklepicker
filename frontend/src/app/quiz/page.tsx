@@ -1,285 +1,281 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { QuizStep, UserProfile, QUIZ_STEPS } from '@/types/paddle'
-import { getProfile, saveProfile, clearProfile } from '@/lib/profile'
-import { QuizStepWelcome } from '@/components/quiz/quiz-step-welcome'
-import { QuizStepIdentity } from '@/components/quiz/quiz-step-identity'
-import { QuizStepStyle } from '@/components/quiz/quiz-step-style'
-import { QuizStepPainPoints } from '@/components/quiz/quiz-step-pain-points'
-import { QuizStepFrequency } from '@/components/quiz/quiz-step-frequency'
-import { QuizStepBudgetSlider } from '@/components/quiz/quiz-step-budget-slider'
-import { QuizAnalyzing } from '@/components/quiz/quiz-analyzing'
-import { ProgressIndicator } from '@/components/quiz/progress-indicator'
+import { cn } from '@/lib/utils'
+import {
+  Trophy, Target, Zap, Crown, Flame, Crosshair, Sparkles, Scale,
+  Wallet, Banknote, PiggyBank, Gem, Feather, Dumbbell, HelpCircle,
+  Home, Sun, ArrowLeftRight, Search, Shuffle, TrendingUp,
+} from 'lucide-react'
+import { QuizProgressBar } from '@/components/ui/quiz-progress-bar'
+import { QuizOptionCard } from '@/components/ui/quiz-option-card'
+import {
+  saveQuizProfile, loadQuizProfile, type QuizProfile,
+} from '@/lib/quiz-profile'
+import { Button } from '@/components/ui/button'
+
+interface QuizOption {
+  value: string
+  label: string
+  description: string
+  icon: React.ComponentType<{ className?: string }>
+}
+
+interface QuizStep {
+  key: keyof Omit<QuizProfile, 'completedAt' | 'targetPaddle'> | 'targetPaddle'
+  question: string
+  type: 'choice' | 'text'
+  options?: QuizOption[]
+  placeholder?: string
+}
+
+const STEPS: QuizStep[] = [
+  {
+    key: 'level',
+    question: 'Qual é o seu nível de jogo?',
+    options: [
+      { value: 'beginner', label: 'Iniciante', description: 'Começando agora', icon: Trophy },
+      { value: 'intermediate', label: 'Intermediário', description: 'Jogo há 6-12 meses', icon: Target },
+      { value: 'advanced', label: 'Avançado', description: 'Competitivo, 1+ ano', icon: Zap },
+      { value: 'competitive', label: 'Profissional', description: 'Torneios, ranking', icon: Crown },
+    ],
+  },
+  {
+    key: 'style',
+    question: 'Como você descreveria seu estilo?',
+    options: [
+      { value: 'baseline-grinder', label: 'Power', description: 'Batidas fortes, fundo de quadra', icon: Flame },
+      { value: 'dink-control', label: 'Control', description: 'Precisão, colocação', icon: Crosshair },
+      { value: 'power-hitter', label: 'Spin', description: 'Efeitos, jogadas técnicas', icon: Sparkles },
+      { value: 'all-round', label: 'All-Round', description: 'Equilibrado, versátil', icon: Scale },
+    ],
+  },
+  {
+    key: 'priority',
+    question: 'O que mais importa pra você?',
+    options: [
+      { value: 'power', label: 'Potência', description: 'Maximizar suas batidas', icon: Flame },
+      { value: 'control', label: 'Controle', description: 'Precisão em cada jogada', icon: Crosshair },
+      { value: 'spin', label: 'Spin', description: 'Efeitos e curvas', icon: Sparkles },
+      { value: 'speed', label: 'Velocidade', description: 'Reações rápidas', icon: ArrowLeftRight },
+    ],
+  },
+  {
+    key: 'budget',
+    question: 'Qual seu orçamento?',
+    options: [
+      { value: 'under-80', label: 'Até R$ 200', description: 'Entrada, bom preço', icon: Wallet },
+      { value: '80-150', label: 'R$ 200 - 400', description: 'Intermediário', icon: Banknote },
+      { value: '150-250', label: 'R$ 400 - 600', description: 'Premium', icon: PiggyBank },
+      { value: '250-plus', label: 'R$ 600+', description: 'Top de linha', icon: Gem },
+    ],
+  },
+  {
+    key: 'weightPreference',
+    question: 'Preferência de peso?',
+    options: [
+      { value: 'light', label: 'Leve (≤ 240g)', description: 'Maneio rápido', icon: Feather },
+      { value: 'medium', label: 'Médio (240-260g)', description: 'Equilíbrio perfeito', icon: Scale },
+      { value: 'heavy', label: 'Pesado (≥ 260g)', description: 'Mais potência', icon: Dumbbell },
+      { value: 'no-preference', label: 'Não sei', description: 'Me recomende', icon: HelpCircle },
+    ],
+  },
+  {
+    key: 'location',
+    question: 'Onde você joga?',
+    options: [
+      { value: 'indoor', label: 'Indoor', description: 'Quadras cobertas', icon: Home },
+      { value: 'outdoor', label: 'Outdoor', description: 'Ao ar livre', icon: Sun },
+      { value: 'both', label: 'Ambos', description: 'Indoor e outdoor', icon: Scale },
+    ],
+  },
+  {
+    key: 'targetPaddle',
+    question: 'Tem algum modelo em mente?',
+    type: 'text',
+    placeholder: 'Ex: Selkirk Vanguard, Joola Hyperion...',
+  },
+]
 
 export default function QuizPage() {
   const router = useRouter()
-  
-  const [currentStep, setCurrentStep] = useState<number>(0)
+  const [step, setStep] = useState(1)
+  const [answers, setAnswers] = useState<Partial<Record<string, string>>>({})
   const [direction, setDirection] = useState<'forward' | 'backward'>('forward')
-  const [isTransitioning, setIsTransitioning] = useState(false)
-  const [profile, setProfile] = useState<Partial<UserProfile>>({
-    level: '',
-    style: '',
-    budget_max: 400,
-    identity: '',
-    pain_points: [],
-    frequency: '',
-  })
+  const [showAnalyzing, setShowAnalyzing] = useState(false)
+  const [animKey, setAnimKey] = useState(0)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const currentStepData = STEPS[step - 1]
+  const selectedValue = currentStepData ? answers[currentStepData.key] : undefined
+  const isTextStep = currentStepData?.type === 'text'
 
   useEffect(() => {
-    const existingProfile = getProfile()
-    if (existingProfile) {
-      setProfile(existingProfile)
-      if (
-        existingProfile.level &&
-        existingProfile.style &&
-        existingProfile.budget_max
-      ) {
-        router.push('/quiz/results')
-      }
+    const existing = loadQuizProfile()
+    if (existing && existing.completedAt) {
+      router.push('/chat')
     }
-
-    if (window.location.hash) {
-      const hashStep = parseInt(window.location.hash.replace('#step-', ''), 10)
-      if (!isNaN(hashStep) && hashStep >= 0 && hashStep < QUIZ_STEPS.length) {
-        setCurrentStep(hashStep)
-      }
-    }
-  }, [])
-
-  const handleNext = useCallback(() => {
-    if (isTransitioning) return
-
-    setDirection('forward')
-    setIsTransitioning(true)
-
-    setTimeout(() => {
-      setCurrentStep((prev) => {
-        const next = prev + 1
-        if (next < QUIZ_STEPS.length) {
-          window.location.hash = `step-${next}`
-        }
-        return next
-      })
-      setIsTransitioning(false)
-    }, 300)
-  }, [isTransitioning])
-
-  const handleBack = useCallback(() => {
-    if (isTransitioning || currentStep === 0) return
-
-    setDirection('backward')
-    setIsTransitioning(true)
-
-    setTimeout(() => {
-      setCurrentStep((prev) => {
-        const next = Math.max(0, prev - 1)
-        window.location.hash = `step-${next}`
-        return next
-      })
-      setIsTransitioning(false)
-    }, 300)
-  }, [isTransitioning, currentStep])
+  }, [router])
 
   useEffect(() => {
-    const handleHashChange = () => {
-      if (window.location.hash) {
-        const hashStep = parseInt(window.location.hash.replace('#step-', ''), 10)
-        if (!isNaN(hashStep) && hashStep >= 0 && hashStep < QUIZ_STEPS.length) {
-          setDirection('backward')
-          setCurrentStep(hashStep)
-        }
-      }
+    if (isTextStep && inputRef.current) {
+      inputRef.current.focus()
     }
+  }, [step, isTextStep])
 
-    window.addEventListener('hashchange', handleHashChange)
-    return () => window.removeEventListener('hashchange', handleHashChange)
-  }, [])
+  function handleSelect(value: string) {
+    const key = currentStepData.key
+    setAnswers(prev => ({ ...prev, [key]: value }))
 
-  const handleIdentitySelect = (value: string) => {
-    setProfile((prev) => ({ ...prev, identity: value, level: value }))
-    setTimeout(() => handleNext(), 300)
-  }
-
-  const handleStyleSelect = (value: string) => {
-    setProfile((prev) => ({ ...prev, style: value }))
-    setTimeout(() => handleNext(), 300)
-  }
-
-  const handlePainPointsSelect = (value: string[]) => {
-    setProfile((prev) => ({ ...prev, pain_points: value }))
-    handleNext()
-  }
-
-  const handleFrequencySelect = (value: string) => {
-    setProfile((prev) => ({ ...prev, frequency: value }))
-    setTimeout(() => handleNext(), 300)
-  }
-
-  const handleBudgetSelect = (value: number) => {
-    setProfile((prev) => ({ ...prev, budget_max: value }))
-    setTimeout(() => handleNext(), 300)
-  }
-
-  const handleAnalyzingComplete = () => {
-    if (profile.level && profile.style && profile.budget_max) {
-      saveProfile({
-        level: profile.level,
-        style: profile.style,
-        budget_max: profile.budget_max,
-        identity: profile.identity,
-        pain_points: profile.pain_points,
-        frequency: profile.frequency,
-      } as UserProfile)
-      router.push('/quiz/results')
+    if (step < 7) {
+      setDirection('forward')
+      setAnimKey(k => k + 1)
+      setTimeout(() => setStep(s => s + 1), 150)
+    } else {
+      finishQuiz(value)
     }
   }
 
-  const handleRestart = () => {
-    clearProfile()
-    setProfile({
-      level: '',
-      style: '',
-      budget_max: 400,
-      identity: '',
-      pain_points: [],
-      frequency: '',
-    })
-    setCurrentStep(0)
-    window.location.hash = 'step-0'
-  }
-
-  const renderStep = () => {
-    const stepType = QUIZ_STEPS[currentStep]
-
-    switch (stepType) {
-      case 'welcome':
-        return (
-          <div aria-live="polite">
-            <QuizStepWelcome
-              onStart={handleNext}
-            />
-          </div>
-        )
-
-      case 'identity':
-        return (
-          <div aria-live="polite">
-            <QuizStepIdentity
-              value={profile.identity || ''}
-              onSelect={handleIdentitySelect}
-              onBack={handleBack}
-            />
-          </div>
-        )
-
-      case 'style':
-        return (
-          <div aria-live="polite">
-            <QuizStepStyle
-              value={profile.style || ''}
-              onSelect={handleStyleSelect}
-              onBack={handleBack}
-            />
-          </div>
-        )
-
-      case 'pain-points':
-        return (
-          <div aria-live="polite">
-            <QuizStepPainPoints
-              value={profile.pain_points || []}
-              onSelect={handlePainPointsSelect}
-              onBack={handleBack}
-            />
-          </div>
-        )
-
-      case 'frequency':
-        return (
-          <div aria-live="polite">
-            <QuizStepFrequency
-              value={profile.frequency || ''}
-              onSelect={handleFrequencySelect}
-              onBack={handleBack}
-            />
-          </div>
-        )
-
-      case 'budget':
-        return (
-          <div aria-live="polite">
-            <QuizStepBudgetSlider
-              value={profile.budget_max}
-              onSelect={handleBudgetSelect}
-              onBack={handleBack}
-            />
-          </div>
-        )
-
-      case 'analyzing':
-        return (
-          <div aria-live="polite">
-            <QuizAnalyzing
-              onComplete={handleAnalyzingComplete}
-            />
-          </div>
-        )
-
-      default:
-        return null
+  function handleSkip() {
+    if (step < 7) {
+      setDirection('forward')
+      setAnimKey(k => k + 1)
+      setTimeout(() => setStep(s => s + 1), 150)
+    } else {
+      finishQuiz('')
     }
   }
 
+  function finishQuiz(targetPaddleValue: string) {
+    const finalAnswers = { ...answers, targetPaddle: targetPaddleValue }
+    const profile: QuizProfile = {
+      level: (finalAnswers.level as QuizProfile['level']) || 'beginner',
+      style: (finalAnswers.style as QuizProfile['style']) || 'all-round',
+      priority: (finalAnswers.priority as QuizProfile['priority']) || 'control',
+      budget: (finalAnswers.budget as QuizProfile['budget']) || 'under-80',
+      weightPreference: (finalAnswers.weightPreference as QuizProfile['weightPreference']) || 'no-preference',
+      location: (finalAnswers.location as QuizProfile['location']) || 'both',
+      targetPaddle: finalAnswers.targetPaddle || undefined,
+      completedAt: new Date().toISOString(),
+    }
+    saveQuizProfile(profile)
+    setShowAnalyzing(true)
+    setTimeout(() => router.push('/chat'), 2000)
+  }
+
+  function handleBack() {
+    if (step > 1) {
+      setDirection('backward')
+      setAnimKey(k => k + 1)
+      setTimeout(() => setStep(s => s - 1), 150)
+    }
+  }
+
+  if (showAnalyzing) {
     return (
-      <div 
-        className="min-h-screen bg-[var(--warm-white)] flex flex-col"
-        aria-label="Quiz de recomendação de raquetes"
-      >
-        <div className="flex items-center justify-between px-4 py-4 max-w-[480px] mx-auto w-full">
-          {currentStep > 0 && (
-            <button
-              type="button"
-              onClick={handleBack}
-              className="wg-button-ghost"
-              aria-label="Voltar ao passo anterior"
-            >
-              ← Voltar
-            </button>
+      <main className="min-h-screen bg-base flex flex-col items-center justify-center px-4">
+        <div className="flex flex-col items-center gap-6">
+          <div className="w-16 h-16 rounded-full bg-brand-primary animate-pulse flex items-center justify-center">
+            <Zap className="w-8 h-8 text-base" />
+          </div>
+          <p className="font-sans text-lg text-text-muted animate-pulse">
+            Analisando seu perfil...
+          </p>
+        </div>
+      </main>
+    )
+  }
+
+  return (
+    <main className="min-h-screen bg-base flex flex-col">
+      <div className="max-w-lg mx-auto w-full px-4 md:px-6 flex-1 flex flex-col justify-center">
+        <div className="mb-8">
+          <QuizProgressBar currentStep={step} />
+        </div>
+
+        <div
+          key={animKey}
+          className={cn(
+            'transition-all duration-300 ease-in-out',
+            direction === 'forward'
+              ? 'animate-[fadeInRight_300ms_ease-in-out]'
+              : 'animate-[fadeInLeft_300ms_ease-in-out]'
           )}
-          {currentStep === 0 && <div />}
-          {currentStep > 0 && currentStep < 6 && (
-            <div className="text-xs text-gray-500">
-              Quiz - {currentStep + 1} de {QUIZ_STEPS.length - 1}
+        >
+          <h1 className="font-sans text-2xl md:text-3xl font-semibold text-text-primary mb-8 leading-tight">
+            {currentStepData.question}
+          </h1>
+
+          {isTextStep ? (
+            <div className="space-y-4">
+              <input
+                ref={inputRef}
+                type="text"
+                placeholder={currentStepData.placeholder}
+                value={selectedValue || ''}
+                onChange={(e) => setAnswers(prev => ({ ...prev, [currentStepData.key]: e.target.value }))}
+                maxLength={120}
+                className="w-full bg-elevated border border-border rounded-rounded px-4 py-3 text-base font-sans text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand-primary"
+              />
+              <button
+                type="button"
+                onClick={handleSkip}
+                className="text-sm text-text-muted hover:text-text-primary transition-colors"
+              >
+                Pular esta etapa
+              </button>
+            </div>
+          ) : (
+            <div
+              className="grid grid-cols-2 gap-4"
+              role="radiogroup"
+              aria-labelledby="quiz-question"
+            >
+              {currentStepData.options!.map((opt) => (
+                <QuizOptionCard
+                  key={opt.value}
+                  icon={opt.icon}
+                  label={opt.label}
+                  description={opt.description}
+                  selected={selectedValue === opt.value}
+                  onSelect={() => handleSelect(opt.value)}
+                />
+              ))}
             </div>
           )}
         </div>
 
-        {currentStep > 0 && currentStep < 6 && (
-          <div className="px-4 py-2 max-w-[480px] mx-auto w-full">
-            <ProgressIndicator currentStep={currentStep} />
-          </div>
-        )}
-
-        <div className="flex-1 flex flex-col justify-center min-h-[70vh]">
-          <div className="max-w-[480px] mx-auto px-4">
-            {renderStep()}
-          </div>
-        </div>
-
-        {currentStep >= 6 && (
-          <div className="py-6 text-center">
-            <button
-              type="button"
-              onClick={handleRestart}
-              className="text-sm text-gray-500 hover:text-coral transition-colors"
+        <div className="flex gap-3 mt-12">
+          {step > 1 && (
+            <Button
+              variant="ghost"
+              onClick={handleBack}
+              className="flex-1 text-text-secondary hover:text-text-primary"
             >
-              Refazer quiz
-            </button>
-          </div>
-        )}
+              Voltar
+            </Button>
+          )}
+          {isTextStep ? (
+            <Button
+              variant="default"
+              onClick={() => handleSelect(selectedValue || '')}
+              className="flex-1 bg-brand-primary hover:bg-brand-primary/90 text-base"
+            >
+              {step === 7 ? 'Ver Minhas Raquetes' : 'Próximo'}
+            </Button>
+          ) : (
+            <Button
+              variant="default"
+              onClick={() => selectedValue && handleSelect(selectedValue)}
+              disabled={!selectedValue}
+              className="flex-1 bg-brand-primary hover:bg-brand-primary/90 text-base disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              {step === 7 ? 'Ver Minhas Raquetes' : 'Próximo'}
+            </Button>
+          )}
+        </div>
       </div>
-    )
+    </main>
+  )
 }

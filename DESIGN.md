@@ -111,6 +111,8 @@
 }
 ```
 
+**Note:** For professional/elite level paddles (rare), use violet accent `#8B5CF6`. This is an intentional contrast color used sparingly.
+
 **Usage:** Skill level badges on product cards, filter chips, quiz profile display. Background color with white text (beginner/advanced) or dark text (intermediate).
 
 ### Data Credibility (Retained from v3.0)

@@ -67,7 +67,7 @@ export async function generateProductMetadata(
   modelSlug: string,
   paddle: Paddle
 ): Promise<Metadata> {
-  const canonicalUrl = `${SITE_URL}/paddles/${brand}/${modelSlug}`
+  const canonicalUrl = `${SITE_URL}/catalog/${modelSlug}`
   const title = `${paddle.name} - PickleIQ`
   const pricePart =
     paddle.price_brl != null
