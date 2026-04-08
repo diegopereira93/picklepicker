@@ -92,9 +92,9 @@ export default function GiftResultsPage() {
         <div className="grid gap-3">
           <button
             type="button"
-            onClick={() => {
-              window.location.href = '/paddles'
-            }}
+          onClick={() => {
+            window.location.href = '/catalog'
+          }}
             className="wg-button-coral text-lg px-6 py-3"
           >
             VER MAIS OPÇÕES →

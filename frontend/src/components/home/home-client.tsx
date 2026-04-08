@@ -230,7 +230,7 @@ export function HomeClient() {
                       )}
                       
                       <Link
-                        href={paddle.model_slug && paddle.brand ? `/paddles/${encodeURIComponent(paddle.brand.toLowerCase())}/${encodeURIComponent(paddle.model_slug)}` : '/paddles'}
+                        href={paddle.model_slug && paddle.brand ? `/catalog/${encodeURIComponent(paddle.model_slug)}` : '/catalog'}
                         className="inline-flex items-center text-sm font-semibold text-coral-600 hover:text-coral-700 transition-colors"
                       >
                         Ver →
