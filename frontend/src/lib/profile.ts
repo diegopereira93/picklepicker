@@ -1,9 +1,22 @@
 import type { UserProfile } from '@/types/paddle'
 
 const UID_KEY = 'pickleiq:uid'
+const AUTH_USER_ID_KEY = 'pickleiq:user_id'
+const AUTH_TOKEN_KEY = '__clerk_client_jwt'
+
+function getAuthToken(): string | null {
+  if (typeof window === 'undefined') return null
+  return localStorage.getItem(AUTH_TOKEN_KEY)
+}
+
+function isAuthenticated(): boolean {
+  return !!getAuthToken()
+}
 
 export function getOrCreateUserId(): string {
   if (typeof window === 'undefined') return ''
+  const authId = localStorage.getItem(AUTH_USER_ID_KEY)
+  if (authId) return authId
   const existing = localStorage.getItem(UID_KEY)
   if (existing) return existing
   const uid = crypto.randomUUID()
@@ -16,8 +29,27 @@ function profileKey(): string {
   return `pickleiq:profile:${uid}`
 }
 
-export function getProfile(): UserProfile | null {
+export async function getProfile(): Promise<UserProfile | null> {
   if (typeof window === 'undefined') return null
+
+  const authToken = getAuthToken()
+  if (authToken) {
+    try {
+      const res = await fetch('/api/v1/users/profile/me', {
+        headers: { Authorization: `Bearer ${authToken}` },
+      })
+      if (res.ok) {
+        const data = await res.json()
+        return {
+          level: data.level,
+          style: data.style,
+          budget_max: data.budget_max,
+        }
+      }
+    } catch {
+    }
+  }
+
   const raw = localStorage.getItem(profileKey())
   if (!raw) return null
   try {
@@ -27,9 +59,30 @@ export function getProfile(): UserProfile | null {
   }
 }
 
-export function saveProfile(profile: UserProfile): void {
+export async function saveProfile(profile: UserProfile): Promise<void> {
   if (typeof window === 'undefined') return
+
   localStorage.setItem(profileKey(), JSON.stringify(profile))
+
+  const authToken = getAuthToken()
+  if (authToken) {
+    try {
+      await fetch('/api/v1/users/profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({
+          user_id: getOrCreateUserId(),
+          level: profile.level,
+          style: profile.style,
+          budget_max: profile.budget_max,
+        }),
+      })
+    } catch {
+    }
+  }
 }
 
 export function clearProfile(): void {
@@ -37,22 +90,25 @@ export function clearProfile(): void {
   localStorage.removeItem(profileKey())
 }
 
-/**
- * Called after Clerk sign-in to migrate anonymous profile data to the authenticated account.
- * Clears the old UUID-keyed profile from localStorage and records the new Clerk user_id.
- */
 export async function migrateProfileOnLogin(oldUUID: string, newUserId: string): Promise<void> {
-  const res = await fetch('/api/users/migrate', {
+  const authToken = getAuthToken()
+  if (!authToken) {
+    throw new Error('Not authenticated')
+  }
+
+  const res = await fetch('/api/v1/users/migrate', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ old_uuid: oldUUID }),
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${authToken}`,
+    },
+    body: JSON.stringify({ old_uuid: oldUUID, new_user_id: newUserId }),
   })
 
   if (!res.ok) {
     throw new Error('Migration failed')
   }
 
-  // Clear old anonymous profile, store new authenticated user_id
   localStorage.removeItem(`pickleiq:profile:${oldUUID}`)
-  localStorage.setItem('pickleiq:user_id', newUserId)
+  localStorage.setItem(AUTH_USER_ID_KEY, newUserId)
 }

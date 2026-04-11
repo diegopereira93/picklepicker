@@ -40,20 +40,66 @@ FIRECRAWL_SCHEMA = {
 
 @retry(
     stop=stop_after_attempt(3),
-    wait=wait_exponential(multiplier=1, min=1, max=10),
+    wait=wait_exponential(multiplier=1, min=10, max=120),
     retry=retry_if_exception_type(Exception),
     reraise=True,
 )
 def extract_products(app: FirecrawlApp, url: str) -> dict:
-    """Extract paddle products from URL using Firecrawl /extract endpoint."""
-    return app.extract(
-        urls=[url],
-        prompt=(
-            "Extract all pickleball paddle products with name, price in BRL, "
-            "availability, image URL, product URL, brand, and technical specs"
-        ),
-        schema=FIRECRAWL_SCHEMA,
-    )
+    result = app.scrape(url)
+
+    if hasattr(result, 'markdown'):
+        markdown = result.markdown
+    elif isinstance(result, dict):
+        markdown = result.get('markdown', '')
+    else:
+        markdown = str(result)
+
+    lines = markdown.split('\n')
+    products = []
+
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+
+        if any(keyword in line for keyword in ['Raquete', 'Paddle', 'Pickleball']) and len(line) > 10:
+            name = line.strip().lstrip('#').lstrip('*').lstrip('-').strip()
+
+            price = None
+            url = ''
+            image_url = ''
+
+            for j in range(i+1, min(i+20, len(lines))):
+                if lines[j].startswith('R$') and '\\n\\n' not in lines[j]:
+                    price_match = re.search(r'R\$([\d\.,]+)', lines[j])
+                    if price_match:
+                        price_str = price_match.group(1)
+                        price = float(price_str.replace('.', '').replace(',', '.'))
+                        break
+
+            for j in range(max(0, i-10), i):
+                prev_line = lines[j]
+                if 'dropshotbrasil.com.br' in prev_line and '](' in prev_line:
+                    url_match = re.search(r'\]\((https?://[^\)]+)', prev_line)
+                    if url_match:
+                        url = url_match.group(1).rstrip('"').rstrip("'")
+                        break
+
+            if price:
+                products.append({
+                    "name": name,
+                    "price_brl": price,
+                    "product_url": url,
+                    "url": url,
+                    "image_url": image_url,
+                    "brand": name.split()[0] if name else "",
+                    "in_stock": True,
+                    "specs": {},
+                })
+
+        i += 1
+
+    logger.info("Parsed %d products from markdown", len(products))
+    return {"data": {"products": products}}
 
 
 @retry(
