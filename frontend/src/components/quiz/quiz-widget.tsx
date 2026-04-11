@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import type { UserProfile } from '@/types/paddle'
+import { saveProfile } from '@/lib/profile'
 
 interface QuizWidgetProps {
   onComplete: (profile: UserProfile) => void
@@ -32,9 +33,11 @@ export function QuizWidget({ onComplete }: QuizWidgetProps) {
 
   const isComplete = level !== null && budget !== null && style !== null
 
-  function handleComplete() {
+  async function handleComplete() {
     if (!isComplete) return
-    onComplete({ level: level!, style: style!, budget_max: budget! })
+    const profile: UserProfile = { level: level!, style: style!, budget_max: budget! }
+    await saveProfile(profile)
+    onComplete(profile)
   }
 
   return (
