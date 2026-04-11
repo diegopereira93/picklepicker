@@ -129,6 +129,19 @@ CREATE TABLE price_alerts (
 );
 
 -- ============================================================
+-- Table 9: user_profiles — Persisted user quiz profiles
+-- ============================================================
+CREATE TABLE user_profiles (
+    id              BIGSERIAL PRIMARY KEY,
+    user_id         TEXT UNIQUE NOT NULL,
+    level           TEXT NOT NULL CHECK (level IN ('beginner', 'intermediate', 'advanced')),
+    style           TEXT CHECK (style IN ('control', 'power', 'balanced')),
+    budget_max      NUMERIC(10,2) NOT NULL,
+    created_at      TIMESTAMPTZ DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- ============================================================
 -- Seed data: Retailers for Phase 1
 -- ============================================================
 INSERT INTO retailers (name, base_url, integration_type, is_active) VALUES
