@@ -313,6 +313,135 @@
 
 ---
 
+## Milestone v2.2.0 — Launch Readiness: Testes & Correções Críticas
+
+**Goal:** Corrigir todos os problemas críticos de qualidade identificados no relatório de launch readiness de 12/04/2026. Tornar o produto apto para lançamento em produção.
+
+**Score atual:** 5.0/10 — Meta: 8.5+/10 para launch
+
+**Status:** 📋 Not Started — Branch: `feat/v2.2.0-launch-readiness`
+
+| # | Phase | Goal | Priority | Est. Effort |
+|---|-------|------|----------|-------------|
+| 24 | Fix Pipeline Tests | Recriar fixtures + mock responses, desbloquear 130 testes | P0 — Crítico | 3-5 dias |
+| 25 | Fix Frontend Test Failures | Corrigir quiz imports + session upgrade mocks | P0 — Crítico | 1-2 dias |
+| 26 | Playwright E2E Tests | Configurar Playwright + specs para fluxos críticos | P0 — Crítico | 7-10 dias |
+| 27 | Backend Deprecation Fixes | Corrigir `datetime.utcnow()` + small cleanups | P2 — Baixo | 0.5 dia |
+
+### Phase 24: Fix Pipeline Tests — Recriar Fixtures
+
+**Goal:** Restaurar diretório `pipeline/tests/fixtures/mock_responses/` com arquivos JSON válidos para desbloquear todos os 130 testes do pipeline de scraping.
+
+**Root causes:**
+1. O pull do master removeu os arquivos de mock responses (`brazil_store_response.json`, `dropshot_brasil_response.json`, `mercado_livre_response.json`) e o diretório `pipeline/tests/fixtures/`.
+2. `test_data_integrity.py` faz `load_mock_response("brazil_store_response.json")` no module-level, causando `FileNotFoundError` que bloqueia a coleção de TODOS os 130 testes.
+3. Sem pipeline tests, zero visibilidade na integridade dos crawlers (Brazil Store, Dropshot Brasil, Mercado Livre).
+
+**Tasks:**
+
+| Task | File(s) | Description |
+|------|---------|-------------|
+| 24.1 | `pipeline/tests/fixtures/mock_responses/` (criar dir) | Recriar diretório de mock responses |
+| 24.2 | `pipeline/tests/fixtures/mock_responses/brazil_store_response.json` | Criar mock response válido baseado na estrutura real do scraper Brazil Store |
+| 24.3 | `pipeline/tests/fixtures/mock_responses/dropshot_brasil_response.json` | Criar mock response válido baseado na estrutura real do scraper Dropshot Brasil |
+| 24.4 | `pipeline/tests/fixtures/mock_responses/mercado_livre_response.json` | Criar mock response válido baseado na estrutura real do scraper Mercado Livre |
+| 24.5 | `pipeline/tests/fixtures/staging_config.yaml` (se necessário) | Recriar config de staging se testes dependem dele |
+| 24.6 | `pipeline/tests/` | Executar `pytest` e validar que todos os 130 testes coletam e passam |
+
+**Success criteria:**
+1. `cd pipeline && pytest --co -q` coleta 130 testes sem erros
+2. Todos os testes passam (ou falhas são bugs reais, não problemas de fixture)
+3. Coverage de crawlers ≥ 80%
+
+---
+
+### Phase 25: Fix Frontend Test Failures
+
+**Goal:** Corrigir as 3 falhas de teste do frontend: suite de quiz quebrada (imports de componentes inexistentes) + session upgrade (Clerk auth mock).
+
+**Root causes:**
+1. `quiz-flow.tsx` importa `./step-level`, `./step-style`, `./step-budget` — estes componentes foram deletados no redesign v2.1.0 mas o import ficou.
+2. `session-upgrade.test.ts` não faz mock de `getAuthToken()` do Clerk, causando "Not authenticated" onde deveria testar a migração.
+3. O build do Next.js passa porque o tree-shaking remove imports não utilizados, mas vitest carrega tudo.
+
+**Tasks:**
+
+| Task | File(s) | Description |
+|------|---------|-------------|
+| 25.1 | `frontend/src/components/quiz/quiz-flow.tsx` | Remover imports de `step-level`, `step-style`, `step-budget` (deletados). Atualizar para usar os novos componentes do redesign v2.1.0 |
+| 25.2 | `frontend/src/tests/unit/quiz.test.ts` | Atualizar testes do quiz para refletir a nova estrutura de componentes |
+| 25.3 | `frontend/src/tests/unit/session-upgrade.test.ts` | Adicionar mock de `getAuthToken()` do Clerk antes de testar `migrateProfileOnLogin` |
+| 25.4 | `frontend/` | Executar `npx vitest run` e validar 19/19 suites passando, 169/169 testes passando |
+
+**Success criteria:**
+1. `npx vitest run` — 19 suites, 0 falhas
+2. Quiz suite carrega e executa testes
+3. Session upgrade tests passam com Clerk auth mockado
+4. Build continua passando (`next build` sem erros)
+
+---
+
+### Phase 26: Playwright E2E Tests — Fluxos Críticos
+
+**Goal:** Configurar Playwright e implementar testes E2E para os fluxos de usuário mais críticos do produto. Zero → cobertura básica de navegação.
+
+**Root causes:**
+1. Zero testes E2E existem — `@playwright/test` v1.58.2 instalado mas sem config nem specs.
+2. Browsers Playwright instalados (chromium-1208) mas sem utilização.
+3. Sem validação de fluxos reais: navegação, chat, quiz, catálogo, comparação, afiliados.
+
+**Tasks:**
+
+| Task | File(s) | Description |
+|------|---------|-------------|
+| 26.1 | `frontend/playwright.config.ts` (novo) | Configurar Playwright: baseURL localhost:3000, chromium only, timeout 30s, retries 0, screenshot on failure |
+| 26.2 | `frontend/e2e/navigation.spec.ts` (novo) | Testar navegação entre páginas: Home → Catalog → Product Detail → Chat → Quiz → Compare |
+| 26.3 | `frontend/e2e/catalog.spec.ts` (novo) | Testar catálogo: página carrega, filtros funcionam, ordenação funciona, grid/table toggle funciona |
+| 26.4 | `frontend/e2e/quiz.spec.ts` (novo) | Testar quiz: seleção de opções, progresso, resultado de recomendação |
+| 26.5 | `frontend/e2e/chat.spec.ts` (novo) | Testar chat: envio de mensagem, resposta streaming, cards de produto |
+| 26.6 | `frontend/package.json` | Adicionar script `"test:e2e": "playwright test"` |
+| 26.7 | `frontend/` | Executar testes E2E contra `npm run dev` e validar que todos passam |
+
+**Success criteria:**
+1. `playwright.config.ts` configurado e funcional
+2. ≥ 5 spec files com ≥ 15 testes E2E
+3. Fluxos críticos testados: navegação, catálogo, quiz, chat
+4. Todos os testes E2E passam contra dev server
+5. Adicionar `test:e2e` ao CI (opcional para esta phase)
+
+---
+
+### Phase 27: Backend Deprecation Fixes & Cleanup
+
+**Goal:** Corrigir warnings de deprecation e pequenos cleanups no backend.
+
+**Tasks:**
+
+| Task | File(s) | Description |
+|------|---------|-------------|
+| 27.1 | `backend/app/api/health.py` | Substituir `datetime.utcnow()` por `datetime.now(timezone.utc)` |
+| 27.2 | `backend/` | Validar que 183/183 testes passam sem warnings |
+
+**Success criteria:**
+1. Zero deprecation warnings no pytest output
+2. 183/183 backend tests passando
+
+---
+
+**Launch Readiness Scorecard (pós-milestone target):**
+
+| Dimensão | Score Atual | Meta |
+|----------|-------------|------|
+| Backend Stability | 9/10 | 9/10 |
+| Frontend Stability | 6/10 | 9/10 |
+| Pipeline Health | 0/10 | 8/10 |
+| E2E Coverage | 0/10 | 7/10 |
+| Build Integrity | 10/10 | 10/10 |
+| Production Readiness | 5/10 | 8/10 |
+| **Média** | **5.0/10** | **8.5/10** |
+
+---
+
 ## Deferred Milestones (Planned, Not Started)
 
 ### v1.5.0 — Production Readiness
@@ -346,4 +475,4 @@ See existing v1.5 roadmap for full details.
 
 ---
 *Roadmap created: 2026-04-05*  
-*Last updated: 2026-04-08 — Phases 16-20 marked complete, Phase 21 current*
+*Last updated: 2026-04-12 — Milestone v2.2.0 Launch Readiness added (Phases 24-27)*
