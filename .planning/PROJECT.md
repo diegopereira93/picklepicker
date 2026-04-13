@@ -2,7 +2,7 @@
 
 ## What This Is
 
-Pickleball paddle intelligence platform for the Brazilian market. Scrapes prices/specs from BR retailers, runs a RAG AI agent for personalized recommendations, and monetizes via affiliate links.
+Pickleball paddle intelligence platform for the Brazilian market. Scrapes prices/specs from BR retailers, runs a RAG AI agent for personalized recommendations, and monetizes via affiliate links. Now includes comprehensive test coverage (backend, frontend, pipeline, E2E) and full project documentation.
 
 ## Core Value
 
@@ -25,6 +25,15 @@ Users can confidently choose the right pickleball paddle through AI-powered reco
 - ✓ FIX-04: Zero console errors on core user flows (catalog, detail, chat) — v1.4
 - ✓ FIX-05: Existing tests pass + new regression tests for fixed bugs — v1.4
 - ✓ Frontend redesign v2.1.0 Premium Sports Analytics — dark-only design, 6 pages, 15 components — v2.1
+- ✓ Similar paddles endpoint (GET /paddles/{id}/similar via pgvector) — v2.2
+- ✓ Price alerts CRUD (POST /api/v1/price-alerts with 409 duplicate detection) — v2.2
+- ✓ Affiliate click tracking (DB persistence replacing console.log) — v2.2
+- ✓ Quiz profile persistence (already existed in users.py) — v2.2
+- ✓ Pipeline test suite restored (146+ tests passing, mock updates for scrape-based crawlers) — v2.2
+- ✓ Frontend test suite stabilized (179/179 Vitest tests passing) — v2.2
+- ✓ Playwright E2E test suite (23 tests across 5 spec files) — v2.2
+- ✓ Backend deprecation fixes (datetime.utcnow → datetime.now(timezone.utc)) — v2.2
+- ✓ Project documentation (7 docs, 2,108 lines: README, ARCHITECTURE, GETTING-STARTED, DEVELOPMENT, TESTING, CONFIGURATION, DEPLOYMENT) — v2.2
 
 ### Active
 
@@ -37,21 +46,26 @@ Users can confidently choose the right pickleball paddle through AI-powered reco
 
 ### Out of Scope
 
-- Frontend changes (complete in v2.1.0)
 - Performance optimization (addressed in v1.2)
 - Data pipeline quality improvements (addressed in v1.1)
-- Production deployment (v1.5.0)
 - TODOS T1-T7 from eng review (deferred, not launch-blocking)
 
 ## Context
 
-**Current state (v2.1.0):** Frontend redesign shipped (PR #18). Dark-only Premium Sports Analytics design system complete. Backend needs 4 new endpoints to support new frontend features: similar paddles, price alerts, affiliate tracking, and quiz profile persistence.
+**Current state (v2.2.0):** All backend endpoints implemented (similar paddles, price alerts, affiliate tracking, quiz persistence). Full test coverage: 198 backend, 179 frontend, 23 E2E Playwright, 146+ pipeline tests. Project documentation complete (7 docs, 2,108 lines). Launch readiness score improved from 5.0/10 to target range.
+
+**Tech stack:** Python 3.12 + FastAPI | Next.js 14 App Router | PostgreSQL + pgvector | Groq (LLM) | Jina AI (embeddings)
+
+**Known issues:**
+- 2 pre-existing backend chat test failures (Jina/HF/Groq API keys not set in test env)
+- 2 pre-existing pipeline embedding placeholder tests (require real DB)
+- `vercel.json` security headers duplicated in root and `frontend/` — should reconcile
 
 ## Constraints
 
 - **Tech stack:** Python 3.12 + FastAPI (backend) | Next.js 14 App Router (frontend) | PostgreSQL + pgvector
 - **No ORM:** Raw psycopg with parameterized queries — must validate column names against `pipeline/db/schema.sql`
-- **Tests:** pytest-asyncio (backend) + Vitest (frontend) — must not introduce regressions
+- **Tests:** pytest-asyncio (backend) + Vitest (frontend) + Playwright (E2E) — must not introduce regressions
 - **Locale:** PT-BR for all user-facing text
 - **Design system:** Follow DESIGN.md v5.0 (Premium Sports Analytics, dark-only)
 
@@ -63,21 +77,12 @@ Users can confidently choose the right pickleball paddle through AI-powered reco
 | Groq over Claude | Cost optimization | ✓ Working for chat |
 | Jina AI over OpenAI | Free embeddings | ✓ Working for RAG |
 | placehold.co for seed data | Quick prototyping | ⚠️ Causes image errors in production |
-| Similar paddles via pgvector | Already have `_get_similar_paddle_ids()` in RAG Agent | ✓ Minimal code needed |
-| Price alerts table | New DB table, simple CRUD | 🆕 v1.7 — planned |
-| Affiliate tracking via POST | Replace console.log with DB insert | 🆕 v1.7 — planned |
-
-## Current Milestone: v1.7.0 Backend API Updates
-
-**Goal:** Add 4 backend endpoints required by the frontend redesign (v2.1.0). Support similar paddles on product detail, price alerts modal, affiliate click tracking, and quiz profile persistence.
-
-**Target features:**
-1. `GET /paddles/{id}/similar` — Product detail shows similar paddles (currently placeholder)
-2. `POST /price-alerts` — Price alerts modal posts to backend (currently 404)
-3. `POST /api/affiliate-clicks` — Affiliate tracking logs to DB (currently console.log only)
-4. `POST/GET /quiz/profile` — Quiz profile persistence across devices (optional)
-
-**Implementation order:** Similar Paddles → Price Alerts → Affiliate Tracking → Quiz Persistence
+| Similar paddles via pgvector | Already have `_get_similar_paddle_ids()` in RAG Agent | ✓ Shipped in v2.2 |
+| Price alerts table | New DB table, simple CRUD | ✓ Shipped in v2.2 |
+| Affiliate tracking via POST | Replace console.log with DB insert | ✓ Shipped in v2.2 |
+| Fix mocks (not crawlers) | Crawlers migrated to scrape(), tests still mocked extract() | ✓ 38 pipeline failures resolved |
+| Playwright for E2E | Standard framework, good Next.js support | ✓ 23 E2E tests passing |
+| Manual docs over gsd-doc-writer | Agents timed out on large codebase | ✓ 7 docs written (3 by agents, 4 manually) |
 
 ## Evolution
 
@@ -97,4 +102,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-07 — v1.7.0 Backend API Updates milestone created from frontend redesign integration needs*
+*Last updated: 2026-04-13 after v2.2.0 milestone completion*

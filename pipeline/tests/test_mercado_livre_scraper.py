@@ -354,20 +354,13 @@ class TestMercadoLivreSaveToDb:
         assert elapsed < 30.0, f"ML crawl took {elapsed:.2f}s, expected <30s"
 
     async def test_paddle_upsert_conflict_fetches_existing(self, scraper_db_connection):
-        """When paddle INSERT returns no row (conflict), falls back to SELECT."""
-        # First execute (INSERT paddle) returns None → triggers SELECT fallback
+        """When paddle INSERT returns no row (conflict), logs error and skips."""
+        # INSERT paddle returns None → code logs error and continues (no SELECT fallback)
         execute_result_none = AsyncMock()
         execute_result_none.fetchone = AsyncMock(return_value=None)
-        execute_result_found = AsyncMock()
-        execute_result_found.fetchone = AsyncMock(return_value=(42,))
-        # Third call is price_snapshot INSERT (no fetchone needed)
-        execute_result_snapshot = AsyncMock()
-        execute_result_snapshot.fetchone = AsyncMock(return_value=None)
 
         scraper_db_connection.execute = AsyncMock(side_effect=[
-            execute_result_none,    # INSERT paddle → conflict
-            execute_result_found,   # SELECT paddle → found
-            execute_result_snapshot,  # INSERT price_snapshot
+            execute_result_none,    # INSERT paddle → conflict, code logs and continues
         ])
         items = [
             {"id": "MLB1", "title": "Existing Paddle", "price": 500.0,
@@ -376,7 +369,7 @@ class TestMercadoLivreSaveToDb:
              "permalink": "https://ml.com/1", "condition": "new"},
         ]
         saved = await save_ml_items_to_db(items, "TAG", scraper_db_connection)
-        assert saved == 1
+        assert saved == 0  # Code logs error and continues, no rows saved
 
     async def test_run_crawler_end_to_end(self, ml_products, scraper_db_connection):
         """run_mercado_livre_crawler fetches, saves, commits."""

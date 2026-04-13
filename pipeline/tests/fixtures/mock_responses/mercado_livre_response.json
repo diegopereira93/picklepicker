@@ -1,0 +1,55 @@
+{
+  "site_id": "MLB",
+  "query": "raquete pickleball",
+  "results": [
+    {
+      "id": "MLB123456789",
+      "title": "Raquete Pickleball Selkirk Vanguard Power Air Carbon Fiber",
+      "price": 1299.90,
+      "currency_id": "BRL",
+      "available_quantity": 5,
+      "permalink": "https://www.mercadolivre.com.br/raquete-pickleball-selkirk-vanguard-power-air-MLB123456789",
+      "thumbnail": "http://http2.mlstatic.com/D_123456-MLB.jpg",
+      "official_image_url": "https://http2.mlstatic.com/D_123456-MLB.jpg",
+      "installments": {"quantity": 10, "amount": 129.99, "rate": 0, "currency_id": "BRL"},
+      "shipping": {"free_shipping": true}
+    },
+    {
+      "id": "MLB234567890",
+      "title": "Raquete Pickleball JOOLA Ben Johns Hyperion CFS 16",
+      "price": 1499.90,
+      "currency_id": "BRL",
+      "available_quantity": 3,
+      "permalink": "https://www.mercadolivre.com.br/raquete-pickleball-joola-ben-johns-hyperion-cfs-MLB234567890",
+      "thumbnail": "http://http2.mlstatic.com/D_234567-MLB.jpg",
+      "official_image_url": "https://http2.mlstatic.com/D_234567-MLB.jpg",
+      "installments": {"quantity": 10, "amount": 149.99, "rate": 0, "currency_id": "BRL"},
+      "shipping": {"free_shipping": true}
+    },
+    {
+      "id": "MLB345678901",
+      "title": "Raquete Pickleball Engage Pursuit Pro Carbon",
+      "price": 899.90,
+      "currency_id": "BRL",
+      "available_quantity": 8,
+      "permalink": "https://www.mercadolivre.com.br/raquete-pickleball-engage-pursuit-pro-MLB345678901",
+      "thumbnail": "http://http2.mlstatic.com/D_345678-MLB.jpg",
+      "official_image_url": "https://http2.mlstatic.com/D_345678-MLB.jpg",
+      "installments": {"quantity": 10, "amount": 89.99, "rate": 0, "currency_id": "BRL"},
+      "shipping": {"free_shipping": false}
+    },
+    {
+      "id": "MLB456789012",
+      "title": "Raquete Pickleball Diadem Warrior 3.0 Carbon Fiber",
+      "price": 749.90,
+      "currency_id": "BRL",
+      "available_quantity": 4,
+      "permalink": "https://www.mercadolivre.com.br/raquete-pickleball-diadem-warrior-3-MLB456789012",
+      "thumbnail": "http://http2.mlstatic.com/D_456789-MLB.jpg",
+      "official_image_url": "https://http2.mlstatic.com/D_456789-MLB.jpg",
+      "installments": {"quantity": 10, "amount": 74.99, "rate": 0, "currency_id": "BRL"},
+      "shipping": {"free_shipping": true}
+    }
+  ],
+  "paging": {"total": 50, "offset": 0, "limit": 50}
+}

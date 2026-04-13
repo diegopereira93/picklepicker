@@ -16,7 +16,6 @@ os.environ.setdefault('DATABASE_URL', 'postgresql://test:test@localhost/test')
 @pytest.fixture(autouse=True)
 def mock_db_pool():
     """Mock database connection pool for all tests."""
-    # Create mock cursor
     mock_cursor = AsyncMock()
     mock_cursor.execute = AsyncMock()
     mock_cursor.fetchone = AsyncMock(return_value={"total": 0})
@@ -24,13 +23,11 @@ def mock_db_pool():
     mock_cursor.__aenter__ = AsyncMock(return_value=mock_cursor)
     mock_cursor.__aexit__ = AsyncMock(return_value=None)
 
-    # Create mock connection
     mock_conn = AsyncMock()
     mock_conn.cursor = MagicMock(return_value=mock_cursor)
     mock_conn.__aenter__ = AsyncMock(return_value=mock_conn)
     mock_conn.__aexit__ = AsyncMock(return_value=None)
 
-    # Create mock pool
     mock_pool = AsyncMock()
     mock_pool.connection = MagicMock(return_value=mock_conn)
     mock_pool.__aenter__ = AsyncMock(return_value=mock_pool)

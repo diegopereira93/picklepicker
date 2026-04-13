@@ -90,7 +90,49 @@ class SimilarPaddleResponse(BaseModel):
 
 
 class SimilarPaddlesResponse(BaseModel):
-    
+
     similar_paddles: List[SimilarPaddleResponse]
     query_paddle_id: int
     limit: int
+
+
+class PriceAlertCreate(BaseModel):
+    """Request body for creating a price alert."""
+    user_id: int
+    paddle_id: int
+    target_price_brl: float
+
+    model_config = {"from_attributes": True}
+
+
+class PriceAlertResponse(BaseModel):
+    """Response for a price alert."""
+    id: int
+    user_id: int
+    paddle_id: int
+    target_price_brl: float
+    is_active: bool
+    created_at: Optional[datetime] = None
+
+    model_config = {"from_attributes": True}
+
+
+class AffiliateClickCreate(BaseModel):
+    paddle_id: Optional[int] = None
+    retailer: Optional[str] = None
+    source: str = "organic"
+    campaign: str = "general"
+    medium: str = "affiliate"
+    page: Optional[str] = None
+    affiliate_url: Optional[str] = None
+    
+    model_config = {"from_attributes": True}
+
+
+class AffiliateClickResponse(BaseModel):
+    id: int
+    paddle_id: Optional[int] = None
+    retailer: Optional[str] = None
+    created_at: Optional[datetime] = None
+    
+    model_config = {"from_attributes": True}
