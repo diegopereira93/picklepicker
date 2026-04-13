@@ -103,9 +103,12 @@ describe('POST /api/users/migrate', () => {
 describe('lib/profile - migration helpers', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    // Reset localStorage mock
+    // Reset localStorage mock with Clerk auth token
     const localStorageMock = {
-      getItem: vi.fn(),
+      getItem: vi.fn((key: string) => {
+        if (key === '__clerk_client_jwt') return 'mock-jwt-token'
+        return null
+      }),
       setItem: vi.fn(),
       removeItem: vi.fn(),
       clear: vi.fn(),

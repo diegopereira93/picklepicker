@@ -18,27 +18,27 @@ class TestHappyPath:
         saved = await save_products_to_db(products, retailer_id, mock_db_connection)
 
         assert saved == 2
-        assert mock_db_connection.execute.call_count == 2
+        assert mock_db_connection.execute.call_count == 4  # 2 products × 2 DB ops (paddles + price_snapshots)
         # Verify first INSERT contains correct price_brl
         first_call_args = mock_db_connection.execute.call_args_list[0]
-        assert "INSERT INTO price_snapshots" in str(first_call_args)
+        assert "INSERT INTO paddles" in str(first_call_args)
 
 
 class TestRetryBackoff:
     async def test_retry_backoff(self, mock_firecrawl_app):
         """Firecrawl fails twice then succeeds on 3rd attempt."""
-        mock_firecrawl_app.extract = MagicMock(
-            side_effect=[Exception("500 error"), Exception("500 error"), {"data": {"products": []}}]
+        mock_firecrawl_app.scrape = MagicMock(
+            side_effect=[Exception("500 error"), Exception("500 error"), MagicMock(markdown="")]
         )
         result = extract_products(mock_firecrawl_app, "https://example.com")
         assert result == {"data": {"products": []}}
-        assert mock_firecrawl_app.extract.call_count == 3
+        assert mock_firecrawl_app.scrape.call_count == 3
 
 
 class TestPersistentFailure:
     async def test_persistent_failure_telegram(self, mock_firecrawl_app):
         """All 3 retries fail -> Telegram alert sent."""
-        mock_firecrawl_app.extract = MagicMock(
+        mock_firecrawl_app.scrape = MagicMock(
             side_effect=Exception("500 error")
         )
         with patch("pipeline.crawlers.brazil_store.send_telegram_alert", new_callable=AsyncMock) as mock_alert:
@@ -63,4 +63,4 @@ class TestPartialData:
         ]
         saved = await save_products_to_db(products, 1, mock_db_connection)
         assert saved == 1
-        assert mock_db_connection.execute.call_count == 1
+        assert mock_db_connection.execute.call_count == 2  # 1 valid product × 2 DB ops (paddles + price_snapshots)

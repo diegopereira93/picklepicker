@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import React from 'react'
 import { getOrCreateUserId, getProfile, saveProfile } from '@/lib/profile'
-import { QuizFlow } from '@/components/quiz/quiz-flow'
+import { QuizWidget } from '@/components/quiz/quiz-widget'
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -26,13 +26,13 @@ beforeEach(() => {
 })
 
 describe('getOrCreateUserId', () => {
-  it('Test 5: generates UUID on first call', () => {
+  it('generates UUID on first call', () => {
     const uid = getOrCreateUserId()
     expect(uid).toBe('test-uuid-1234')
     expect(localStorageMock.getItem('pickleiq:uid')).toBe('test-uuid-1234')
   })
 
-  it('Test 5b: returns same UUID on subsequent calls', () => {
+  it('returns same UUID on subsequent calls', () => {
     localStorageMock.setItem('pickleiq:uid', 'existing-uuid')
     const uid = getOrCreateUserId()
     expect(uid).toBe('existing-uuid')
@@ -40,135 +40,106 @@ describe('getOrCreateUserId', () => {
 })
 
 describe('getProfile / saveProfile', () => {
-  it('Test 4: saves profile to localStorage under pickleiq:profile:{uid}', () => {
+  it('saves profile to localStorage under pickleiq:profile:{uid}', async () => {
     localStorageMock.setItem('pickleiq:uid', 'myuid')
-    saveProfile({ level: 'beginner', style: 'control', budget_max: 600 })
+    await saveProfile({ level: 'beginner', style: 'control', budget_max: 600 })
     const raw = localStorageMock.getItem('pickleiq:profile:myuid')
     expect(raw).not.toBeNull()
     const parsed = JSON.parse(raw!)
     expect(parsed).toEqual({ level: 'beginner', style: 'control', budget_max: 600 })
   })
 
-  it('returns null when no profile stored', () => {
+  it('returns null when no profile stored', async () => {
     localStorageMock.setItem('pickleiq:uid', 'myuid')
-    expect(getProfile()).toBeNull()
+    const profile = await getProfile()
+    expect(profile).toBeNull()
   })
 
-  it('returns stored profile', () => {
+  it('returns stored profile', async () => {
     localStorageMock.setItem('pickleiq:uid', 'myuid')
-    saveProfile({ level: 'advanced', style: 'power', budget_max: 1000 })
-    const profile = getProfile()
+    await saveProfile({ level: 'advanced', style: 'power', budget_max: 1000 })
+    const profile = await getProfile()
     expect(profile?.level).toBe('advanced')
     expect(profile?.budget_max).toBe(1000)
   })
 })
 
-describe('QuizFlow component', () => {
+describe('QuizWidget component', () => {
   function renderQuiz(onComplete = vi.fn()) {
     localStorageMock.setItem('pickleiq:uid', 'myuid')
-    return render(React.createElement(QuizFlow, { onComplete }))
+    return render(React.createElement(QuizWidget, { onComplete }))
   }
 
-  it('Test 1: renders step 1 (level) first', () => {
+  function getSubmitButton(): HTMLElement | undefined {
+    const buttons = screen.getAllByRole('button')
+    return buttons.find(btn => (btn.textContent || '').includes('Comecar'))
+  }
+
+  it('renders all three sections: level, budget, style', () => {
     renderQuiz()
-    expect(screen.getByText(/qual o seu nivel de jogo/i)).toBeDefined()
+    expect(screen.getByText('Iniciante')).toBeDefined()
+    expect(screen.getByText('Ate R$300')).toBeDefined()
+    expect(screen.getByText('R$300-600')).toBeDefined()
+    expect(screen.getByText('Acima R$600')).toBeDefined()
+    expect(screen.getByText('Controle')).toBeDefined()
   })
 
-  it('Test 1b: advance button disabled without selection', () => {
+  it('submit button is disabled without all selections', () => {
     renderQuiz()
-    const btn = screen.getByRole('button', { name: /proximo/i })
-    expect(btn).toHaveProperty('disabled', true)
+    const submitBtn = getSubmitButton()
+    expect(submitBtn).toBeDefined()
+    expect(submitBtn!.hasAttribute('disabled')).toBe(true)
   })
 
-  it('Test 2: selecting beginner enables advance button', () => {
+  it('selecting all three options enables button', () => {
     renderQuiz()
     fireEvent.click(screen.getByText('Iniciante'))
-    const btn = screen.getByRole('button', { name: /proximo/i })
-    expect(btn).toHaveProperty('disabled', false)
-  })
-
-  it('Test 2b: clicking Next after level selection shows step 2 (style)', () => {
-    renderQuiz()
-    fireEvent.click(screen.getByText('Iniciante'))
-    fireEvent.click(screen.getByRole('button', { name: /proximo/i }))
-    expect(screen.getByText(/qual seu estilo de jogo/i)).toBeDefined()
-  })
-
-  it('Test 8: advance blocked without selection at each step', () => {
-    renderQuiz()
-    // Step 1 - no selection
-    expect(screen.getByRole('button', { name: /proximo/i }).getAttribute('disabled')).not.toBeNull()
-    // Move to step 2
-    fireEvent.click(screen.getByText('Iniciante'))
-    fireEvent.click(screen.getByRole('button', { name: /proximo/i }))
-    // Step 2 - no selection
-    expect(screen.getByRole('button', { name: /proximo/i }).getAttribute('disabled')).not.toBeNull()
-  })
-
-  it('Test 3: completing all 3 steps calls saveProfile with correct data', () => {
-    localStorageMock.setItem('pickleiq:uid', 'myuid')
-    const onComplete = vi.fn()
-    render(React.createElement(QuizFlow, { onComplete }))
-
-    // Step 1: level
-    fireEvent.click(screen.getByText('Iniciante'))
-    fireEvent.click(screen.getByRole('button', { name: /proximo/i }))
-
-    // Step 2: style
+    fireEvent.click(screen.getByText('Ate R$300'))
     fireEvent.click(screen.getByText('Controle'))
-    fireEvent.click(screen.getByRole('button', { name: /proximo/i }))
-
-    // Step 3: budget
-    fireEvent.click(screen.getByText('R$ 600'))
-    fireEvent.click(screen.getByRole('button', { name: /comecar/i }))
-
-    expect(onComplete).toHaveBeenCalledWith({
-      level: 'beginner',
-      style: 'control',
-      budget_max: 600,
-    })
-
-    // Also check localStorage
-    const raw = localStorageMock.getItem('pickleiq:profile:myuid')
-    expect(raw).not.toBeNull()
-    const saved = JSON.parse(raw!)
-    expect(saved.level).toBe('beginner')
-    expect(saved.budget_max).toBe(600)
+    const submitBtn = getSubmitButton()
+    expect(submitBtn!.hasAttribute('disabled')).toBe(false)
   })
 
-  it('Test 7: editing profile updates localStorage without clearing external state', () => {
-    localStorageMock.setItem('pickleiq:uid', 'myuid')
-    saveProfile({ level: 'beginner', style: 'control', budget_max: 600 })
-
+  it('clicking submit with all selections calls onComplete with correct profile', async () => {
     const onComplete = vi.fn()
-    render(React.createElement(QuizFlow, { onComplete, editMode: true }))
+    renderQuiz(onComplete)
 
-    // Change level to advanced
-    fireEvent.click(screen.getByText('Avancado'))
-    fireEvent.click(screen.getByRole('button', { name: /proximo/i }))
+    fireEvent.click(screen.getByText('Iniciante'))
+    fireEvent.click(screen.getByText('Ate R$300'))
+    fireEvent.click(screen.getByText('Controle'))
 
-    fireEvent.click(screen.getByText('Potencia'))
-    fireEvent.click(screen.getByRole('button', { name: /proximo/i }))
+    const submitBtn = getSubmitButton()
+    expect(submitBtn).toBeDefined()
+    fireEvent.click(submitBtn!)
 
-    fireEvent.click(screen.getByText('R$ 1000'))
-    fireEvent.click(screen.getByRole('button', { name: /comecar/i }))
-
-    const saved = JSON.parse(localStorageMock.getItem('pickleiq:profile:myuid')!)
-    expect(saved.level).toBe('advanced')
-    expect(onComplete).toHaveBeenCalledTimes(1)
+    await vi.waitFor(() => {
+      expect(onComplete).toHaveBeenCalledWith({
+        level: 'beginner',
+        style: 'control',
+        budget_max: 300,
+      })
+    })
   })
-})
 
-describe('Edit profile option', () => {
-  it('Test 6: QuizFlow in editMode pre-fills values from existing profile', () => {
-    localStorageMock.setItem('pickleiq:uid', 'myuid')
-    saveProfile({ level: 'intermediate', style: 'balanced', budget_max: 800 })
+  it('saves profile to localStorage on complete', async () => {
+    const onComplete = vi.fn()
+    renderQuiz(onComplete)
 
-    render(React.createElement(QuizFlow, { onComplete: vi.fn(), editMode: true }))
-    // The quiz should still show step 1 with pre-filled selection visible
-    expect(screen.getByText(/qual o seu nivel de jogo/i)).toBeDefined()
-    // The advance button should be enabled because existing profile pre-fills level
-    const btn = screen.getByRole('button', { name: /proximo/i })
-    expect(btn).toHaveProperty('disabled', false)
+    fireEvent.click(screen.getByText('Iniciante'))
+    fireEvent.click(screen.getByText('R$300-600'))
+    fireEvent.click(screen.getByText('Potencia'))
+
+    const submitBtn = getSubmitButton()
+    expect(submitBtn).toBeDefined()
+    fireEvent.click(submitBtn!)
+
+    await vi.waitFor(() => {
+      const raw = localStorageMock.getItem('pickleiq:profile:myuid')
+      expect(raw).not.toBeNull()
+      const saved = JSON.parse(raw!)
+      expect(saved.level).toBe('beginner')
+      expect(saved.style).toBe('power')
+      expect(saved.budget_max).toBe(600)
+    })
   })
 })

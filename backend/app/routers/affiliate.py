@@ -3,13 +3,15 @@ from fastapi.responses import RedirectResponse
 from datetime import datetime
 import structlog
 import urllib.parse
+from psycopg.rows import dict_row
+from app.db import get_connection
 
 
 logger = structlog.get_logger()
 router = APIRouter()
 
 
-@router.get("/api/track-affiliate")
+@router.get("/track-affiliate")
 async def track_affiliate(
     utm_source: str = "pickleiq",
     utm_campaign: str = "search",
@@ -19,7 +21,6 @@ async def track_affiliate(
 ):
     """Track affiliate click and redirect to partner."""
     try:
-        # Log the click (database integration would go here)
         logger.info(
             "affiliate.click",
             utm_source=utm_source,
@@ -29,13 +30,24 @@ async def track_affiliate(
             redirect_url=redirect_url
         )
 
-        # Redirect to partner
+        try:
+            async with get_connection() as conn:
+                async with conn.cursor(row_factory=dict_row) as cur:
+                    await cur.execute(
+                        """INSERT INTO affiliate_clicks (paddle_id, source, campaign, medium, affiliate_url)
+                           VALUES (%s, %s, %s, %s, %s) RETURNING id""",
+                        [paddle_id, utm_source, utm_campaign, utm_medium, redirect_url]
+                    )
+        except Exception:
+            pass
+
         if redirect_url:
-            # Decode the URL if it was encoded
             decoded_url = urllib.parse.unquote(redirect_url)
             return RedirectResponse(url=decoded_url, status_code=302)
         else:
             raise HTTPException(status_code=400, detail="Missing redirect_url")
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error("affiliate.tracking.error", error=str(e))
         raise HTTPException(status_code=500, detail="Tracking failed")

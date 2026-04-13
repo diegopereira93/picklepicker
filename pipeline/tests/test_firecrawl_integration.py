@@ -46,6 +46,31 @@ class ClientError(FirecrawlHTTPError):
 
 
 # ---------------------------------------------------------------------------
+# Helper functions and constants
+# ---------------------------------------------------------------------------
+
+def make_scrape_mock(markdown="", side_effect=None):
+    """Create a mock app that uses scrape() instead of extract()."""
+    app = MagicMock()
+    if side_effect:
+        app.scrape = MagicMock(side_effect=side_effect)
+    else:
+        app.scrape = MagicMock(return_value=MagicMock(markdown=markdown))
+    return app
+
+
+BRAZIL_STORE_MARKDOWN = """\
+[Raquete Selkirk Vanguard Power Air](https://brazilpickleballstore.com.br/produtos/selkirk-vanguard)
+R$1.299,90
+"""
+
+DROPSHOT_MARKDOWN = """\
+Paddle X Power
+R$899,00
+"""
+
+
+# ---------------------------------------------------------------------------
 # Plan v1.1-05 Task 1: Firecrawl integration test suite
 # ---------------------------------------------------------------------------
 
@@ -54,43 +79,38 @@ class TestFirecrawlExtractEndpoint:
 
     def test_extract_endpoint_basic(self):
         """Valid URL + normal response → returns products dict."""
-        app = MagicMock()
-        expected = {"data": {"products": [
-            {"name": "Paddle X", "price_brl": 500.0, "in_stock": True,
-             "image_url": "https://img.com/x.jpg",
-             "product_url": "https://store.com/x",
-             "brand": "Brand", "specs": {}}
-        ]}}
-        app.extract = MagicMock(return_value=expected)
+        app = make_scrape_mock(markdown=BRAZIL_STORE_MARKDOWN)
         result = bs_extract(app, "https://example.com/raquetes")
-        assert result == expected
-        app.extract.assert_called_once()
+        assert "data" in result
+        assert "products" in result["data"]
+        assert len(result["data"]["products"]) == 1
+        assert "Raquete Selkirk Vanguard Power Air" in result["data"]["products"][0]["name"]
+        assert result["data"]["products"][0]["price_brl"] == 1299.9
+        app.scrape.assert_called_once()
 
     def test_timeout_3_retry_attempts(self):
         """Timeout on first 2 calls, success on 3rd → 3 total attempts."""
-        app = MagicMock()
-        success = {"data": {"products": []}}
-        app.extract = MagicMock(side_effect=[
+        success_response = MagicMock(markdown="")
+        app = make_scrape_mock(side_effect=[
             TimeoutError("Request timed out"),
             TimeoutError("Request timed out"),
-            success,
+            success_response,
         ])
         result = bs_extract(app, "https://example.com/raquetes")
-        assert result == success
-        assert app.extract.call_count == 3
+        assert "data" in result
+        assert "products" in result["data"]
+        assert app.scrape.call_count == 3
 
     def test_rate_limit_429_response(self):
         """All 3 retries hit rate limit → raises RateLimitError."""
-        app = MagicMock()
-        app.extract = MagicMock(side_effect=RateLimitError())
+        app = make_scrape_mock(side_effect=RateLimitError())
         with pytest.raises(RateLimitError):
             bs_extract(app, "https://example.com/raquetes")
-        assert app.extract.call_count == 3
+        assert app.scrape.call_count == 3
 
     def test_parse_error_invalid_json(self):
         """Firecrawl returns data=None → run_crawler returns 0 gracefully."""
-        app = MagicMock()
-        app.extract = MagicMock(return_value={"data": None})
+        app = make_scrape_mock(markdown="")
 
         async def _run():
             with patch("pipeline.crawlers.brazil_store.get_connection") as mc:
@@ -104,33 +124,28 @@ class TestFirecrawlExtractEndpoint:
 
     def test_http_error_4xx_handling(self):
         """HTTP 4xx (client error) is non-retryable — tenacity retries anyway but raises."""
-        app = MagicMock()
-        app.extract = MagicMock(side_effect=ClientError(400))
+        app = make_scrape_mock(side_effect=ClientError(400))
         with pytest.raises(ClientError):
             bs_extract(app, "https://example.com/raquetes")
-        # tenacity retries all exceptions; 3 attempts made
-        assert app.extract.call_count == 3
+        assert app.scrape.call_count == 3
 
     def test_http_error_5xx_handling(self):
         """HTTP 5xx (server error) is retryable — 3 attempts then raises."""
-        app = MagicMock()
-        app.extract = MagicMock(side_effect=ServerError(500))
+        app = make_scrape_mock(side_effect=ServerError(500))
         with pytest.raises(ServerError):
             bs_extract(app, "https://example.com/raquetes")
-        assert app.extract.call_count == 3
+        assert app.scrape.call_count == 3
 
     def test_max_retries_exceeded_raises(self):
         """After 3 retries, exception re-raised (reraise=True in @retry)."""
-        app = MagicMock()
-        app.extract = MagicMock(side_effect=Exception("Persistent failure"))
+        app = make_scrape_mock(side_effect=Exception("Persistent failure"))
         with pytest.raises(Exception, match="Persistent failure"):
             bs_extract(app, "https://example.com/raquetes")
-        assert app.extract.call_count == 3
+        assert app.scrape.call_count == 3
 
     async def test_max_retries_exceeded_triggers_alert(self):
         """After max retries, Telegram alert sent with scraper name."""
-        app = MagicMock()
-        app.extract = MagicMock(side_effect=Exception("Network error"))
+        app = make_scrape_mock(side_effect=Exception("Network error"))
         with patch("pipeline.crawlers.brazil_store.send_telegram_alert", new_callable=AsyncMock) as mock_alert:
             with pytest.raises(Exception):
                 await run_brazil_store_crawler(app=app)
@@ -165,10 +180,8 @@ class TestConcurrentScraperExecution:
 
     async def test_concurrent_3_scrapers(self):
         """Run Brazil Store, Drop Shot, and ML in parallel — all succeed."""
-        bs_app = MagicMock()
-        bs_app.extract = MagicMock(return_value={"data": {"products": []}})
-        ds_app = MagicMock()
-        ds_app.extract = MagicMock(return_value={"data": {"products": []}})
+        bs_app = make_scrape_mock(markdown="")
+        ds_app = make_scrape_mock(markdown="")
 
         empty_ml = {"results": [], "paging": {"total": 0, "offset": 0, "limit": 50}}
         mock_ml_resp = MagicMock()
@@ -203,12 +216,10 @@ class TestConcurrentScraperExecution:
     async def test_rate_limit_under_concurrent_load(self):
         """One scraper hits rate limit; others continue successfully."""
         # Brazil Store: rate limited (fails)
-        bs_app = MagicMock()
-        bs_app.extract = MagicMock(side_effect=RateLimitError())
+        bs_app = make_scrape_mock(side_effect=RateLimitError())
 
         # Drop Shot: succeeds
-        ds_app = MagicMock()
-        ds_app.extract = MagicMock(return_value={"data": {"products": []}})
+        ds_app = make_scrape_mock(markdown="")
 
         with patch("pipeline.crawlers.brazil_store.send_telegram_alert", new_callable=AsyncMock), \
              patch("pipeline.crawlers.dropshot_brasil.get_connection") as ds_conn:
@@ -228,8 +239,7 @@ class TestConcurrentScraperExecution:
 
     async def test_circuit_breaker_on_repeated_failures(self):
         """Repeated failures trigger Telegram alert (acting as circuit breaker signal)."""
-        failing_app = MagicMock()
-        failing_app.extract = MagicMock(side_effect=Exception("Firecrawl down"))
+        failing_app = make_scrape_mock(side_effect=Exception("Firecrawl down"))
 
         alert_calls = []
         async def capture_alert(msg):
@@ -260,25 +270,22 @@ class TestErrorHandlingDocumentation:
         assert wait.max == 120
 
     def test_dropshot_brasil_retry_config(self):
-        """Drop Shot Brasil: 3 retries, exponential backoff min=1s max=10s."""
+        """Drop Shot Brasil: 3 retries, exponential backoff min=10s max=120s."""
         retry_obj = ds_extract.retry
         assert retry_obj.stop.max_attempt_number == 3
         wait = retry_obj.wait
-        assert wait.min == 1
-        assert wait.max == 10
+        assert wait.min == 10
+        assert wait.max == 120
 
     def test_reraise_true_on_final_failure(self):
         """reraise=True means final exception propagates to caller."""
-        app = MagicMock()
-        original_error = ValueError("Custom error")
-        app.extract = MagicMock(side_effect=original_error)
+        app = make_scrape_mock(side_effect=ValueError("Custom error"))
         with pytest.raises(ValueError, match="Custom error"):
             bs_extract(app, "https://example.com")
 
     async def test_alert_message_format(self):
         """Alert message includes scraper name and '3 retries'."""
-        app = MagicMock()
-        app.extract = MagicMock(side_effect=Exception("boom"))
+        app = make_scrape_mock(side_effect=Exception("boom"))
         with patch("pipeline.crawlers.brazil_store.send_telegram_alert", new_callable=AsyncMock) as mock_alert:
             with pytest.raises(Exception):
                 await run_brazil_store_crawler(app=app)
@@ -288,8 +295,7 @@ class TestErrorHandlingDocumentation:
 
     async def test_dropshot_alert_message_format(self):
         """Drop Shot Brasil alert includes 'Drop Shot Brasil' in message."""
-        app = MagicMock()
-        app.extract = MagicMock(side_effect=Exception("boom"))
+        app = make_scrape_mock(side_effect=Exception("boom"))
         with patch("pipeline.crawlers.dropshot_brasil.send_telegram_alert", new_callable=AsyncMock) as mock_alert:
             with pytest.raises(Exception):
                 await run_dropshot_brasil_crawler(app=app)

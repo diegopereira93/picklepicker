@@ -1,0 +1,58 @@
+{
+  "data": {
+    "products": [
+      {
+        "name": "Selkirk Vanguard Power Air",
+        "price_brl": 1299.90,
+        "in_stock": true,
+        "image_url": "https://brazilpickleballstore.com.br/wp-content/uploads/selkirk-vanguard-power-air.jpg",
+        "product_url": "https://brazilpickleballstore.com.br/produto/selkirk-vanguard-power-air/",
+        "brand": "Selkirk",
+        "specs": {
+          "peso": "226g",
+          "espessura": "13mm",
+          "material": "T700 Carbon Fiber"
+        }
+      },
+      {
+        "name": "JOOLA Ben Johns Hyperion CFS 16",
+        "price_brl": 1499.90,
+        "in_stock": true,
+        "image_url": "https://brazilpickleballstore.com.br/wp-content/uploads/joola-ben-johns-hyperion.jpg",
+        "product_url": "https://brazilpickleballstore.com.br/produto/joola-ben-johns-hyperion-cfs-16/",
+        "brand": "JOOLA",
+        "specs": {
+          "peso": "227g",
+          "espessura": "16mm",
+          "material": "Carbon Fiber"
+        }
+      },
+      {
+        "name": "Engage Pursuit Pro",
+        "price_brl": 899.90,
+        "in_stock": false,
+        "image_url": "https://brazilpickleballstore.com.br/wp-content/uploads/engage-pursuit-pro.jpg",
+        "product_url": "https://brazilpickleballstore.com.br/produto/engage-pursuit-pro/",
+        "brand": "Engage",
+        "specs": {
+          "peso": "223g",
+          "espessura": "13mm",
+          "material": "Graphite"
+        }
+      },
+      {
+        "name": "Diadem Warrior 3.0",
+        "price_brl": 749.90,
+        "in_stock": true,
+        "image_url": "https://brazilpickleballstore.com.br/wp-content/uploads/diadem-warrior-3.jpg",
+        "product_url": "https://brazilpickleballstore.com.br/produto/diadem-warrior-3-0/",
+        "brand": "Diadem",
+        "specs": {
+          "peso": "220g",
+          "espessura": "14mm",
+          "material": "Carbon Fiber"
+        }
+      }
+    ]
+  }
+}

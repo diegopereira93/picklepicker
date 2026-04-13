@@ -9,6 +9,7 @@
     "lint": "next lint",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "playwright test",
     "lighthouse": "lighthouse http://localhost:3000 --output html --output-path ./lighthouse-report.html --chrome-flags='--headless'",
     "lighthouse:ci": "lhci autorun",
     "analyze": "cross-env ANALYZE=true next build",

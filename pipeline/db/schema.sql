@@ -142,6 +142,26 @@ CREATE TABLE user_profiles (
 );
 
 -- ============================================================
+-- Table 10: affiliate_clicks — Affiliate click tracking
+-- ============================================================
+CREATE TABLE affiliate_clicks (
+    id              BIGSERIAL PRIMARY KEY,
+    paddle_id       BIGINT REFERENCES paddles(id),
+    retailer        TEXT,
+    source          TEXT DEFAULT 'organic',
+    campaign        TEXT DEFAULT 'general',
+    medium          TEXT DEFAULT 'affiliate',
+    page            TEXT,
+    affiliate_url   TEXT,
+    user_agent      TEXT,
+    ip_address      TEXT,
+    created_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_affiliate_clicks_paddle ON affiliate_clicks(paddle_id);
+CREATE INDEX idx_affiliate_clicks_created ON affiliate_clicks(created_at);
+
+-- ============================================================
 -- Seed data: Retailers for Phase 1
 -- ============================================================
 INSERT INTO retailers (name, base_url, integration_type, is_active) VALUES
