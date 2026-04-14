@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.2.1] - 2026-04-14
+
+### Fixed
+- **Comparação de raquetes** — Corrigido bug onde usuários não conseguiam comparar raquetes. Agora o fluxo mantém estado local entre cliques (compareIds) e só redireciona para /compare quando exatamente 2 raquetes são selecionadas. Adicionado toggle para remover raquetes do comparador e feedback visual via toast.
+- **CatalogClient onCompare** — Implementado handler onCompare no SelectionBar que estava vazio, permitindo navegação para página de comparação quando 2 raquetes selecionadas.
+
 ## [2.1.0] - 2026-04-07
 
 ### Changed
