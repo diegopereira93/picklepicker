@@ -1,9 +1,11 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import { Paddle } from '@/types/paddle'
 import { fetchPaddles } from '@/lib/api'
 import { getProfile } from '@/lib/profile'
+import { toast } from 'sonner'
 import { FilterBar } from './filter-bar'
 import { ComparisonTable } from './comparison-table'
 import { ProductGrid } from './product-grid'
@@ -19,6 +21,7 @@ export function CatalogClient() {
   const [activeLevel, setActiveLevel] = useState<string | null>(null)
   const [userProfile, setUserProfile] = useState<import('@/types/paddle').UserProfile | null>(null)
   const [selected, setSelected] = useState<Set<number>>(new Set())
+  const router = useRouter()
 
   useEffect(() => {
     async function load() {
@@ -119,8 +122,18 @@ export function CatalogClient() {
 
       <SelectionBar
         count={selected.size}
-        onCompare={() => {}}
-        onClear={() => setSelected(new Set())}
+        onCompare={() => {
+          if (selected.size !== 2) {
+            toast.error('Selecione exatamente 2 raquetes para comparar')
+            return
+          }
+          const ids = Array.from(selected)
+          router.push(`/compare?a=${ids[0]}&b=${ids[1]}`)
+        }}
+        onClear={() => {
+          setSelected(new Set())
+          toast.info('Selecao limpa')
+        }}
       />
     </div>
   )
