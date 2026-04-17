@@ -1,50 +1,54 @@
+---
+gsd_state_version: 1.0
+milestone: v2.2.0
+milestone_name: Launch Readiness: Testes & Correções Críticas
+status: completed
+last_updated: "2026-04-13T22:30:00.000Z"
+last_activity: 2026-04-13 — v2.2.0 milestone completed and archived
+progress:
+  total_phases: 4
+  completed_phases: 4
+  total_plans: 4
+  completed_plans: 4
+  percent: 100
+---
+
 # STATE.md — PickleIQ
 
 ## Current Position
 
-Milestone: v1.7.0 — Backend API for Frontend Redesign
-Phase: 21 — Price Alerts CRUD
-Status: Planning complete, awaiting `/gsd:execute-phase 21` to begin execution
-Last activity: 2026-04-08 — Documentation cleanup: Phases 16-20 marked complete
+Milestone: v2.2.0 — COMPLETED AND ARCHIVED
+Phase: None — milestone complete
+Status: Ready for next milestone planning
+Last activity: 2026-04-13
 
 ## Recently Completed
 
 | Phase | Description | Date | Commit |
 |-------|-------------|------|--------|
-| 16 | DESIGN.md v3.0 + Foundation | 2026-04-05 | 6853154 |
-| 17 | Home-C Quiz-Forward | 2026-04-05 | 6853154 |
-| 18 | Chat-B Sidebar Companion | 2026-04-05 | 6853154 |
-| 19 | Catalog-A Comparison Table | 2026-04-05 | 6853154 |
-| 20 | Similar Paddles Endpoint | 2026-04-07 | ccfd7c7 |
+| 24 | Fix Pipeline Tests | 2026-04-12 | 762d654 |
+| 25 | Fix Frontend Tests | 2026-04-12 | 141cf2b |
+| 26 | Playwright E2E Tests | 2026-04-12 | e710a91 |
+| 27 | Backend Deprecation Fixes | 2026-04-12 | 50762c8 |
+| — | E2E selector fixes | 2026-04-12 | 82e119c |
+| — | Project documentation (7 docs) | 2026-04-13 | ca05820 |
+| — | backend/.env.example | 2026-04-13 | 6df9037 |
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-07)
+See: .planning/PROJECT.md (updated 2026-04-13)
 
 **Core value:** Users can confidently choose the right pickleball paddle through AI-powered recommendations backed by real-time pricing and technical specs
-**Current focus:** v1.7.0 Backend API — endpoint additions for frontend redesign v2.1.0
+**Current focus:** Milestone complete — run `/gsd-new-milestone` to start next
 
-## Context
+## Test Status
 
-Frontend redesign v2.1.0 shipped successfully (PR #18 merged). The new UI features require 4 backend endpoints:
-
-1. **Similar Paddles** (`GET /paddles/{id}/similar`) — Product detail pages need similar paddle recommendations
-2. **Price Alerts** (`POST /price-alerts`) — Price alerts modal needs backend persistence
-3. **Affiliate Tracking** (`POST /api/affiliate-clicks`) — Analytics requires DB logging instead of console.log
-4. **Quiz Profile** (`POST/GET /quiz/profile`) — Cross-device profile persistence (optional)
-
-**Implementation priority:** Similar Paddles → Price Alerts → Affiliate Tracking → Quiz Profile
-**Estimated effort:** ~4.5 hours total
-
-## Prerequisites (Complete ✅)
-
-- [x] Frontend redesign v2.1.0 shipped (PR #18 merged)
-- [x] 182/182 frontend tests passing
-- [x] 174+ backend tests passing (2 pre-existing Jina/HF API 401 failures)
-- [x] Build passes (0 errors, 21/21 pages)
-- [x] Token audit clean (23 files verified)
-- [x] Oracle APPROVED (v1.7 redesign complete)
-- [x] Backend analyzed for integration points (4 gaps identified)
+| Suite | Status | Details |
+|-------|--------|---------|
+| Frontend (vitest) | ✅ 179/179 pass | 19 suites |
+| Backend (pytest) | ✅ 196/198 pass | 2 pre-existing (Jina/HF API 401) |
+| Pipeline (pytest) | ✅ 146+ pass | 2 embedding placeholders, 2 slow retry (pre-existing) |
+| E2E (Playwright) | ✅ 23/23 pass | 5 spec files |
 
 ## Accumulated Context
 
@@ -59,60 +63,19 @@ Frontend redesign v2.1.0 shipped successfully (PR #18 merged). The new UI featur
 | Launch Readiness | v1.4.0 | 14 | ✅ Complete |
 | UI Redesign | v1.6.0 | 16–19 | ✅ Complete |
 | Frontend Redesign v2.1.0 | v2.1.0 | — | ✅ Complete |
-| **Backend API Updates** | **v1.7.0** | **20–23** | **⏳ Planning** |
-
-### Key Files for v1.7.0 Implementation
-
-| File | Purpose | Phase |
-|------|---------|-------|
-| `backend/app/api/paddles.py` | Add `GET /paddles/{id}/similar` endpoint | 20 |
-| `backend/app/agents/rag_agent.py` | Contains `_get_similar_paddle_ids()` — reference for endpoint | 20 |
-| `pipeline/db/schema.sql` | Add `price_alerts`, `affiliate_clicks`, `quiz_profiles` tables | 21-23 |
-| `backend/app/api/price_alerts.py` | New file for POST endpoint | 21 |
-| `backend/app/routers/affiliate.py` | Add POST tracking endpoint | 22 |
-| `backend/app/api/quiz.py` | New file for profile endpoints | 23 |
-| `backend/app/schemas.py` | Add Pydantic models for all new endpoints | 20-23 |
-
-### Backend Analysis Summary
-
-**Similar Paddles:**
-- RAG Agent has `_get_similar_paddle_ids()` method ready to expose
-- Need to add endpoint to existing `paddles.py` router
-- Return full paddle objects, not just IDs
-
-**Price Alerts:**
-- New table required (`price_alerts`)
-- Worker `price_alert_check.py` exists but has no data
-- Email validation via Pydantic `EmailStr`
-
-**Affiliate Tracking:**
-- New table required (`affiliate_clicks`)
-- Add POST to existing `affiliate.py` router (GET already exists)
-- Optional fields for analytics: session_id, user_agent
-
-**Quiz Profile:**
-- New table required (`quiz_profiles`)
-- New file `quiz.py` for endpoints
-- UUID profile_id for cross-device persistence
-
-### Key Technical Notes
-
-- **No ORM:** Raw psycopg with parameterized queries — validate column names against `pipeline/db/schema.sql`
-- **Async:** All DB queries via `psycopg_pool.AsyncConnectionPool`
-- **Tests:** pytest-asyncio, 80%+ coverage required
-- **Locale:** PT-BR for user-facing error messages
-- **Frontend:** Already shipped — 56 files changed in v2.1.0
-- **DB migrations:** Run `schema.sql` updates against PostgreSQL
+| Backend API Updates | v1.7.0 | 20–23 | ✅ Complete |
+| Launch Readiness | v2.2.0 | 24–27 | ✅ Complete (archived) |
 
 ### Active Deferred Items (T1-T7)
 
 From eng review (TODOS.md):
+
 - T1: Provision Supabase/Railway production infrastructure → v1.5.0
 - T2: Eval gate as monthly CI job → v1.5.1
 - T3: Legal assessment of scraping BR retailer data → v1.5.2
 - T5: Load test /chat endpoint (P95 < 3s) → v1.5.1
 - T6: Zero-paddle alert in crawler GitHub Actions → v1.5.0
-- T7: Embedding provider reliability (local fallback) → v1.5.0 (Phase 15.5-15.6)
+- T7: Embedding provider reliability (local fallback) → v1.5.0
 
 ---
-*State updated: 2026-04-07 — v1.7.0 Backend API Updates milestone ready to start*
+*State updated: 2026-04-13 — v2.2.0 milestone completed and archived*

@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 import structlog
 
@@ -13,7 +13,7 @@ async def health():
     """Extended health check including environment and version info."""
     status_data = {
         "status": "ok",
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "environment": os.getenv("ENVIRONMENT", "development"),
         "version": os.getenv("RAILWAY_GIT_COMMIT_SHA", "unknown")[:8] if os.getenv("RAILWAY_GIT_COMMIT_SHA") else "local",
         "subsystems": {

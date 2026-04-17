@@ -1,320 +1,351 @@
-# 🏓 PickleIQ
+# PickleIQ
 
-**Plataforma de Inteligência de Dados & IA para Pickleball**
+[![Version](https://img.shields.io/badge/version-1.4.0-brightgreen.svg)](VERSION)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/release/python-3120/)
+[![Next.js](https://img.shields.io/badge/Next.js-14-black.svg)](https://nextjs.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.104-teal.svg)](https://fastapi.tiangolo.com/)
 
-PickleIQ é uma plataforma web que combina monitoramento automatizado de preços de mercado com um agente de IA conversacional para ajudar jogadores de pickleball a escolherem raquetes de forma informada.
+> Plataforma de inteligência para raquetes de Pickleball no mercado brasileiro.
 
----
+PickleIQ é uma plataforma que compara preços e especificações de raquetes de pickleball em varejistas brasileiros, oferece recomendações personalizadas através de um agente de IA com RAG, e monetiza por meio de links de afiliados.
 
-## O Problema
+## Índice
 
-O mercado de pickleball cresceu **311% em 3 anos**, com 19,8 milhões de jogadores nos EUA. Mas compradores enfrentam dois desafios críticos:
+- [Sobre o Projeto](#sobre-o-projeto)
+- [Screenshots](#screenshots)
+- [Recursos](#recursos)
+- [Tecnologias](#tecnologias)
+- [Como Começar](#como-começar)
+- [Estrutura do Projeto](#estrutura-do-projeto)
+- [Comandos de Desenvolvimento](#comandos-de-desenvolvimento)
+- [API](#api)
+- [Deploy](#deploy)
+- [Testing](#testing)
+- [Contribuindo](#contribuindo)
+- [Licença](#licença)
 
-1. **Métricas técnicas incompreensíveis** — Swingweight, twistweight, composição de materiais. A maioria dos jogadores não entende o que significa.
-2. **Fragmentação de mercado** — Preços e disponibilidade variam significativamente entre varejistas, sem visibilidade centralizada.
+## Sobre o Projeto
 
-## A Solução
+O PickleIQ nasceu para resolver um problema real no mercado brasileiro de pickleball, a falta de informações centralizadas sobre raquetes, preços variados entre varejistas, e dificuldade em escolher a raquete ideal para cada perfil de jogador.
 
-PickleIQ resolve ambos os problemas:
+Nossa plataforma oferece:
 
-- **Monitoramento de preços em tempo real** — Scraping automatizado de múltiplos varejistas brasileiros (Brazil Pickleball Store, Drop Shot Brasil, Mercado Livre).
-- **Agente de IA conversacional** — Um assistente que traduz métricas técnicas em linguagem simples e recomenda raquetes personalizadas baseado no perfil do jogador.
-- **Comparador visual** — Compare lado a lado com métricas traduzidas e um gráfico radar intuitivo.
-- **Monetização por afiliados** — Links contextuais que geram receita (10-40% de comissão por venda).
+- **Comparação de Preços**: Monitoramento em tempo real de raquetes em 3 varejistas brasileiros (Brazil Store, Dropshot Brasil, Mercado Livre)
+- **Recomendações Personalizadas**: Quiz de 7 perguntas para entender seu perfil e sugerir raquetes adequadas
+- **Chat com IA**: Agente RAG que responde perguntas sobre raquetes usando busca semântica no catálogo
+- **Alertas de Preço**: Receba notificações quando raquetes de interesse tiverem queda de preço
+- **Sistema de Afiliados**: Rastreamento de cliques para monetização
 
----
+## Screenshots
 
-## Para Quem É
+<!-- Placeholder para screenshot da homepage -->
+![Homepage](./docs/screenshots/homepage.png)
 
-| Persona | Necessidade | Solução |
-|---------|-----------|----------|
-| **Iniciante entusiasmado** (35-55 anos) | Quer comprar a "raquete certa" mas não entende o jargão técnico | Recomendação personalizada em linguagem simples |
-| **Jogador intermediário analítico** (28-45 anos) | Quer comparar objetivamente modelos diferentes com dados atualizados | Comparativo técnico + preços em tempo real |
-| **Gift buyer** | Quer dar uma raquete como presente mas não sabe por onde começar | Descreve o perfil, recebe sugestão direta com link de compra |
+<!-- Placeholder para screenshot do chat -->
+![Chat IA](./docs/screenshots/chat-ai.png)
 
----
+<!-- Placeholder para screenshot do catálogo -->
+![Catálogo](./docs/screenshots/catalog.png)
 
-## Stack Tecnológico
+## Recursos
 
-| Camada | Tecnologia |
-|--------|------------|
-| **Scraping** | Firecrawl API |
-| **Pipeline** | GitHub Actions (cron) |
-| **Banco Relacional** | PostgreSQL (Supabase em produção) |
-| **Banco Vetorial** | pgvector (extensão Supabase) |
-| **LLM** | Groq (Mixtral 8x7B — streaming) |
-| **Embeddings** | Jina AI (v2-base, 768d) + Hugging Face (fallback) |
-| **Backend API** | Python + FastAPI |
-| **Frontend** | Next.js 14 (App Router) + Tailwind CSS |
-| **Autenticação** | Clerk (Phase 5+) |
-| **Hospedagem Backend** | Railway |
-| **Hospedagem Frontend** | Vercel |
+### Para Usuários
 
----
+- **Quiz de Recomendação**: 7 perguntas sobre estilo de jogo, nível, orçamento e preferências
+- **Chat Inteligente**: Faça perguntas em português e receba respostas baseadas no catálogo
+- **Catálogo Completo**: Mais de 150 raquetes com especificações detalhadas
+- **Comparação de Preços**: Veja o melhor preço entre múltiplos varejistas
+- **Alertas de Preço**: Cadastre-se para receber avisos de queda de preço
+- **Raquetes Similares**: Encontre alternativas semelhantes à sua escolha
 
-## Roadmap de Desenvolvimento
+### Para Desenvolvedores
 
-A plataforma é desenvolvida em fases organizadas em milestones:
+- **API RESTful**: Endpoints para raquetes, chat, alertas de preço, tracking de afiliados
+- **Streaming SSE**: Chat com respostas em tempo real via Server-Sent Events
+- **RAG com pgvector**: Busca semântica usando embeddings Jina AI (768 dimensões)
+- **Scraping Robusto**: Crawlers com retry (tenacity) para 3 varejistas
+- **Testes Abrangentes**: 174 testes backend + 182 testes frontend
+- **CI/CD Automatizado**: Deploy automático via GitHub Actions
 
-### v2.1.0 — Premium Sports Analytics Redesign (2026-04-07)
+## Tecnologias
 
-| Fase | Objetivo | Status |
-|------|----------|--------|
-| **16** | DESIGN.md v5.0 + Foundation — dark-only design system, tokens, animations | ✅ Concluído |
-| **17** | Home-C Quiz-Forward — quiz above-the-fold, data stats, trust signals | ✅ Concluído |
-| **18** | Chat-B Sidebar Companion — split-panel, product sidebar, card responses | ✅ Concluído |
-| **19** | Catalog-A Comparison Table — sortable table, grid toggle, filters | ✅ Concluído |
-| **20** | Similar Paddles Endpoint — GET /paddles/{id}/similar API | ✅ Concluído |
-| **21** | Price Alerts CRUD — database + POST endpoint for price alerts | 📋 Pendente |
+### Backend
+- **Python 3.12** com FastAPI (API assíncrona)
+- **PostgreSQL + pgvector** (banco de dados vetorial)
+- **Groq** (LLM: Mixtral 8x7B para chat)
+- **Jina AI** (embeddings: v2-base, 768d)
+- **psycopg_pool** (connection pool assíncrono)
 
-### v2.0.0 — Warm Guide Redesign (2026-04-06)
+### Frontend
+- **Next.js 14** (App Router + Server Components)
+- **TypeScript** (tipagem estática)
+- **TailwindCSS** (estilização)
+- **Clerk** (autenticação)
+- **Vitest** (testes unitários)
 
-| Fase | Objetivo | Status |
-|------|----------|--------|
-| **—** | Light-first "Warm Guide" aesthetic, coral accents, full dark mode toggle | ✅ Concluído |
-
-### v1.6.0 — NVIDIA Design System (2026-04-05)
-
-| Fase | Objetivo | Status |
-|------|----------|--------|
-| **—** | Hybrid Modern Sports Tech v2.0 with NVIDIA-inspired UI | ✅ Concluído |
-
-### v1.4 — Launch Readiness & Bug Fixes (2026-04-04)
-
-| Fase | Objetivo | Status |
-|------|----------|--------|
-| **14** | Fix images, routing, chat bugs + regression tests | ✅ Concluído |
-
-### v1.3 — Hybrid UI Redesign (2026-04-02)
-
-| Fase | Objetivo | Status |
-|------|----------|--------|
-| **13** | Hybrid Modern Sports Tech design system — typography, colors, components | ✅ Concluído |
-
-### v1.2 — Core Web Vitals Optimization (2026-04-01)
-
-| Fase | Objetivo | Status |
-|------|----------|--------|
-| **11** | Performance optimization — images, fonts, layout stability, accessibility | ✅ Concluído |
-
-### v1.1 — Scraper Validation & E2E Testing (2026-04-01)
-
-| Fase | Objetivo | Status |
-|------|----------|--------|
-| **7** | E2E Testing & Scraper Validation — 101 testes, 94% coverage | ✅ Concluído |
-| **8** | Navigation UX Fixes — /compare 404, quiz gate, mobile nav | ✅ Concluído |
-| **9** | Image Extraction — real product images from Brazil Store | ✅ Concluído |
-
-### v1.0 — MVP (2026-03-28)
-
-| Fase | Objetivo | Status |
-|------|----------|--------|
-| **1** | Ambiente dev + primeiro crawler funcional | ✅ Concluído |
-| **2** | Pipeline completo + scraping de todos os varejistas | ✅ Concluído |
-| **3** | Agente RAG de recomendação com latência < 3s | ✅ Concluído |
-| **4** | Frontend: chat, comparador, tracking de afiliados | ✅ Concluído |
-| **5** | Autenticação Clerk, SEO, alertas de preço, blog, admin | ✅ Concluído |
-| **6** | Deploy produção, beta launch com 50 usuários | ✅ Concluído |
-
-**Status atual:** v2.1.0 Premium Sports Analytics — redesign completo, Phase 21 (Price Alerts) pendente.
-
----
-
-## Métricas de Sucesso
-
-- **500 MAU** no mês 3 pós-lançamento
-- **Taxa de conversão ≥ 3%** (clique → compra)
-- **NPS ≥ 50** após 90 dias de operação
-- **MRR USD 1.000** no mês 9
-- **P95 latência agente < 3 segundos**
-
----
-
-## Documentação
-
-- **[PickleIQ_PRD_v1.0.md](./PickleIQ_PRD_v1.0.md)** — Produto completo: problema, solução, personas, user stories, requisitos técnicos, roadmap
-- **[TODOS.md](./TODOS.md)** — 7 itens deferred do eng review (T1-T7): infraestrutura, monitoring, legal, testes
-- **[CLAUDE.md](./CLAUDE.md)** — Configuração AI assistant: workflow, skills, design system
-- **[CONTRIBUTING.md](./CONTRIBUTING.md)** — Setup de desenvolvimento, CI/CD, workflow de contribuição
-- **[DESIGN.md](./DESIGN.md)** — Design system e diretrizes visuais do projeto
-- **[CHANGELOG.md](./CHANGELOG.md)** — Histórico de versões e mudanças
-
----
+### Pipeline & Infra
+- **Python 3.12** com Firecrawl (scraping)
+- **Docker Compose** (Postgres local)
+- **GitHub Actions** (CI/CD)
+- **Railway** (backend production)
+- **Vercel** (frontend production)
+- **Supabase** (DB production com pgvector)
 
 ## Como Começar
 
 ### Pré-requisitos
-- Docker & Docker Compose
+
+- Docker (para PostgreSQL local)
 - Python 3.12+
 - Node.js 18+
-- curl (para health checks)
+- Make
 
-### Setup Rápido
+### Instalação
+
 ```bash
-git clone <repo>
+# Clone o repositório
+git clone https://github.com/seu-usuario/picklepicker.git
 cd picklepicker
 
-# Instala todas as dependências (backend + frontend)
+# Configure as variáveis de ambiente
+cp .env.example .env
+# Edite .env com suas chaves de API (Groq, Jina AI, Clerk, etc.)
+
+# Instale todas as dependências
 make setup
+```
 
-# Crie o arquivo de ambiente
-cp backend/.env.example backend/.env
-# Edite backend/.env com suas credenciais:
-#   DATABASE_URL, GROQ_API_KEY, FIRECRAWL_API_KEY, etc.
+### Executando Localmente
 
-# Inicia tudo (DB + backend + frontend)
+```bash
+# Inicie o banco de dados, backend e frontend (hot-reload)
 make dev
 ```
 
-Backend: http://localhost:8000 | API Docs: http://localhost:8000/docs
-Frontend: http://localhost:3000
+Isso vai:
+1. Subir PostgreSQL com pgvector via Docker
+2. Iniciar backend em http://localhost:8000
+3. Iniciar frontend em http://localhost:3000
 
-### Usando o Makefile
+Acesse a aplicação em http://localhost:3000.
 
-O Makefile é a forma recomendada de interagir com o projeto. Todos os comandos incluem validação de ambiente e health checks automáticos.
-
-```bash
-make help          # Lista todos os comandos disponíveis
-make help-full     # Ajuda completa com categorias
-```
-
-#### Ambiente
-
-| Comando | O que faz |
-|---------|-----------|
-| `make setup` | Instala dependências do backend (pip) + frontend (npm) |
-| `make setup-backend` | Instala apenas dependências do backend |
-| `make setup-frontend` | Instala apenas dependências do frontend |
-| `make env-check` | Verifica pré-requisitos (Docker, DATABASE_URL, GROQ_API_KEY) |
-
-#### Desenvolvimento
-
-| Comando | O que faz |
-|---------|-----------|
-| `make dev` | Sobe DB + backend + frontend em paralelo (hot-reload) |
-| `make dev-backend` | Sobe apenas o backend (requer DB) |
-| `make dev-frontend` | Sobe apenas o frontend |
-
-#### Banco de Dados
-
-| Comando | O que faz |
-|---------|-----------|
-| `make db-up` | Inicia PostgreSQL (pgvector) via Docker com health check |
-| `make db-down` | Para o PostgreSQL |
-| `make db-logs` | Mostra logs do PostgreSQL em tempo real |
-| `make db-shell` | Abre shell psql |
-| `make db-clean` | Para e remove todos os dados (destructive!) |
-
-#### Testes
-
-| Comando | O que faz |
-|---------|-----------|
-| `make test` | Roda todos os testes (backend + frontend) |
-| `make test-backend` | Roda testes do backend com pytest |
-| `make test-backend-cov` | Roda testes com relatório de cobertura HTML |
-| `make test-frontend` | Roda testes do frontend com vitest |
-| `make test-e2e` | Roda testes E2E dos crawlers (requer DB) |
-
-#### Controle
-
-| Comando | O que faz |
-|---------|-----------|
-| `make stop` | Para todos os serviços (DB + backend + frontend) |
-| `make clean` | Remove tudo (venvs, node_modules, dados do DB) |
-
-#### Fluxo de trabalho típico
-
-```bash
-# Primeira vez no projeto
-make setup
-cp backend/.env.example backend/.env  # preencha suas credenciais
-make dev
-
-# Dia a dia
-make dev              # inicia tudo
-make stop             # para tudo
-
-# Antes de abrir PR
-make test             # verifica se tudo passa
-```
-
-### Variáveis de Ambiente
-
-Crie `backend/.env` com as variáveis necessárias:
-
-```bash
-# Obrigatórias
-DATABASE_URL=postgresql://pickleiq:changeme@localhost:5432/pickleiq
-GROQ_API_KEY=your_groq_api_key
-
-# Embeddings (Jina AI primário, Hugging Face fallback)
-JINA_API_KEY=your_jina_api_key
-HUGGINGFACE_API_KEY=your_hf_api_key  # opcional, fallback
-
-# Opcionais (para crawlers)
-FIRECRAWL_API_KEY=your_firecrawl_key
-MERCADO_LIVRE_API_KEY=your_ml_key
-TELEGRAM_BOT_TOKEN=your_telegram_token
-TELEGRAM_CHAT_ID=your_chat_id
-```
-
-O `make env-check` valida as variáveis obrigatórias automaticamente antes de iniciar qualquer serviço.
-
----
-
-## Estrutura do Repositório
+## Estrutura do Projeto
 
 ```
 picklepicker/
-├── backend/              # FastAPI + RAG agent
+├── backend/                 # FastAPI + RAG agent
 │   ├── app/
-│   │   ├── main.py
-│   │   ├── api/
-│   │   └── agents/
-│   ├── pipeline/         # Crawlers, embeddings, dedup, alerts
-│   ├── tests/
+│   │   ├── main.py         # FastAPI entrypoint
+│   │   ├── api/            # REST endpoints
+│   │   ├── agents/         # RAG agent + eval gate
+│   │   ├── middleware/     # Telegram alerting
+│   │   ├── routers/        # Affiliate tracking, webhooks
+│   │   ├── db.py           # Async connection pool
+│   │   ├── schemas.py      # Pydantic models
+│   │   ├── prompts.py      # Prompt templates (PT-BR)
+│   │   └── cache.py        # Caching layer
+│   ├── workers/            # Background workers
+│   ├── tests/              # pytest-asyncio tests
 │   └── pyproject.toml
-├── frontend/             # Next.js 14 (App Router)
+├── frontend/               # Next.js 14 App Router
 │   ├── src/
-│   │   ├── app/
-│   │   ├── components/
-│   │   ├── lib/
-│   │   └── types/
+│   │   ├── app/            # Pages (/, /paddles, /chat, etc.)
+│   │   ├── components/     # UI components
+│   │   ├── lib/            # API client, auth, tracking
+│   │   ├── types/          # TypeScript types
+│   │   ├── hooks/          # Custom hooks
+│   │   └── tests/          # Vitest tests
 │   └── package.json
-├── pipeline/             # Standalone scraping pipeline
-│   ├── crawlers/
-│   ├── embeddings/
-│   ├── dedup/
-│   └── alerts/
-├── .github/workflows/    # CI/CD + scheduled scraping
-├── prisma/               # Database migrations
-├── scripts/              # Utility scripts
-├── docker-compose.yml
-├── CLAUDE.md
-├── CONTRIBUTING.md
-├── DESIGN.md
-├── CHANGELOG.md
-├── TODOS.md
-└── VERSION
+├── pipeline/               # Scraping + data pipeline
+│   ├── crawlers/           # Brazil Store, Dropshot, ML
+│   ├── db/                # Schema, connection pool
+│   ├── dedup/             # Spec matching, normalization
+│   ├── embeddings/         # Jina AI embeddings
+│   ├── alerts/            # Price alert notifications
+│   └── tests/              # Pipeline tests
+├── .github/workflows/      # CI/CD workflows
+├── docker-compose.yml      # Local Postgres
+├── Makefile               # Dev orchestration
+├── DESIGN.md              # Design system v2.0
+├── CLAUDE.md              # AI assistant config
+└── README.md              # This file
 ```
 
+## Comandos de Desenvolvimento
+
+### Setup
+```bash
+make setup              # Install all deps (backend + frontend)
+make setup-backend      # Install backend deps only
+make setup-frontend     # Install frontend deps only
+make env-check          # Validate environment
+```
+
+### Development
+```bash
+make dev               # Start DB + backend + frontend (parallel)
+make dev-backend       # Backend only (:8000)
+make dev-frontend      # Frontend only (:3000)
+make stop              # Stop all services
+```
+
+### Testing
+```bash
+make test              # All tests (backend + frontend)
+make test-backend      # pytest (backend)
+make test-frontend     # vitest (frontend)
+make test-e2e          # E2E scraper tests
+make test-backend-cov  # Coverage report (backend)
+```
+
+### Database
+```bash
+make db-up             # Start PostgreSQL
+make db-down           # Stop PostgreSQL
+make db-logs           # Tail PostgreSQL logs
+make db-shell          # Open psql shell
+make db-clean          # Remove all data (destructive!)
+```
+
+### Help
+```bash
+make help              # List all commands
+make help-full         # Grouped command reference
+```
+
+## API
+
+### Endpoints Principais
+
+#### Paddles
+- `GET /api/v1/paddles` — Lista todas as raquetes (com filtros: brand, price_range, skill_level)
+- `GET /api/v1/paddles/{id}` — Detalhes de uma raquete específica
+- `GET /api/v1/paddles/{id}/similar` — Raquetes similares (embeddings + pgvector)
+
+#### Chat (RAG)
+- `POST /api/v1/chat` — Chat com IA (SSE streaming)
+  - Body: `{"message": "qual raquete para jogador iniciante?", "history": [...]}`
+
+#### Price Alerts
+- `POST /api/v1/price-alerts` — Criar alerta de preço
+- `GET /api/v1/price-alerts/{user_id}` — Listar alertas do usuário
+
+#### Affiliate Tracking
+- `GET /api/v1/affiliate/{paddle_id}` — Redirecionamento com tracking
+- `POST /api/v1/affiliate/click` — Registrar clique
+
+#### Admin
+- `GET /api/v1/admin/health` — Health check
+- `GET /api/v1/admin/price-history/{paddle_id}` — Histórico de preços
+
+### Documentação Completa
+
+Acesse http://localhost:8000/docs (Swagger UI) para documentação interativa completa.
+
+## Deploy
+
+### Production
+
+- **Backend**: Railway (automatic deployment via GitHub Actions)
+- **Frontend**: Vercel (automatic deployment via GitHub Actions)
+- **Database**: Supabase (PostgreSQL + pgvector)
+
+### Environment Variables (Production)
+
+```env
+# Backend
+DATABASE_URL=postgresql://user:pass@host:port/db
+GROQ_API_KEY=gsk_...
+JINA_API_KEY=jina_...
+ADMIN_SECRET=seu-secret-admin
+TELEGRAM_BOT_TOKEN=seu-token
+TELEGRAM_CHAT_ID=seu-chat-id
+
+# Frontend
+NEXT_PUBLIC_API_URL=https://pickleiq-backend.railway.app
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_...
+CLERK_SECRET_KEY=sk_...
+```
+
+### CI/CD Workflows
+
+- `.github/workflows/deploy.yml` — Deploy automático em push para main
+- `.github/workflows/test.yml` — Run tests em todos os PRs
+- `.github/workflows/scrape.yml` — Scraping diário (cron)
+- `.github/workflows/lighthouse.yml` — Lighthouse CI para performance
+
+## Testing
+
+### Backend Tests
+
+```bash
+cd backend
+pytest --cov=app --cov-report=html
+```
+
+- Framework: pytest-asyncio
+- Coverage target: 80%+
+- 174 passing tests (current)
+
+### Frontend Tests
+
+```bash
+cd frontend
+npm test
+```
+
+- Framework: Vitest + jsdom
+- 182 passing tests (current)
+
+### E2E Tests
+
+```bash
+make test-e2e
+```
+
+- Framework: Playwright
+- Testa fluxo completo: quiz → catálogo → chat
+
+## Contribuindo
+
+Contribuições são bem-vindas! Por favor:
+
+1. Fork o repositório
+2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
+3. Commit suas mudanças (`git commit -m 'Add nova feature'`)
+4. Push para a branch (`git push origin feature/nova-feature`)
+5. Abra um Pull Request
+
+### Convenções de Código
+
+- **Backend**: PEP 8, type hints, docstrings (PT-BR)
+- **Frontend**: ESLint, Prettier, TypeScript strict mode
+- **Commit messages**: Conventional Commits (`feat:`, `fix:`, `docs:`)
+- **Tests**: Escreva testes para novas features
+
+### Design System
+
+Leia `DESIGN.md` antes de modificar qualquer componente UI. Seguimos o sistema de design v2.0 com estética Modern Sports Tech.
+
+## Roadmap
+
+- [ ] Fase 21: Price Alerts CRUD (table + POST endpoint)
+- [ ] Fase 22: Affiliate Click Tracking (DB persistence)
+- [ ] Fase 23: Quiz Profile Persistence (cross-device sync)
+- [ ] Integração com mais varejistas brasileiros
+- [ ] App mobile (React Native)
+
+## Licença
+
+Este projeto está licenciado sob a Licença MIT — veja o arquivo [LICENSE](LICENSE) para detalhes.
+
+## Contato
+
+- **Issues**: https://github.com/seu-usuario/picklepicker/issues
+- **Discussions**: https://github.com/seu-usuario/picklepicker/discussions
+- **Email**: contato@pickleiq.com.br
+
 ---
 
-## Próximas Ações
-
-v2.1.0 Redesign completo. Próximos passos:
-1. Phase 21: Price Alerts CRUD — endpoint POST /price-alerts
-2. Phase 22: Affiliate Click Tracking — persistir clicks no banco
-3. Phase 23: Quiz Profile Persistence — cross-device (opcional)
-4. v1.5 Production Readiness — infra, legal, reliability (deferred)
-
----
-
-## Contato & Suporte
-
-- **Deferred work:** Veja [TODOS.md](./TODOS.md) para 7 itens do eng review
-
----
-
-**Status do Projeto:** v2.1.0 — 7 milestones entregues, v1.7.0 em progresso
-**Última atualização:** 2026-04-08
+Feito com 🥒 para a comunidade brasileira de pickleball.

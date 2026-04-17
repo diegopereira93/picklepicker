@@ -1,0 +1,31 @@
+{
+  "data": {
+    "products": [
+      {
+        "name": "Drop Shot Explorer 3.0",
+        "price_brl": 459.90,
+        "in_stock": true,
+        "image_url": "https://dropshotbrasil.com.br/wp-content/uploads/explorer-3.jpg",
+        "product_url": "https://www.dropshotbrasil.com.br/raquetes/drop-shot-explorer-3-0",
+        "brand": "Drop Shot",
+        "specs": {
+          "espessura": "13mm",
+          "material": "Carbon Fiber"
+        }
+      },
+      {
+        "name": "Head Graphene 360+ Radical",
+        "price_brl": 679.90,
+        "in_stock": true,
+        "image_url": "https://dropshotbrasil.com.br/wp-content/uploads/head-graphene.jpg",
+        "product_url": "https://www.dropshotbrasil.com.br/raquetes/head-graphene-360-radical",
+        "brand": "Head",
+        "specs": {
+          "peso": "225g",
+          "espessura": "13mm",
+          "formato": "standard"
+        }
+      }
+    ]
+  }
+}

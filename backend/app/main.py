@@ -13,6 +13,8 @@ from app.api.health import router as health_router
 from app.api.price_history import router as price_history_router
 from app.api.embeddings import router as embeddings_router
 from app.api.users import router as users_router
+from app.api.price_alerts import router as price_alerts_router
+from app.api.affiliate_clicks import router as affiliate_clicks_router
 from app.routers.affiliate import router as affiliate_router
 from app.logging_config import configure_logging
 from app.middleware.alerts import alerter
@@ -55,7 +57,9 @@ app.include_router(health_router)
 app.include_router(price_history_router)
 app.include_router(embeddings_router)
 app.include_router(users_router, prefix="/api/v1")
-app.include_router(affiliate_router, tags=["affiliate"])
+app.include_router(price_alerts_router, prefix="/api/v1")
+app.include_router(affiliate_clicks_router, prefix="/api/v1")
+app.include_router(affiliate_router, prefix="/api")
 
 
 # HTTP request/response logging middleware

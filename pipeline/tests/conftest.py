@@ -9,7 +9,7 @@ os.environ.setdefault("DATABASE_URL", "postgresql://test:test@localhost/test")
 @pytest.fixture
 def mock_firecrawl_app():
     app = MagicMock()
-    app.extract = MagicMock()
+    app.scrape = MagicMock()
     return app
 
 

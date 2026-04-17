@@ -55,6 +55,8 @@ function CatalogPageContent() {
     filters.brand ? filters.brand.split(',') : []
   )
 
+  const [compareIds, setCompareIds] = useState<string[]>([])
+
   const loadProducts = useCallback(async () => {
     setIsLoading(true)
     const params: Record<string, string | number | boolean | undefined> = {
@@ -214,19 +216,24 @@ function CatalogPageContent() {
                   <ProductCard
                     paddle={paddle}
                     mode="catalog"
+                    isCompareSelected={compareIds.includes(String(paddle.id))}
                     onCompare={() => {
-                      const existing = new URLSearchParams(window.location.search).get('compare')
-                      const ids = existing ? existing.split(',') : []
-                      if (ids.length >= 2) {
+                      if (compareIds.includes(String(paddle.id))) {
+                        setCompareIds(prev => prev.filter(id => id !== String(paddle.id)))
+                        toast.info(`${paddle.name} removido do comparador.`)
+                        return
+                      }
+                      if (compareIds.length >= 2) {
                         toast.error('Comparador cheio! Maximo 2 raquetes.')
                         return
                       }
-                      if (ids.includes(String(paddle.id))) {
-                        toast.info('Raquete ja esta no comparador.')
-                        return
+                      const newIds = [...compareIds, String(paddle.id)]
+                      setCompareIds(newIds)
+                      if (newIds.length === 2) {
+                        router.push(`/compare?a=${newIds[0]}&b=${newIds[1]}`)
+                      } else {
+                        toast.success(`${paddle.name} adicionado! Clique em Compare em outra raquete para completar.`)
                       }
-                      ids.push(String(paddle.id))
-                      window.location.href = `/compare?a=${ids[0]}&b=${ids[1]}`
                     }}
                     onAlert={() => {
                       toast.info('Alerta de preco em breve disponivel!')

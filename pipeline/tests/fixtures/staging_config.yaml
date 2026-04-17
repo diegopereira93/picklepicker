@@ -1,0 +1,12 @@
+brazil_store:
+  url: "https://brazilpickleballstore.com.br/raquete/"
+
+dropshot_brasil:
+  url: "https://www.dropshotbrasil.com.br/raquetes"
+
+mercado_livre:
+  search_url: "https://api.mercadolibre.com/sites/MLB/search"
+
+timeout_seconds: 30
+retry_attempts: 3
+backoff_base_seconds: 10
