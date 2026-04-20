@@ -1,0 +1,17 @@
+FROM node:22-alpine
+
+WORKDIR /app
+
+# Install deps first (layer cache)
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm install --legacy-peer-deps
+
+# Copy source (overridden by volume mount in dev)
+COPY frontend/ .
+
+# Next.js needs this for HMR in Docker on Linux
+ENV WATCHPACK_POLLING=true
+
+EXPOSE 3000
+
+CMD ["npm", "run", "dev"]

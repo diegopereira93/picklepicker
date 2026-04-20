@@ -33,20 +33,6 @@ PRODUCT_DETAIL_URL = f"{JOOLA_BASE_URL}/products"
 # Shopify paginates max 250 products per page
 PAGE_SIZE = 250
 
-# Keywords that indicate non-paddle products to filter out
-EXCLUDE_KEYWORDS = {
-    "bola", "ball", "bolinhas", "bag", "mochila", "bolso", "luva",
-    "sapato", "shoe", "tenis", "camisa", "shirt", "bermuda", "short",
-    "meia", "sock", "headband", "faixa", "boné", "cap", "acessorio",
-    "accessory", "grip", "overgrip", "eyewear", "oculos", "hat",
-    "visor", "protetor", "case", "capa", "conjunto", "kit",
-    "backpack", "rack", "cart", "torre", "net", "rede", "post",
-}
-
-# Keywords that confirm a product IS a paddle
-PADDLE_KEYWORDS = {
-    "paddle", "raquete", "raquet", "paddles", "raquetes",
-}
 
 
 class HTMLTextExtractor(HTMLParser):
@@ -135,21 +121,7 @@ def extract_specs_from_html(html_content: str) -> dict:
 
 
 def is_paddle_product(title: str, product_type: str = "") -> bool:
-    """Return True if the product is a pickleball paddle, not an accessory."""
-    combined = f"{title} {product_type}".lower()
-
-    # Explicitly exclude non-paddle items
-    for kw in EXCLUDE_KEYWORDS:
-        if kw in combined:
-            return False
-
-    # Must contain a paddle keyword
-    for kw in PADDLE_KEYWORDS:
-        if kw in combined:
-            return True
-
-    # If no paddle keyword found, assume it's not a paddle
-    return False
+    return "raquete" in f"{title} {product_type}".lower()
 
 
 def map_shopify_product(product: dict) -> Optional[dict]:

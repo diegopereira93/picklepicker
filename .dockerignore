@@ -1,0 +1,16 @@
+.git
+.gitignore
+.node_modules
+.next
+.planning
+.sisyphus
+.claude
+**/venv
+**/.venv
+**/__pycache__
+**/node_modules
+**/.pytest_cache
+**/htmlcov
+**/.env.local
+*.md
+!README.md

@@ -3,6 +3,7 @@
 
 -- Enable pgvector extension (available in pgvector/pgvector:pg16 image)
 CREATE EXTENSION IF NOT EXISTS vector;
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
 -- ============================================================
 -- Table 1: paddles — Master paddle catalog
