@@ -3,6 +3,13 @@
 import re
 import unicodedata
 
+KNOWN_BRANDS: set[str] = {
+    "selkirk", "joola", "franklin", "onomic", "engage", "paddletek",
+    "prokennex", "babolat", "head", "yonex", "vulcan", "gearbox",
+    "electrum", "diadem", "dropshot", "niupipo", "bsport", "eleven",
+    "slk", "proton", "ronbus", "sixzero", "breadnbutters",
+}
+
 
 def normalize_paddle_name(name: str) -> str:
     if not name:
@@ -70,7 +77,7 @@ def validate_image_belongs_to_product(image_url: str, product_name: str) -> bool
     # Para URLs de CDN conhecidos sem palavras-chave, valida por domínio
     cdn_domains = [
         'mitiendanube.com', 'cloudfront.net', 'amazonaws.com',
-        'dropshotbrasil.com.br', 'mercadolivre.com', 'mlcdn.com',
+        'dropshotbrasil.com.br', 'joola.com.br', 'shopify.com', 'shopifycdn.com', 'cdn.',
         'cdn.', 'images.', 'img.', 'products.', 'produtos.'
     ]
     is_known_cdn = any(domain in url_lower for domain in cdn_domains)
@@ -79,18 +86,28 @@ def validate_image_belongs_to_product(image_url: str, product_name: str) -> bool
 
 
 def extract_brand_from_name(name: str) -> str:
-    """Extrai a marca do nome do produto.
-    
-    Assume que a marca geralmente é a primeira palavra relevante.
+    """Extrai a marca do nome do produto usando lookup de marcas conhecidas.
+
+    Primeiro verifica cada palavra contra KNOWN_BRANDS (case-insensitive).
+    Se não encontrar, faz fallback para a primeira palavra após remover stop words.
     """
     if not name:
         return ""
-    
-    # Remove prefixos comuns
-    name = re.sub(r'^(raquete[s]?\s+|de\s+|para\s+)', '', name, flags=re.IGNORECASE)
-    
-    # Pega a primeira palavra como marca
-    words = name.strip().split()
-    if words:
-        return words[0]
-    return ""
+
+    cleaned = re.sub(r'^(raquete[s]?\s+|de\s+|para\s+)', '', name, flags=re.IGNORECASE)
+    words = cleaned.strip().split()
+
+    # Check each word against known brands
+    for word in words:
+        normalized = re.sub(r'[^a-z]', '', word.lower())
+        if normalized in KNOWN_BRANDS:
+            return normalized.capitalize()
+
+    # Fallback: first word after removing stop words
+    stop_words = {"de", "para", "com", "sem", "the", "and", "or", "em", "um", "uma"}
+    for word in words:
+        w = word.lower().strip()
+        if w not in stop_words and len(w) > 1:
+            return w.capitalize()
+
+    return words[0].capitalize() if words else ""
