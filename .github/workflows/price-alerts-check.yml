@@ -9,6 +9,12 @@ jobs:
   check-prices:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      FASTAPI_URL: ${{ secrets.FASTAPI_URL }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
 
     steps:
       - uses: actions/checkout@v4
@@ -18,11 +24,25 @@ jobs:
           python-version: '3.12'
 
       - name: Install dependencies
-        run: pip install "psycopg[binary,pool]" httpx
+        run: pip install "psycopg[binary,pool]" httpx python-telegram-bot
 
       - name: Run price alert worker
-        run: python backend/workers/price_alert_check.py
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-          FASTAPI_URL: ${{ secrets.FASTAPI_URL }}
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 15
+          max_attempts: 3
+          retry_on: error
+          command: python backend/workers/price_alert_check.py
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          python3 -c "
+          import asyncio
+          import os
+          import sys
+          sys.path.insert(0, '.')
+          from pipeline.alerts.telegram import send_telegram_alert
+          msg = '🚨 Price alerts check FAILED. Check: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+          asyncio.run(send_telegram_alert(msg))
+          "
