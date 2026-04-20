@@ -4,13 +4,8 @@ interface TipCardProps {
 
 export function TipCard({ content }: TipCardProps) {
   return (
-    <div className="hy-chat-card hy-chat-card-tip hy-animate-card-enter mt-2">
-      <p
-        className="text-sm text-[var(--color-gray-300)] leading-[var(--line-height-normal)]"
-        style={{ lineHeight: 'var(--line-height-normal)' }}
-      >
-        {content}
-      </p>
+    <div className="mt-2 bg-elevated border-l-2 border-brand-primary rounded-rounded px-4 py-3 animate-slide-in">
+      <p className="text-sm text-text-secondary leading-relaxed">{content}</p>
     </div>
   )
 }

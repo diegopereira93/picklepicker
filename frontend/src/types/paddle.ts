@@ -28,6 +28,8 @@ export interface Paddle {
   rating?: number
   review_count?: number
   in_stock?: boolean
+  retailer_count?: number
+  latest_scraped_at?: string
 }
 
 export interface PaddleListResponse {
