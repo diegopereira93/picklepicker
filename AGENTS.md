@@ -3,8 +3,8 @@
  A Pickleball paddle intelligence platform for the Brazilian market. Scrapes prices/specs from BR retailers, runs a RAG AI agent for personalized recommendations, and monetizes via affiliate links.
 
  
-**Generated:** 2026-04-05
-**Version:** 1.4.0
+**Generated:** 2026-04-19
+**Version:** 2.3.0
 **Stack:** Python 3.12 + FastAPI (backend) | Next.js 14 App Router (frontend) | PostgreSQL + pgvector (DB) | Groq (LLM) | Jina AI (embeddings)
 
 ## Structure
@@ -36,22 +36,22 @@ picklepicker/
 │   │   └── middleware.ts # Clerk middleware
 │   └── package.json
 ├── pipeline/          # Scraping + data pipeline (Python)
-│   ├── crawlers/       # Brazil Store, Dropshot Brasil, Mercado Livre
-│   ├── db/            # Schema, connection pool, dead letter queue, quality metrics
+│   ├── crawlers/       # Brazil Store, Dropshot Brasil, JOOLA (Shopify JSON API)
+│   ├── db/            # Schema, connection pool, migrations, dead letter queue, quality metrics
 │   ├── dedup/          # Spec matching (RapidFuzz), normalization
-│   ├── embeddings/     # OpenAI embeddings for pgvector
+│   ├── embeddings/     # Jina AI embeddings for pgvector
 │   ├── alerts/         # Price alert notifications
-│   ├── utils/          # Shared utilities
+│   ├── utils/          # Shared utilities (KNOWN_BRANDS, validation)
 │   ├── tests/          # pytest-asyncio, mock responses, fixtures
 │   └── pyproject.toml
 ├── .github/workflows/  # CI/CD: deploy, test, scrape, lighthouse, price-alerts, NPS survey
-├── prisma/            # Database migrations (legacy)
 ├── scripts/          # Utility scripts (SQL seeds, image extraction, NPS surveys)
 ├── docker-compose.yml # Local Postgres (pgvector image)
 ├── Makefile            # Dev orchestration (setup, db-up, dev, test, prod-local)
 ├── CLAUDE.md           # AI assistant config — READ THIS
 ├── DESIGN.md          # Design system v2.0 — follow strictly
-├── TODOS.md            # 7 deferred items from eng review
+├── .planning/          # GSD project planning (source of truth for architecture, conventions, concerns)
+│   └── codebase/      # Structured codebase docs (ARCHITECTURE, STACK, TESTING, etc.)
 ├── VERSION             # Current version
 ```
 
@@ -62,7 +62,8 @@ picklepicker/
 | Add new API endpoint | `backend/app/api/` + `backend/app/routers/` | Follow FastAPI router pattern |
 | Modify chat/RAG logic | `backend/app/agents/rag_agent.py` | Uses pgvector semantic search |
 | Change DB schema | `pipeline/db/schema.sql` | SQL-based, no ORM |
-| Add new scraper | `pipeline/crawlers/` | Use tenacity retry + Firecrawl |
+| Add new scraper | `pipeline/crawlers/` | Use tenacity retry + Firecrawl. Shopify stores use native JSON API (see joola.py pattern) |
+| Fix dedup/duplicate detection | `pipeline/dedup/` | tier2_match + fuzzy_match with RapidFuzz |
 | Fix UI component | `frontend/src/components/` | Read DESIGN.md first |
 | Change page/route | `frontend/src/app/` | App Router convention |
 | Debug deploy | `.github/workflows/deploy.yml` | Railway (backend) + Vercel (frontend) |
@@ -81,6 +82,8 @@ Scrapers → paddle_embeddings (pgvector)
   → RAG Agent (backend/app/agents/rag_agent.py)
   → /chat SSE endpoint (backend/app/api/chat.py)
   → Frontend chat widget
+
+Dedup Pipeline: tier2_match (title_hash) → fuzzy_match (RapidFuzz ≥ 0.85) → review_queue (log only)
 ```
 
 ## CONVENTIONS
@@ -92,8 +95,10 @@ Scrapers → paddle_embeddings (pgvector)
  `DATABASE_URL` env var required.
  Coverage threshold: 80%.
 - **Frontend testing**: Vitest with jsdom. Setup in `frontend/src/tests/setup.ts`.
+- **Scrapers**: Firecrawl structured extraction as primary (Shopify stores use native JSON API). Markdown parsing as fallback.
+- **Dedup**: All crawlers run tier2_match (title hash) + fuzzy_match (RapidFuzz ≥ 0.85) before paddle INSERT. Conservative: duplicates logged to review_queue, not blocked.
 - **Retry logic**: All crawlers use tenacity with `@retry` decorator. Exponential backoff, 3 attempts max.
- Params vary per crawler (1-10s vs 5-120s).
+  Brazil Store/Dropshot use Firecrawl. JOOLA uses httpx with Shopify JSON API.
 - **Error alerting**: Telegram via `backend/app/middleware/alerts.py`. Rate limited to 1 alert per type per 60s.
  No spam.
 - **Auth**: Clerk for frontend. Admin endpoints use Bearer token via `ADMIN_SECRET` env var.
@@ -112,10 +117,11 @@ Scrapers → paddle_embeddings (pgvector)
  The `backend/pipeline/` reference may be stale.
 - **Eval gate is mock** — `eval_gate.py` returns hardcoded scores arrays. Not testing real LLMs.
 - **No LangChain** — Despite being a "RAG" agent, there's no LangChain usage. Direct API calls to Claude/OpenAI. This is intentional (simpler stack).
-- **Crawlers lack consistent `__main__` guards** — Only `mercado Livre` has `if __name__ == "__main__"`. `Brazil Store` and `Dropshot Brasil` are library-only modules.
- They're invoked via GitHub Actions workflows.
- 
 - **vercel.json security headers** — Root `vercel.json` has extensive security headers. `frontend/vercel.json` has a minimal subset. Duplicate purpose.
+
+## COMPLETED FIXES (MVP + v1.4 Launch + v2.1 Redesign + v2.3.0 Pipeline Overhaul)
+
+- ✅ **Phase 21-24** — Pipeline overhaul: JOOLA scraper (Shopify JSON API), spec parsing, dedup integration, backend API fixes, CI/CD Telegram notifications, data quality monitoring, catalog reliability (price freshness + retailer count)
 
 ## COMPLETED FIXES (MVP + v1.4 Launch + v2.1 Redesign)
 
@@ -134,9 +140,9 @@ Scrapers → paddle_embeddings (pgvector)
 
 ## PENDING WORK
 
-- 📋 **Phase 21** — Price Alerts CRUD (table + POST endpoint)
-- 📋 **Phase 22** — Affiliate Click Tracking (DB persistence)
-- 📋 **Phase 23** — Quiz Profile Persistence (optional, cross-device)
+- 📋 **Phase 25** — Price Alerts (enhancement)
+- 📋 **Phase 26** — Affiliate Click Tracking (enhancement)
+- 📋 **Phase 27** — Quiz Profile Persistence (optional, cross-device)
 
 ## COMMANDS
 
@@ -177,7 +183,6 @@ make help-full                # Grouped command reference
 ## NOTES
 
 - `pipeline/` is the real scraping/data pipeline. `backend/` has its own `pipeline/` reference in some worktrees — may be stale.
-- `prisma/` directory exists but unclear if actively used. Schema is SQL-based via `pipeline/db/schema.sql`.
 - Docker Compose only provides Postgres. Backend + frontend run outside containers locally.
  Deploy target: Railway (backend) + Vercel (frontend) + Supabase (DB in production).
 - Two separate Python virtual environments: `backend/venv/` and `pipeline/.venv/`. Dependencies are NOT shared.

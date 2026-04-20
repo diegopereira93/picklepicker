@@ -1,6 +1,6 @@
 # PickleIQ
 
-[![Version](https://img.shields.io/badge/version-1.4.0-brightgreen.svg)](VERSION)
+[![Version](https://img.shields.io/badge/version-2.3.0-brightgreen.svg)](VERSION)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/downloads/release/python-3120/)
 [![Next.js](https://img.shields.io/badge/Next.js-14-black.svg)](https://nextjs.org/)
@@ -13,7 +13,6 @@ PickleIQ é uma plataforma que compara preços e especificações de raquetes de
 ## Índice
 
 - [Sobre o Projeto](#sobre-o-projeto)
-- [Screenshots](#screenshots)
 - [Recursos](#recursos)
 - [Tecnologias](#tecnologias)
 - [Como Começar](#como-começar)
@@ -36,17 +35,6 @@ Nossa plataforma oferece:
 - **Chat com IA**: Agente RAG que responde perguntas sobre raquetes usando busca semântica no catálogo
 - **Alertas de Preço**: Receba notificações quando raquetes de interesse tiverem queda de preço
 - **Sistema de Afiliados**: Rastreamento de cliques para monetização
-
-## Screenshots
-
-<!-- Placeholder para screenshot da homepage -->
-![Homepage](./docs/screenshots/homepage.png)
-
-<!-- Placeholder para screenshot do chat -->
-![Chat IA](./docs/screenshots/chat-ai.png)
-
-<!-- Placeholder para screenshot do catálogo -->
-![Catálogo](./docs/screenshots/catalog.png)
 
 ## Recursos
 
