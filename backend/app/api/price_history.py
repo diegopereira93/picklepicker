@@ -4,15 +4,11 @@ import logging
 from datetime import datetime, timedelta
 from typing import Any
 from fastapi import APIRouter, Query
+from psycopg.rows import dict_row
+from app.db import get_connection
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/paddles", tags=["paddles"])
-
-
-# Mock database function — same pattern as paddles.py (will be replaced with real DB)
-async def db_fetch_all(query: str, params: list) -> list[dict]:
-    """Fetch all rows (mock implementation)."""
-    return []
 
 
 def calculate_p20(prices: list[float]) -> float:
@@ -100,10 +96,14 @@ async def get_price_history(
             r.name AS retailer_name
         FROM price_snapshots ps
         JOIN retailers r ON r.id = ps.retailer_id
-        WHERE ps.paddle_id = $1
-          AND ps.scraped_at >= $2
+        WHERE ps.paddle_id = %s
+          AND ps.scraped_at >= %s
         ORDER BY ps.retailer_id, ps.scraped_at ASC
     """
-    rows = await db_fetch_all(query, [paddle_id, cutoff_date])
+    async with get_connection() as conn:
+        async with conn.cursor(row_factory=dict_row) as cur:
+            await cur.execute(query, [paddle_id, cutoff_date])
+            rows = await cur.fetchall()
+            rows = [dict(r) for r in rows]
 
     return group_prices_by_retailer(rows)
