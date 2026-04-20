@@ -513,6 +513,12 @@ Plans:
 | 29.4 | `frontend/src/app/catalog/page.tsx` | Replace `limit: 200` with pagination: 24 per page, page-based, URL sync `?page=`. |
 | 29.5 | `frontend/src/components/layout/header.tsx` | Add "Presente" and "Blog" to nav links array. Verify mobile nav shows them. |
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 29-01-PLAN.md — Add search, result count, and pagination to catalog page (FR-04, FR-06, FR-07)
+- [ ] 29-02-PLAN.md — Allow chat without quiz + add Presente/Blog to nav (FR-05, FR-08)
+
 **Success criteria:**
 1. User can search "Selkirk" in catalog and see filtered results
 2. User can open `/chat` without completing quiz first
