@@ -1,7 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { GitCompare, Bell } from 'lucide-react'
+import { GitCompare, Bell, Store } from 'lucide-react'
 import type { Paddle } from '@/types/paddle'
 import { PriceTag } from './price-tag'
 import { PriceDeltaBadge } from './price-delta-badge'
@@ -37,6 +37,35 @@ function ProductCard({
   const name = paddle.name
   const brand = paddle.brand
   const imageUrl = paddle.image_url
+
+  if (mode === 'chat') {
+    return (
+      <div
+        className={cn(
+          'group relative flex gap-3 overflow-hidden rounded-rounded bg-surface p-3',
+          'shadow-md transition-all duration-200',
+          'hover:-translate-y-0.5 hover:shadow-glow-green cursor-pointer',
+          className
+        )}
+        onClick={onViewDetails}
+        role="article"
+      >
+        <div className="relative shrink-0 w-20 h-20 bg-elevated rounded-sharp overflow-hidden">
+          <SafeImage src={imageUrl} alt={`${brand} ${name}`} className="w-full h-full object-contain" />
+          {matchScore !== undefined && (
+            <div className="absolute -top-1 -left-1">
+              <MatchScoreBadge score={matchScore} size="sm" showLabel={false} />
+            </div>
+          )}
+        </div>
+        <div className="flex-1 min-w-0 flex flex-col gap-1">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted">{brand}</p>
+          <h3 className="font-display text-base text-text-primary truncate">{name}</h3>
+          <PriceTag price={price} size="sm" scrapedAt={paddle.latest_scraped_at} />
+        </div>
+      </div>
+    )
+  }
 
   if (mode === 'compact') {
     return (
@@ -94,7 +123,14 @@ function ProductCard({
           <h3 className="font-display text-lg text-text-primary truncate">{name}</h3>
         </div>
 
-        <PriceTag price={price} size="sm" />
+        <PriceTag price={price} size="sm" scrapedAt={paddle.latest_scraped_at} />
+
+        {paddle.retailer_count && paddle.retailer_count > 1 && (
+          <span className="inline-flex items-center gap-1 text-xs font-sans text-[#76b900]">
+            <Store className="w-3 h-3" />
+            {paddle.retailer_count} varejistas
+          </span>
+        )}
 
         {paddle.specs && (
           <div className="flex gap-3">

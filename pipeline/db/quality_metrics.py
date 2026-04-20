@@ -148,11 +148,11 @@ async def get_validation_summary(
                 COUNT(*) as failure_count
             FROM data_quality_checks
             WHERE source = %(source)s
-              AND created_at > NOW() - INTERVAL '%(hours)s hours'
+              AND created_at > NOW() - make_interval(secs => %(secs)s)
             GROUP BY source, field
             ORDER BY failure_count DESC
             """,
-            {"source": source, "hours": hours},
+            {"source": source, "secs": hours * 3600},
         )
         rows = await result.fetchall()
         return [

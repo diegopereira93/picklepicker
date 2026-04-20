@@ -83,20 +83,16 @@ async def tier2_match(title: str) -> int | None:
         return row[0] if row else None
 
 
-async def get_or_create_paddle(title: str, brand: str = "", specs: dict | None = None) -> int:
+async def get_or_create_paddle(title: str, brand: str = "") -> int:
     """Get existing paddle by title hash or create new one.
 
     Args:
         title: Paddle product title
         brand: Brand name (optional)
-        specs: Technical specifications JSONB (optional)
 
     Returns:
         paddle_id of existing or newly created paddle
     """
-    if specs is None:
-        specs = {}
-
     hash_value = title_hash(title)
 
     async with get_connection() as conn:
@@ -112,15 +108,15 @@ async def get_or_create_paddle(title: str, brand: str = "", specs: dict | None =
         # Create new paddle
         result = await conn.execute(
             """
-            INSERT INTO paddles (name, brand, title_hash, specs)
-            VALUES (%(name)s, %(brand)s, %(title_hash)s, %(specs)s)
+            INSERT INTO paddles (name, brand, model, title_hash)
+            VALUES (%(name)s, %(brand)s, %(model)s, %(title_hash)s)
             RETURNING id
             """,
             {
                 "name": title,
                 "brand": brand or "",
+                "model": title,
                 "title_hash": hash_value,
-                "specs": specs or {},
             },
         )
         row = await result.fetchone()

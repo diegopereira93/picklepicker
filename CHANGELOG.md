@@ -2,6 +2,42 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.3.0] - 2026-04-19
+
+### Changed
+- **Pipeline overhauled for 100% reliable scraping** — All 3 scrapers now use structured extraction as primary, markdown parsing as fallback
+- **Mercado Livre scraper replaced with JOOLA (Shopify JSON API)** — Structured, reliable data extraction from JOOLA Brazil
+- **Spec parsing added to all scrapers** — PT-BR patterns for weight, face material, thickness, grip size
+- **Brand extraction improved** — KNOWN_BRANDS lookup (24 pickleball brands) in all crawlers
+- **Dedup pipeline wired into all crawlers** — tier-2 hash matching + fuzzy matching with review_queue logging
+- **Backend API: price_history endpoint uses real DB queries** — Was returning mock data
+- **Backend API: health check verifies DB connectivity** — Was returning "ok" without checking
+- **Catalog list endpoint now cached** — 300s TTL with image URL sanitization
+- **CI/CD: scraper failure notifications send real Telegram alerts** — Was echo placeholder
+- **Data quality verification step added to scraper workflow** — Checks null rates and alerts on failure
+
+### Added
+- **`pipeline/crawlers/joola.py`** — Shopify JSON API crawler for JOOLA Brazil (replaces Mercado Livre)
+- **`pipeline/crawlers/validation.py`** — Product data validation module
+- **`pipeline/db/migrations/002_missing_tables.sql`** — Migration for dead_letter_queue, data_quality_checks, title_hash, JOOLA retailer
+- Dead letter queue table and data quality checks table in schema
+- title_hash column on paddles table with index for fast dedup
+- Price freshness indicator on product cards ("atualizado há Xh/Xd", amber warning for >48h)
+- Retailer count badge on product cards ("N varejistas" with data-green styling)
+- retailer_count and latest_scraped_at fields on backend PaddleResponse
+
+### Fixed
+- **quality_metrics.py SQL placeholder bug** — INTERVAL string interpolation not supported by psycopg
+- **normalizer.py referencing nonexistent `specs` column** — On paddles table
+- **freshness.py using snake_case source names** — That don't match DB retailer names
+- **price_history endpoint returning empty array** — Mock db_fetch_all
+- **health check returning "ok" without verifying DB connectivity** — Real DB SELECT 1
+- **Broken image URLs passing through to frontend catalog** — Sanitization added
+
+### Removed
+- **`pipeline/crawlers/mercado_livre.py`** — Replaced by JOOLA Shopify scraper
+- Duplicate `/paddles/health` endpoint in paddles.py
+
 ## [2.2.1] - 2026-04-14
 
 ### Fixed

@@ -1,4 +1,4 @@
--- PickleIQ Schema v1.0 — Phase 1 Foundation
+-- PickleIQ Schema v1.1 — Phase 1 Foundation + Pipeline Fixes
 -- Applied via docker-entrypoint-initdb.d/01-schema.sql
 
 -- Enable pgvector extension (available in pgvector/pgvector:pg16 image)
@@ -19,11 +19,14 @@ CREATE TABLE paddles (
     skill_level       TEXT,                           -- beginner | intermediate | advanced
     in_stock          BOOLEAN DEFAULT true,
     price_min_brl     NUMERIC(10,2),
+    title_hash        TEXT,
     needs_reembed     BOOLEAN DEFAULT false,
     created_at        TIMESTAMPTZ DEFAULT NOW(),
     updated_at        TIMESTAMPTZ DEFAULT NOW(),
     CONSTRAINT unique_paddle_name UNIQUE (name)
 );
+
+CREATE INDEX idx_paddles_title_hash ON paddles(title_hash);
 
 -- ============================================================
 -- Table 2: retailers — Configured retailer sources
@@ -32,7 +35,7 @@ CREATE TABLE retailers (
     id               BIGSERIAL PRIMARY KEY,
     name             TEXT NOT NULL,
     base_url         TEXT NOT NULL,
-    integration_type TEXT NOT NULL CHECK (integration_type IN ('firecrawl', 'ml_api', 'pa_api')),
+    integration_type TEXT NOT NULL CHECK (integration_type IN ('firecrawl', 'ml_api', 'pa_api', 'shopify_json')),
     is_active        BOOLEAN DEFAULT TRUE
 );
 
@@ -166,5 +169,41 @@ CREATE INDEX idx_affiliate_clicks_created ON affiliate_clicks(created_at);
 -- ============================================================
 INSERT INTO retailers (name, base_url, integration_type, is_active) VALUES
     ('Brazil Pickleball Store', 'https://brazilpickleballstore.com.br', 'firecrawl', TRUE),
-    ('Mercado Livre', 'https://www.mercadolivre.com.br', 'ml_api', TRUE),
+    ('JOOLA', 'https://www.joola.com.br', 'shopify_json', TRUE),
     ('Drop Shot Brasil', 'https://www.dropshotbrasil.com.br', 'firecrawl', TRUE);
+
+-- ============================================================
+-- Table 11: dead_letter_queue — Failed extraction storage
+-- ============================================================
+CREATE TABLE dead_letter_queue (
+    id              BIGSERIAL PRIMARY KEY,
+    source          TEXT NOT NULL,
+    payload         JSONB,
+    error_message   TEXT,
+    retry_count     INT DEFAULT 0,
+    max_retries     INT DEFAULT 3,
+    status          TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'resolved', 'failed')),
+    created_at      TIMESTAMPTZ DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ
+);
+
+CREATE INDEX idx_dlq_status ON dead_letter_queue(status);
+
+-- ============================================================
+-- Table 12: data_quality_checks — Validation failure tracking
+-- ============================================================
+CREATE TABLE data_quality_checks (
+    id              BIGSERIAL PRIMARY KEY,
+    source          TEXT NOT NULL,
+    field           TEXT NOT NULL,
+    reason          TEXT NOT NULL,
+    raw_value       TEXT,
+    created_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_dqc_source ON data_quality_checks(source);
+CREATE INDEX idx_dqc_created ON data_quality_checks(created_at);
+
+-- Backfill title_hash for existing paddles
+UPDATE paddles SET title_hash = encode(digest(lower(regexp_replace(regexp_replace(name, '[^\w\s]', '', 'g'), '\s+', ' ', 'g')), 'sha256'), 'hex')
+WHERE title_hash IS NULL;

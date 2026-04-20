@@ -3,52 +3,53 @@
 import { useEffect, useRef, useState } from 'react'
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
+import { Send } from 'lucide-react'
 import type { ChatRecommendation, UserProfile } from '@/types/paddle'
 import { MessageBubble } from './message-bubble'
-import { SuggestedQuestions } from './suggested-questions'
-
-interface ChatWidgetProps {
-  profile: UserProfile
-  onRecommendations?: (recommendations: ChatRecommendation[]) => void
-}
+import { LoadingTheater } from './loading-theater'
+import { ChatEmptyState } from './chat-empty-state'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 const SUGGESTED_QUESTIONS = [
-  'Qual a diferenca entre 13mm e 16mm?',
-  'Qual a melhor raquete pra quem ta comecando?',
-  'Quero gastar ate R$600, qual voce me recomenda?',
+  'Qual a diferença entre 13mm e 16mm?',
+  'Qual a melhor raquete pra quem está começando?',
+  'Quero gastar até R$600, qual você recomenda?',
   'Selkirk ou Joola? Qual vale mais a pena?',
-  'Raquete com bom spin ate R$800',
+  'Raquete com bom spin até R$800',
   'Qual raquete evolui comigo?',
 ]
 
+interface ChatWidgetProps {
+  profile: UserProfile
+  onRecommendations?: (recs: ChatRecommendation[]) => void
+}
+
 export function ChatWidget({ profile, onRecommendations }: ChatWidgetProps) {
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const endRef = useRef<HTMLDivElement>(null)
   const [input, setInput] = useState('')
-  const [lastMessage, setLastMessage] = useState<string>('')
-  const prevRecCountRef = useRef(0)
+  const [lastMessage, setLastMessage] = useState('')
+  const prevRecCount = useRef(0)
 
   const { messages, sendMessage, status, error } = useChat({
-    transport: new DefaultChatTransport({
-      api: '/api/chat',
-      body: { profile },
-    }),
+    transport: new DefaultChatTransport({ api: '/api/chat', body: { profile } }),
   })
 
   const isLoading = status === 'submitted' || status === 'streaming'
+  const showTheater = status === 'submitted'
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    endRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
   useEffect(() => {
-    const lastMsg = messages[messages.length - 1]
-    if (!lastMsg) return
-    const recPart = lastMsg.parts.find((p) => p.type === 'data-recommendations')
+    const last = messages[messages.length - 1]
+    if (!last) return
+    const recPart = last.parts.find((p) => p.type === 'data-recommendations')
     if (!recPart) return
-    const recs = (recPart as { type: string; data: unknown }).data as ChatRecommendation[]
-    if (!Array.isArray(recs) || recs.length === 0) return
-    if (recs.length === prevRecCountRef.current) return
-    prevRecCountRef.current = recs.length
+    const recs = (recPart as { data: unknown }).data as ChatRecommendation[]
+    if (!Array.isArray(recs) || recs.length === 0 || recs.length === prevRecCount.current) return
+    prevRecCount.current = recs.length
     onRecommendations?.(recs)
   }, [messages, onRecommendations])
 
@@ -61,122 +62,83 @@ export function ChatWidget({ profile, onRecommendations }: ChatWidgetProps) {
     sendMessage({ text })
   }
 
-  function handleSuggestedQuestion(question: string) {
+  function handleAsk(text: string) {
     if (isLoading) return
-    setLastMessage(question)
-    sendMessage({ text: question })
-  }
-
-  function handleRetry() {
-    if (!lastMessage) return
-    sendMessage({ text: lastMessage })
+    setLastMessage(text)
+    sendMessage({ text })
   }
 
   return (
     <div className="flex flex-col h-full">
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-1">
-        {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full gap-6 pb-8">
-            <div className="flex items-center gap-3">
-              <div style={{ backgroundColor: 'var(--color-near-black)' }} className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold">
-                <span style={{ color: 'var(--sport-primary)' }}>PI</span>
-              </div>
-              <p className="text-sm" style={{ color: 'var(--color-gray-300)' }}>
-                Ola! Sou o PickleIQ. Posso te ajudar a encontrar a raquete ideal. Me conte sobre seu jogo!
-              </p>
-            </div>
-            <SuggestedQuestions questions={SUGGESTED_QUESTIONS} onSelect={handleSuggestedQuestion} disabled={isLoading} />
-          </div>
+      <div className="flex-1 overflow-y-auto px-4 py-4">
+        {messages.length === 0 ? (
+          <ChatEmptyState questions={SUGGESTED_QUESTIONS} onAsk={handleAsk} disabled={isLoading} />
+        ) : (
+          messages.map((msg) => {
+            const text = msg.parts
+              .filter((p): p is { type: 'text'; text: string } => p.type === 'text')
+              .map((p) => p.text)
+              .join('')
+            const data = msg.parts
+              .filter((p) => p.type.startsWith('data-'))
+              .map((p) => (p as { data: unknown }).data)
+            return (
+              <MessageBubble
+                key={msg.id}
+                role={msg.role as 'user' | 'assistant'}
+                content={text}
+                annotations={data}
+              />
+            )
+          })
         )}
 
-        {messages.map((msg) => {
-          // Extract text content from parts
-          const textContent = msg.parts
-            .filter((p): p is { type: 'text'; text: string } => p.type === 'text')
-            .map((p) => p.text)
-            .join('')
+        {showTheater && <LoadingTheater />}
 
-          // Extract recommendation data from data-* parts
-          const dataParts = msg.parts
-            .filter((p) => p.type.startsWith('data-'))
-            .map((p) => (p as { type: string; data: unknown }).data)
-
-          return (
-            <MessageBubble
-              key={msg.id}
-              role={msg.role as 'user' | 'assistant'}
-              content={textContent || ''}
-              annotations={dataParts}
-            />
-          )
-        })}
-
-        {isLoading && (
-          <div className="flex justify-start mb-3 gap-2">
-            <div style={{ backgroundColor: 'var(--color-near-black)' }} className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0" aria-hidden="true">
-              <span style={{ color: 'var(--sport-primary)' }}>PI</span>
-            </div>
-            <div style={{ backgroundColor: 'transparent', borderRadius: '8px' }} className="px-4 py-3 text-sm">
-              <span className="block mb-2">Buscando as melhores opcoes para voce...</span>
-              <span className="inline-flex gap-1">
-                <span className="animate-bounce [animation-delay:0ms]">.</span>
-                <span className="animate-bounce [animation-delay:150ms]">.</span>
-                <span className="animate-bounce [animation-delay:300ms]">.</span>
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* Error handling per DESIGN.md: inline retry */}
         {error && (
-          <div className="flex justify-start mb-3">
-            <div style={{ backgroundColor: 'rgba(185, 28, 28, 0.1)' }} className="text-sm rounded-lg px-4 py-2 flex items-center gap-2">
-              <span style={{ color: '#B91C1C' }}>⚠️ Ops! Algo deu errado.</span>
-              <button
+          <div className="flex justify-start mb-3 gap-2">
+            <div className="bg-danger/10 border-l-2 border-danger rounded-sharp px-3 py-2 text-sm flex items-center gap-2">
+              <span className="text-danger">Ops! Algo deu errado.</span>
+              <Button
                 type="button"
-                onClick={handleRetry}
-                className="underline hover:no-underline font-medium"
+                size="sm"
+                variant="ghost"
+                onClick={() => lastMessage && sendMessage({ text: lastMessage })}
               >
                 Tentar novamente
-              </button>
+              </Button>
             </div>
           </div>
         )}
 
-        {/* Suggested questions */}
-        {messages.length > 0 && (
-          <div className="px-4 pt-2">
-            <SuggestedQuestions
-              questions={SUGGESTED_QUESTIONS}
-              onSelect={handleSuggestedQuestion}
-              disabled={isLoading}
-            />
-          </div>
-        )}
-
-        <div ref={messagesEndRef} />
+        <div ref={endRef} />
       </div>
 
-      {/* Input */}
-      <div style={{ backgroundColor: 'var(--color-near-black)', borderColor: 'var(--color-gray-border)' }} className="border-t px-4 py-3">
-        <form id="chat-form" onSubmit={handleSubmit} className="flex gap-2">
+      <div className="border-t border-border bg-surface/95 backdrop-blur-md px-4 py-3">
+        <form onSubmit={handleSubmit} className="flex gap-2 max-w-3xl mx-auto">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             disabled={isLoading}
-            placeholder="Pergunte sobre raquetes..."
-            style={{ border: '1px solid var(--color-gray-border)', borderRadius: '8px', backgroundColor: 'var(--color-black)', color: 'var(--color-white)' }}
-            className="flex-1 px-4 py-2 text-sm focus:outline-none disabled:opacity-50"
+            placeholder="Pergunte sobre raquetes…"
+            className={cn(
+              'flex-1 h-11 px-4 text-sm rounded-rounded',
+              'bg-elevated text-text-primary placeholder:text-text-muted',
+              'border border-border focus:border-brand-primary',
+              'focus:outline-none transition-colors',
+              'disabled:opacity-50'
+            )}
           />
-          <button
+          <Button
             type="submit"
+            size="lg"
             disabled={isLoading || !input.trim()}
-            className="hy-chat-send disabled:opacity-40 disabled:cursor-not-allowed"
+            className="h-11 px-4 gap-1.5"
           >
-            Enviar
-          </button>
+            <span className="hidden sm:inline">Enviar</span>
+            <Send size={16} />
+          </Button>
         </form>
       </div>
     </div>

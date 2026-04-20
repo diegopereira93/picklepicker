@@ -1,5 +1,6 @@
 """Paddles API endpoints."""
 
+import hashlib
 import logging
 from typing import Optional
 from fastapi import APIRouter, Query, HTTPException, status
@@ -9,16 +10,30 @@ from app.schemas import (
     PaddleListResponse,
     PriceHistoryResponse,
     LatestPriceResponse,
-    HealthResponse,
     SpecsResponse,
     PriceSnapshot,
     SimilarPaddleResponse,
     SimilarPaddlesResponse,
 )
 from app.db import get_connection
+from app.cache import RedisCache
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/paddles", tags=["paddles"])
+_cache = RedisCache()
+
+_BROKEN_URL_MARKERS = ("placeholder", "default", "no-image", "sem-imagem")
+
+
+def _sanitize_image_url(url: Optional[str]) -> Optional[str]:
+    if not url:
+        return None
+    if not url.startswith(("http://", "https://")):
+        return None
+    lower = url.lower()
+    if any(marker in lower for marker in _BROKEN_URL_MARKERS):
+        return None
+    return url
 
 
 async def _get_similar_paddle_ids(paddle_id: int, top_k: int = 5, threshold: float = 0.2) -> list[int]:
@@ -84,9 +99,14 @@ async def list_paddles(
     offset: int = Query(0, ge=0, description="Pagination offset"),
 ):
     """List all paddles with optional filters."""
-    # Build SQL with WHERE clauses based on filters
-    # Note: dedup_status column may not exist in all schemas, so we omit it
-    where_clauses = ["1=1"]  # Always true placeholder
+    cache_key_params = f"{brand}:{model_slug}:{price_min}:{price_max}:{in_stock}:{limit}:{offset}"
+    cache_key = f"paddles:v2:{hashlib.md5(cache_key_params.encode()).hexdigest()}"
+
+    cached = await _cache.get_cached(cache_key)
+    if cached is not None:
+        return PaddleListResponse(**cached)
+
+    where_clauses = ["1=1"]
     params = []
 
     if brand:
@@ -109,17 +129,17 @@ async def list_paddles(
 
     async with get_connection() as conn:
         async with conn.cursor(row_factory=dict_row) as cur:
-            # Count query
             count_query = f"SELECT COUNT(*) as total FROM paddles WHERE {where}"
             await cur.execute(count_query, params)
             count_result = await cur.fetchone()
             total = count_result["total"] if count_result else 0
 
-            # Data query with pagination - include specs, skill_level, in_stock, model_slug
             data_query = f"""
                 SELECT p.id, p.name, p.brand, p.manufacturer_sku as sku, p.image_url, p.price_min_brl, p.created_at,
                        p.model_slug, p.skill_level, p.in_stock,
-                       ps.swingweight, ps.twistweight, ps.weight_oz, ps.core_thickness_mm, ps.face_material
+                       ps.swingweight, ps.twistweight, ps.weight_oz, ps.core_thickness_mm, ps.face_material,
+                       (SELECT COUNT(DISTINCT lp.retailer_id) FROM latest_prices lp WHERE lp.paddle_id = p.id) AS retailer_count,
+                       (SELECT MAX(lp.scraped_at) FROM latest_prices lp WHERE lp.paddle_id = p.id) AS latest_scraped_at
                 FROM paddles p
                 LEFT JOIN paddle_specs ps ON p.id = ps.paddle_id
                 WHERE {where}
@@ -135,7 +155,7 @@ async def list_paddles(
             name=p.get("name", ""),
             brand=p.get("brand", ""),
             sku=p.get("sku"),
-            image_url=p.get("image_url"),
+            image_url=_sanitize_image_url(p.get("image_url")),
             price_min_brl=p.get("price_min_brl"),
             created_at=p.get("created_at"),
             model_slug=p.get("model_slug"),
@@ -148,10 +168,14 @@ async def list_paddles(
                 core_thickness_mm=p.get("core_thickness_mm"),
                 face_material=p.get("face_material"),
             ) if any([p.get("swingweight"), p.get("twistweight"), p.get("weight_oz"), p.get("core_thickness_mm"), p.get("face_material")]) else None,
+            retailer_count=p.get("retailer_count"),
+            latest_scraped_at=p.get("latest_scraped_at"),
         )
         for p in paddles
     ]
-    return PaddleListResponse(items=items, total=total, limit=limit, offset=offset)
+    result = PaddleListResponse(items=items, total=total, limit=limit, offset=offset)
+    await _cache.set_cached(cache_key, result.model_dump(mode="json"), ttl=300)
+    return result
 
 
 @router.get("/{paddle_id}", response_model=PaddleResponse, status_code=status.HTTP_200_OK)
@@ -187,7 +211,7 @@ async def get_paddle(paddle_id: int):
         name=paddle.get("name", ""),
         brand=paddle.get("brand", ""),
         sku=paddle.get("sku"),
-        image_url=paddle.get("image_url"),
+        image_url=_sanitize_image_url(paddle.get("image_url")),
         specs=specs,
         price_min_brl=paddle.get("price_min_brl"),
         created_at=paddle.get("created_at"),
@@ -290,7 +314,7 @@ async def get_similar_paddles(paddle_id: int, limit: int = Query(5, ge=1, le=10)
             name=p.get("name", ""),
             brand=p.get("brand", ""),
             sku=p.get("sku"),
-            image_url=p.get("image_url"),
+            image_url=_sanitize_image_url(p.get("image_url")),
             model_slug=p.get("model_slug"),
             skill_level=p.get("skill_level"),
             in_stock=p.get("in_stock"),
@@ -303,7 +327,3 @@ async def get_similar_paddles(paddle_id: int, limit: int = Query(5, ge=1, le=10)
     return SimilarPaddlesResponse(similar_paddles=items, query_paddle_id=paddle_id, limit=limit)
 
 
-@router.get("/health", response_model=HealthResponse, status_code=status.HTTP_200_OK)
-async def health():
-    """Health check endpoint."""
-    return HealthResponse(status="ok")

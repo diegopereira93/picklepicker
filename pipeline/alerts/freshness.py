@@ -49,7 +49,7 @@ async def check_data_freshness() -> dict[str, bool]:
     Returns:
         Dict mapping source name to freshness boolean
     """
-    sources = ["brazil_pickleball_store", "mercado_livre", "dropshot_brasil"]
+    sources = ["Brazil Pickleball Store", "JOOLA", "Drop Shot Brasil"]
     results = {}
     threshold = timedelta(hours=FRESHNESS_THRESHOLD_HOURS)
 

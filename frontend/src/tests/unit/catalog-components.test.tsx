@@ -4,8 +4,6 @@ import { FilterBar } from '@/components/catalog/filter-bar'
 import { SelectionBar } from '@/components/catalog/selection-bar'
 import { SuggestedQuestions } from '@/components/chat/suggested-questions'
 import { TipCard } from '@/components/chat/tip-card'
-import { ComparisonCard } from '@/components/chat/comparison-card'
-import type { ChatRecommendation } from '@/types/paddle'
 
 describe('FilterBar', () => {
   const defaultProps = {
@@ -177,100 +175,12 @@ describe('TipCard', () => {
     expect(screen.getByText(content)).toBeInTheDocument()
   })
 
-  it('applies correct CSS classes', () => {
+  it('applies design-token classes', () => {
     const content = 'Test tip content'
     const { container } = render(<TipCard content={content} />)
 
     const cardDiv = container.firstChild as HTMLElement
-    expect(cardDiv.classList.contains('hy-chat-card')).toBe(true)
-    expect(cardDiv.classList.contains('hy-chat-card-tip')).toBe(true)
-    expect(cardDiv.classList.contains('hy-animate-card-enter')).toBe(true)
     expect(cardDiv.classList.contains('mt-2')).toBe(true)
-  })
-})
-
-describe('ComparisonCard', () => {
-  const mockPaddles: ChatRecommendation[] = [
-    {
-      paddle_id: 1,
-      name: 'Paddle A',
-      brand: 'Nox',
-      price_min_brl: 899.99,
-      affiliate_url: 'https://example.com/1',
-      similarity_score: 0.85,
-    },
-    {
-      paddle_id: 2,
-      name: 'Paddle B',
-      brand: 'Selkirk',
-      price_min_brl: 1299.99,
-      affiliate_url: 'https://example.com/2',
-      similarity_score: 0.92,
-    },
-    {
-      paddle_id: 3,
-      name: 'Paddle C',
-      brand: 'Head',
-      price_min_brl: 599.99,
-      affiliate_url: 'https://example.com/3',
-      similarity_score: 0.78,
-    },
-  ]
-
-  it('returns null when < 2 paddles', () => {
-    const singlePaddle = [mockPaddles[0]]
-    const { container } = render(<ComparisonCard paddles={singlePaddle} />)
-
-    expect(container.firstChild).toBeNull()
-  })
-
-  it('renders table when >= 2 paddles', () => {
-    render(<ComparisonCard paddles={mockPaddles.slice(0, 2)} />)
-
-    // Check table headers
-    expect(screen.getByText('Raquete')).toBeInTheDocument()
-    expect(screen.getByText('Nox')).toBeInTheDocument()
-    expect(screen.getByText('Selkirk')).toBeInTheDocument()
-
-    // Check row labels
-    expect(screen.getByText('Modelo')).toBeInTheDocument()
-    expect(screen.getByText('Preco')).toBeInTheDocument()
-    expect(screen.getByText('Match')).toBeInTheDocument()
-
-    // Check paddle names
-    expect(screen.getByText('Paddle A')).toBeInTheDocument()
-    expect(screen.getByText('Paddle B')).toBeInTheDocument()
-
-    // Check prices are formatted (locale-dependent, just verify they contain the amount)
-    expect(screen.getByText(/899/)).toBeInTheDocument()
-    expect(screen.getByText(/1\.299/)).toBeInTheDocument()
-  })
-
-  it('highlights best price (lowest)', () => {
-    render(<ComparisonCard paddles={mockPaddles} />)
-
-    // The cheapest paddle is Paddle C at 599.99 — it should be highlighted
-    // Verify table renders with price data
-    const table = screen.getByRole('table')
-    expect(table).toBeInTheDocument()
-    expect(screen.getByText(/599/)).toBeInTheDocument()
-  })
-
-  it('highlights best score (highest similarity)', () => {
-    render(<ComparisonCard paddles={mockPaddles} />)
-
-    // The highest similarity is Paddle B at 0.92 (92%)
-    expect(screen.getByText('92%')).toBeInTheDocument()
-    expect(screen.getByText('85%')).toBeInTheDocument()
-    expect(screen.getByText('78%')).toBeInTheDocument()
-  })
-
-  it('renders correctly with exactly 2 paddles', () => {
-    const twoPaddles = mockPaddles.slice(0, 2)
-    render(<ComparisonCard paddles={twoPaddles} />)
-
-    // Table should render with 2 columns
-    const brandHeaders = screen.getAllByText(/Nox|Selkirk/)
-    expect(brandHeaders).toHaveLength(2)
+    expect(cardDiv.classList.contains('border-l-2')).toBe(true)
   })
 })

@@ -1,9 +1,10 @@
 'use client'
 
 import type { ChatRecommendation } from '@/types/paddle'
-import { ProductCard } from './product-card'
-import { ComparisonCard } from './comparison-card'
+import { InlinePaddleCard } from './inline-paddle-card'
 import { TipCard } from './tip-card'
+import { PickleIQAvatar } from './pickleiq-avatar'
+import { cn } from '@/lib/utils'
 
 interface MessageBubbleProps {
   role: 'user' | 'assistant'
@@ -19,79 +20,44 @@ function isRecommendationArray(val: unknown): val is ChatRecommendation[] {
   )
 }
 
-function renderText(text: string) {
-  return text.split('\n').map((line, i) => (
-    <span key={i}>
-      {i > 0 && <br />}
-      {line}
-    </span>
-  ))
-}
-
 function isTipContent(text: string): boolean {
-  const tipKeywords = ['dica', 'importante', 'lembre-se', 'saiba que', 'recomendo', 'sugestão', 'sugestao']
-  const hasKeyword = tipKeywords.some(kw => text.toLowerCase().includes(kw))
-  const isShort = text.length < 300
-  return hasKeyword && isShort
-}
-
-function PickleIQAvatar() {
-  return (
-    <div
-      style={{ backgroundColor: 'var(--color-near-black)' }}
-      className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
-      aria-hidden="true"
-    >
-      <span style={{ color: 'var(--sport-primary)' }}>PI</span>
-    </div>
-  )
+  const kw = ['dica', 'importante', 'lembre-se', 'saiba que', 'recomendo', 'sugestão', 'sugestao']
+  return text.length < 300 && kw.some((k) => text.toLowerCase().includes(k))
 }
 
 export function MessageBubble({ role, content, annotations }: MessageBubbleProps) {
   const isUser = role === 'user'
-
-  // Find any paddle recommendation arrays in annotations
-  const recommendations = annotations?.find((a) => isRecommendationArray(a)) as
-    | ChatRecommendation[]
-    | undefined
+  const recs = annotations?.find(isRecommendationArray) as ChatRecommendation[] | undefined
+  const hasTip = !recs?.length && !!content && isTipContent(content)
 
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-3 gap-2`}>
-      {!isUser && <PickleIQAvatar />}
+    <div className={cn('flex mb-4 gap-2', isUser ? 'justify-end' : 'justify-start')}>
+      {!isUser && <PickleIQAvatar size="sm" />}
 
-      <div style={{ maxWidth: '80%' }}>
-        {content && (
+      <div className="max-w-[85%] md:max-w-[75%] flex flex-col gap-2">
+        {content && !hasTip && (
           <div
-            style={{
-              backgroundColor: isUser ? '#111111' : 'transparent',
-              borderLeft: isUser ? '2px solid #84CC16' : 'none',
-              borderRadius: '8px',
-              color: '#ffffff',
-              padding: '12px 16px',
-              fontSize: 'var(--font-size-body)',
-              lineHeight: 'var(--line-height-normal)',
-            }}
-            className={isUser ? '' : 'hy-animate-chat-enter'}
-          >
-            {renderText(content)}
-          </div>
-        )}
-
-        {/* ProductCard(s) or ComparisonCard — rendered inside message bubble area */}
-        {recommendations && recommendations.length > 0 && (
-          <div className="mt-2">
-            {recommendations.length >= 2 ? (
-              <ComparisonCard paddles={recommendations} />
-            ) : (
-              <ProductCard key={recommendations[0].paddle_id} {...recommendations[0]} />
+            className={cn(
+              'rounded-rounded px-4 py-3 text-sm leading-relaxed animate-slide-in',
+              isUser
+                ? 'bg-elevated text-text-primary border-l-2 border-brand-primary'
+                : 'bg-surface text-text-primary shadow-sm'
             )}
+          >
+            {content.split('\n').map((line, i) => (
+              <span key={i}>
+                {i > 0 && <br />}
+                {line}
+              </span>
+            ))}
           </div>
         )}
 
-        {/* TipCard — rendered when there's text but no recommendations */}
-        {!recommendations?.length && content && isTipContent(content) && (
-          <TipCard content={content} />
-        )}
+        {hasTip && <TipCard content={content} />}
+
+        {recs?.map((r) => (
+          <InlinePaddleCard key={r.paddle_id} {...r} />
+        ))}
       </div>
     </div>
   )

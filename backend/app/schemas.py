@@ -30,6 +30,8 @@ class PaddleResponse(BaseModel):
     model_slug: Optional[str] = None
     skill_level: Optional[str] = None
     in_stock: Optional[bool] = None
+    retailer_count: Optional[int] = None
+    latest_scraped_at: Optional[datetime] = None
 
     model_config = {"from_attributes": True}
 

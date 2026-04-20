@@ -14,7 +14,6 @@ jobs:
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
-      MERCADO_LIVRE_API_KEY: ${{ secrets.MERCADO_LIVRE_API_KEY }}
       TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
 
@@ -47,8 +46,8 @@ jobs:
           command: |
             echo "Running Brazil Store crawler..."
             python -m pipeline.crawlers.brazil_store
-            echo "Running Mercado Livre crawler..."
-            python -m pipeline.crawlers.mercado_livre
+            echo "Running JOOLA crawler..."
+            python -m pipeline.crawlers.joola
             echo "Running Dropshot Brasil crawler..."
             python -m pipeline.crawlers.dropshot_brasil
 
@@ -96,4 +95,51 @@ jobs:
       - name: Notify on failure
         if: failure()
         run: |
-          echo "Scraper workflow failed - check logs in Railway"
+          python3 -c "
+          import asyncio
+          import os
+          import sys
+          sys.path.insert(0, '.')
+          from pipeline.alerts.telegram import send_telegram_alert
+          msg = '🚨 Scraper workflow FAILED. Check: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+          asyncio.run(send_telegram_alert(msg))
+          "
+
+      - name: Check data quality
+        if: always()
+        run: |
+          python3 -c "
+          import asyncio
+          import sys
+          sys.path.insert(0, '.')
+          from pipeline.db.connection import get_pool
+          from pipeline.alerts.telegram import send_telegram_alert
+
+          async def main():
+              pool = await get_pool()
+              async with pool.acquire() as conn:
+                  fields = ['brand', 'image_url']
+                  warnings = []
+                  for field in fields:
+                      result = await conn.fetchrow('''
+                          SELECT
+                              COUNT(*) as total,
+                              COUNT(*) FILTER (WHERE {field} IS NULL OR {field} = '') as nulls
+                          FROM paddles
+                      '''.format(field=field))
+                      total = result['total'] or 0
+                      nulls = result['nulls'] or 0
+                      null_pct = (nulls / total * 100) if total > 0 else 0.0
+                      if null_pct > 30:
+                          warnings.append(f'paddles.{field}: {null_pct:.1f}% null ({nulls}/{total})')
+
+              if warnings:
+                  msg = '⚠️ Data Quality Alert:\n' + '\n'.join(warnings)
+                  print(msg)
+                  await send_telegram_alert(msg)
+              else:
+                  print('Data quality OK - all fields below 30% null rate')
+
+          asyncio.run(main())
+          "
+        continue-on-error: true

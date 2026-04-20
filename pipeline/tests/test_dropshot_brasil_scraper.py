@@ -142,7 +142,7 @@ class TestDropShotRetryBehavior:
         # Use different keyword in URL to avoid it being parsed as a product
         success_response = MagicMock()
         success_response.markdown = """[Test Product](https://www.dropshotbrasil.com.br/raquetes/test)
-Raquete Test Paddle
+Raquete Test Paddle Premium
 R$600,00
 """
         app = MagicMock()
@@ -222,7 +222,7 @@ class TestDropShotSaveToDb:
 
     async def test_retailer_id_is_3(self, scraper_db_connection):
         """retailer_id=3 (Drop Shot Brasil) set in INSERT."""
-        product = {"name": "Test", "price_brl": 100.0, "in_stock": True,
+        product = {"name": "Test Paddle", "price_brl": 100.0, "in_stock": True,
                    "image_url": "", "product_url": "", "brand": "Test", "specs": {}}
         await save_products_to_db([product], retailer_id=3, conn=scraper_db_connection)
         call_kwargs = scraper_db_connection.execute.call_args[0][1]
@@ -245,7 +245,7 @@ class TestDropShotSaveToDb:
 
     async def test_source_raw_is_json(self, scraper_db_connection):
         """source_raw column contains valid JSON string."""
-        product = {"name": "Test", "price_brl": 100.0, "in_stock": True,
+        product = {"name": "Test Paddle", "price_brl": 100.0, "in_stock": True,
                    "image_url": "", "product_url": "", "brand": "Test", "specs": {}}
         await save_products_to_db([product], retailer_id=3, conn=scraper_db_connection)
         # Get the second execute call (first is paddle insert, second is snapshot insert)
