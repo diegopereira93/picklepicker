@@ -94,8 +94,8 @@ async def list_paddles(
     model_slug: Optional[str] = Query(None, description="Filter by model slug"),
     price_min: Optional[float] = Query(None, description="Min price BRL"),
     price_max: Optional[float] = Query(None, description="Max price BRL"),
-    in_stock: Optional[bool] = Query(None, description="Only in-stock items"),
-    limit: int = Query(50, ge=1, le=100, description="Pagination limit"),
+    in_stock: Optional[bool] = Query(True, description="Only in-stock items"),
+    limit: int = Query(50, ge=1, le=500, description="Pagination limit"),
     offset: int = Query(0, ge=0, description="Pagination offset"),
 ):
     """List all paddles with optional filters."""

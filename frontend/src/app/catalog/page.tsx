@@ -14,7 +14,6 @@ interface CatalogFilters {
   brand?: string
   price_min?: number
   price_max?: number
-  in_stock?: boolean
 }
 
 type SortOption = 'relevance' | 'price_asc' | 'price_desc' | 'name_asc' | 'newest'
@@ -44,7 +43,6 @@ function CatalogPageContent() {
     price_min: searchParams.get('price_min') ? Number(searchParams.get('price_min')) : undefined,
     price_max: searchParams.get('price_max') ? Number(searchParams.get('price_max')) : undefined,
     brand: searchParams.get('brand') || undefined,
-    in_stock: searchParams.get('in_stock') === 'true',
   })
 
   const [sort, setSort] = useState<SortOption>(
@@ -60,8 +58,9 @@ function CatalogPageContent() {
   const loadProducts = useCallback(async () => {
     setIsLoading(true)
     const params: Record<string, string | number | boolean | undefined> = {
-      limit: 24,
+      limit: 200,
       offset: 0,
+      in_stock: true,
       sort: sort === 'price_asc' ? 'price' : sort === 'price_desc' ? '-price' : undefined,
       ...filters,
       brand: selectedBrands.length > 0 ? selectedBrands.join(',') : undefined,
@@ -102,7 +101,7 @@ function CatalogPageContent() {
     router.push(`/catalog/${slug}`)
   }
 
-  const hasActiveFilters = selectedBrands.length > 0 || filters.price_min || filters.price_max || filters.in_stock
+  const hasActiveFilters = selectedBrands.length > 0 || filters.price_min || filters.price_max
 
   return (
     <main className="min-h-screen bg-base">
@@ -358,30 +357,6 @@ function FilterContent({
             </label>
           ))}
         </div>
-      </div>
-
-      {/* In stock toggle */}
-      <div>
-        <label className="flex items-center justify-between cursor-pointer">
-          <span className="font-sans text-sm text-text-primary">Em estoque</span>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={!!filters.in_stock}
-            onClick={() => setFilters(prev => ({ ...prev, in_stock: !prev.in_stock }))}
-            className={cn(
-              'w-10 h-5 rounded-full transition-colors relative',
-              filters.in_stock ? 'bg-brand-primary' : 'bg-elevated border border-border'
-            )}
-          >
-            <div
-              className={cn(
-                'absolute top-0.5 w-4 h-4 rounded-full transition-transform',
-                filters.in_stock ? 'translate-x-5 bg-base' : 'translate-x-0.5 bg-text-muted'
-              )}
-            />
-          </button>
-        </label>
       </div>
     </div>
   )
