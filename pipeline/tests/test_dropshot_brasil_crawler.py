@@ -46,7 +46,7 @@ async def test_retry_3_times__on_firecrawl_500(mock_firecrawl_app, mock_db_conne
     mock_response.markdown = """# Raquetes
 
 [Test Product](https://www.dropshotbrasil.com.br/raquetes/test)
-Raquete Test Paddle
+Raquete Test Paddle Premium
 R$600,00
 """
 
