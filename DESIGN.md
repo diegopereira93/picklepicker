@@ -1,129 +1,98 @@
 # PickleIQ — Design System
 
-**Version:** 4.0 (Warm Guide — UI Redesign, 2026-04-05)
-**Type:** APP UI — light-first, approachable, quiz-centric, Brazilian warmth
+**Version:** 5.0 (Dark Premium Sports Analytics, 2026-04-20)
+**Type:** APP UI — dark-only, data-driven, quiz-centric, premium sports tech
 
-**Changelog v4.0:**
-- Complete redesign from "Hybrid Modern Sports Tech" to "Warm Guide"
-- Light-first aesthetic with warm-white backgrounds (#FAFAF8)
-- Coral (#F97316) as primary CTA accent, lime retained for data
-- Soft corners (8-12px) replacing sharp 2px tech edges
-- 7-step quiz with emotional progression as core experience
-- Recommendation cards with "Por que pra voce" explanations
-- Dark mode optional (next-themes toggle), chat forces dark
-- WCAG 2.2 compliance with coral focus indicators
-
-**Changelog v3.0:** (superseded — see v4.0)
+**Changelog v5.0:**
+- Complete rewrite to match actual dark-theme implementation
+- Dark-only design (bg-base #0a0a0a) — no light mode
+- Fonts: Bebas Neue (display), Source Sans 3 (body), JetBrains Mono (data)
+- Brand primary: lime #84CC16 (CTAs, highlights), secondary: orange #F97316
+- All color values verified against tailwind.config.ts
+- Font loading via next/font/google with CSS variables
+- Removed all light-first, warm-white, warm-cream, Inter references
 
 ---
 
 ## Design Philosophy
 
 **Product:** PickleIQ — Brazilian pickleball paddle recommendation platform
-**Positioning:** "The warm guide to your perfect paddle" — approachable, conversational, trustworthy
-**Voice:** Brazilian warmth, conversational, encouraging — like a knowledgeable friend
+**Positioning:** Premium sports analytics — intelligent, data-driven, trustworthy
+**Voice:** Brazilian Portuguese, knowledgeable and encouraging
 
-**Core insight:** PickleIQ serves confused beginners, not data analysts. The quiz IS the product. Design must guide, not intimidate.
+**Core insight:** PickleIQ serves players seeking the perfect paddle through data and AI guidance. Design must feel premium and credible without being intimidating.
 
 **Design pillars:**
-- **Light-first** — Warm, approachable, not a tech dashboard
-- **Quiz-centric** — 7-step emotional journey, not a 3-step widget
-- **Brazilian warmth** — Conversational PT-BR, coral accent, generous whitespace
+- **Dark premium** — Sports analytics aesthetic, high contrast, immersive
+- **Quiz-centric** — 7-step emotional journey as core experience
+- **Data credibility** — Clean spec tables, price tracking, comparison tools
 - **Trust through clarity** — Explain "why", show freshness, social proof
-
-**What this is NOT:**
-- NOT a data dashboard (too cold for beginners)
-- NOT a pure sports app (too one-dimensional)
-- NOT dark-first (intimidating for new players)
 
 ---
 
 ## Aesthetic Direction
 
-**Direction:** Warm Guide
-**Mood:** Approachable, conversational, Brazilian, trustworthy
-**Reference sites:** Duolingo (gamified guidance), Wirecutter (research-backed recommendations), Nike Run Club (sporty warmth)
+**Direction:** Dark Premium Sports Analytics
+**Mood:** Premium, data-driven, trustworthy, Brazilian
+**Reference sites:** Strava (sports analytics), Wirecutter (research-backed recommendations), ESPN (data presentation)
 
-**Decoration:** Intentional — warm textures, lifestyle photography, clean surfaces
-**Imagery:** Real paddle photography, diverse Brazilian players, white/cream product backgrounds
+**Decoration:** Minimal — dark surfaces, lime accents, sharp data presentation
+**Imagery:** Real paddle photography on dark backgrounds, spec-first presentation
 
 ---
 
 ## Color System
 
-### Base Palette
+### Background Hierarchy
 
-```css
-:root {
-  --warm-white: #FAFAF8;      /* Primary background */
-  --warm-cream: #F5F2EB;      /* Secondary background, cards */
-  --warm-charcoal: #2A2A2A;   /* Primary text */
-}
-```
+| Token | Tailwind Class | Value | Usage |
+|-------|---------------|-------|-------|
+| base | `bg-base` | #0a0a0a | Page background, default |
+| surface | `bg-surface` | #141414 | Cards, panels, elevated sections |
+| elevated | `bg-elevated` | #1f1f1f | Hover states, nested surfaces |
 
-### Accent Colors
+### Brand Colors
 
-```css
-:root {
-  --accent-coral: #F97316;        /* Primary CTA, buttons, links */
-  --accent-coral-hover: #EA580C;  /* Hover state */
-  --accent-lime: #84CC16;         /* Secondary accent, data highlights */
-  --accent-amber: #F59E0B;        /* Warnings, tips, intermediate level */
-}
-```
+| Token | Tailwind Class | Value | Usage |
+|-------|---------------|-------|-------|
+| brand-primary | `bg-brand-primary` | #84CC16 | Primary CTAs, links, highlights, success |
+| brand-secondary | `bg-brand-secondary` | #F97316 | Secondary accent, warnings, emphasis |
 
-**Contrast rule:** Coral (#F97316) has 3.5:1 on white — AA for large text only.
-- ✅ Use coral for buttons, headlines, CTAs
-- ❌ Never use coral for small body text on light backgrounds
+### Text Hierarchy
 
-### Trust & Semantic Colors
+| Token | Tailwind Class | Value | Usage |
+|-------|---------------|-------|-------|
+| text-primary | `text-text-primary` | #FAFAFA | Headlines, body text |
+| text-secondary | `text-text-secondary` | #A3A3A3 | Descriptions, secondary info |
+| text-muted | `text-text-muted` | #737373 | Captions, disabled text |
+| text-disabled | `text-text-disabled` | #525252 | Inactive elements |
 
-```css
-:root {
-  --trust-blue: #0EA5E9;      /* Links, trust signals */
-  --success-green: #22C55E;   /* Success states, beginner level */
-  --error-red: #EF4444;       /* Errors, advanced level */
-}
-```
+### Semantic Colors
 
-### Neutral Scale
+| Token | Tailwind Class | Value | Usage |
+|-------|---------------|-------|-------|
+| success | `text-success` | #84CC16 | Success states, beginner level |
+| warning | `text-warning` | #FBBF24 | Warnings, intermediate level |
+| danger | `text-danger` | #EF4444 | Errors, destructive actions, advanced level |
+| info | `text-info` | #60A5FA | Information, links |
 
-```css
-:root {
-  --gray-100: #F3F4F6;
-  --gray-200: #E5E7EB;
-  --gray-300: #D1D5DB;
-  --gray-400: #9CA3AF;
-  --gray-500: #6B7280;        /* Secondary text */
-  --gray-600: #4B5563;
-  --gray-700: #374151;
-  --gray-800: #1F2937;
-}
-```
+### Price Delta Colors
 
-### Skill Level Colors (Retained from v3.0)
+| Token | Tailwind Class | Value | Usage |
+|-------|---------------|-------|-------|
+| price-up | `text-price-up` | #EF4444 | Price increased |
+| price-down | `text-price-down` | #84CC16 | Price decreased |
+| price-neutral | `text-price-neutral` | #737373 | No change |
 
-```css
-:root {
-  --level-beginner: #22C55E;      /* Green — Iniciante */
-  --level-intermediate: #F59E0B;  /* Amber — Intermediário */
-  --level-advanced: #EF4444;      /* Red — Avançado */
-}
-```
+### Skill Level Colors
 
-**Note:** For professional/elite level paddles (rare), use violet accent `#8B5CF6`. This is an intentional contrast color used sparingly.
+| Level | Color | Tailwind | Usage |
+|-------|-------|----------|-------|
+| Iniciante | #22C55E | green-500 | Beginner paddles, badges |
+| Intermediário | #FBBF24 | amber-400 | Intermediate paddles |
+| Avançado | #EF4444 | red-500 | Advanced paddles |
 
-**Usage:** Skill level badges on product cards, filter chips, quiz profile display. Background color with white text (beginner/advanced) or dark text (intermediate).
-
-### Data Credibility (Retained from v3.0)
-
-```css
-:root {
-  --data-green: #76b900;        /* Charts, specs, comparison highlights */
-}
-```
-
-**Usage:** Green accent for data elements: charts, table highlights, spec badges. NOT for CTAs.
+**Usage:** Skill level badges on product cards, filter chips, quiz profile display. Background with white text.
 
 ---
 
@@ -131,42 +100,49 @@
 
 ### Font Stack
 
-| Role | Font | Weight | Usage |
-|------|------|--------|-------|
-| Display/Hero | Inter | 700 | Headlines, H1, H2 |
-| Body | Inter | 400 | Paragraphs, descriptions, chat |
-| Body Bold | Inter | 600-700 | Button labels, emphasis |
-| Data/Specs | JetBrains Mono | 400 | Comparison tables, spec values, prices |
-| Caption | Inter | 400-500 | Metadata, timestamps, tooltips |
-
-**Retained from v3.0:** Inter for display/body, JetBrains Mono for data.
+| Role | Font | CSS Variable | Weights | Usage |
+|------|------|-------------|---------|-------|
+| Display | Bebas Neue | `--font-display` | 400 | Hero text, section headlines |
+| Body | Source Sans 3 | `--font-body` | 400, 500, 600, 700 | Paragraphs, buttons, UI text |
+| Mono | JetBrains Mono | `--font-mono` | 400, 500, 600, 700 | Prices, specs, data, code |
 
 ### Font Loading
 
-```html
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+Loaded via `next/font/google` in `layout.tsx` with CSS variables:
+
+```typescript
+// frontend/src/app/layout.tsx
+const bebasNeue = Bebas_Neue({ subsets: ["latin"], weight: "400", variable: "--font-display", display: "swap" })
+const sourceSans3 = Source_Sans_3({ subsets: ["latin"], variable: "--font-body", display: "swap", weight: ["400", "500", "600", "700"] })
+const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap", weight: ["400", "500", "600", "700"] })
+```
+
+Applied to `<html>` element: `className="${bebasNeue.variable} ${sourceSans3.variable} ${jetbrainsMono.variable}"`
+
+Tailwind mapping:
+```typescript
+fontFamily: {
+  display: ["var(--font-display)"],  // Bebas Neue
+  sans: ["var(--font-body)"],        // Source Sans 3
+  mono: ["var(--font-mono)"],        // JetBrains Mono
+}
 ```
 
 ### Scale
 
-| Element | Desktop | Mobile | Weight | Line Height |
-|---------|---------|--------|--------|-------------|
-| H1 (Hero) | 64px | 48px | 700 | 1.1 |
-| H2 (Section) | 32px | 28px | 700 | 1.25 |
-| H3 (Card) | 20px | 18px | 600 | 1.3 |
-| Body | 16px | 16px | 400 | 1.6 |
-| Body Bold | 16px | 16px | 600-700 | 1.6 |
-| Data | 14px | 14px | 400 | 1.5 |
-| Caption | 12px | 12px | 400-500 | 1.43 |
-
-**Changes from v3.0:** Larger mobile headlines (48px vs 40px), increased body line-height (1.6 vs 1.5) for readability.
+| Element | Class | Desktop | Mobile | Weight | Line Height |
+|---------|-------|---------|--------|--------|-------------|
+| H1 (Hero) | `text-5xl font-display` | 48px | 48px | 400 (Bebas) | 1 |
+| H2 (Section) | `text-3xl font-display` | 30px | 30px | 400 (Bebas) | 2.25rem |
+| H3 (Card) | `text-xl font-sans` | 20px | 20px | 600 | 1.75rem |
+| Body | `text-base font-sans` | 16px | 16px | 400 | 1.5rem |
+| Data/Price | `text-sm font-mono` | 14px | 14px | 500-700 | 1.25rem |
+| Caption | `text-xs font-sans` | 12px | 12px | 400-500 | 1rem |
 
 ### Content Tone
 
-- Sentence case for labels (warmer than uppercase)
-- Conversational: "Como voce se descreve?" not "Selecione seu nivel"
+- Sentence case for labels (warmer than uppercase, except Bebas Neue headlines which are naturally uppercase)
+- Conversational PT-BR: "Como voce se descreve?" not "Selecione seu nivel"
 - Plain language: "Facil de controlar" not "Alta controlabilidade"
 
 ---
@@ -193,25 +169,13 @@
 
 ## Border Radius
 
-```css
-:root {
-  --radius-sm: 8px;     /* Buttons, small elements */
-  --radius-md: 12px;    /* Cards, quiz options */
-  --radius-lg: 16px;    /* Chat bubbles, containers */
-  --radius-xl: 24px;    /* Large containers, profile cards */
-  --radius-full: 9999px; /* Pills, toggle switches */
-}
-```
-
-**Why soft corners?** Warm, approachable, conversational. Sharp corners signal "tech dashboard" — wrong for a guidance platform.
-
-**Usage:**
-- Buttons: 8px
-- Product cards: 12px
-- Quiz cards: 12px
-- Chat bubbles: 16px
-- Profile summary: 24px
-- Pills/toggles: full (9999px)
+| Token | Tailwind Class | Value | Usage |
+|-------|---------------|-------|-------|
+| sharp | `rounded-sharp` | 2px | Data tables, technical elements |
+| rounded | `rounded-rounded` | 8px | Buttons, inputs |
+| lg | `rounded-lg` | 12px | Cards, panels |
+| xl | `rounded-xl` | 16px | Chat bubbles, containers |
+| full | `rounded-full` | 9999px | Pills, badges, toggles |
 
 ---
 
@@ -221,43 +185,24 @@
 
 ```css
 /* Default: content pages, quiz, marketing */
-max-width: 1200px;
+max-width: 1280px;
 margin: 0 auto;
-padding: 0 24px;
+padding: 0 2rem;
 
-/* Data-dense: comparison tables, dashboards */
-max-width: 1440px;
+/* Data-dense: comparison tables */
+max-width: 88rem;
 margin: 0 auto;
-padding: 0 24px;
+padding: 0 2rem;
 ```
-
-**When to use which:** Default `1200px` for homepage, quiz, catalog cards, chat. Use `1440px` for 9+ column comparison tables and data-dense layouts.
 
 ### Section Backgrounds
 
-**Default:** Light-first aesthetic
-```css
-/* Light section (default) */
-background: var(--warm-white);
-color: var(--warm-charcoal);
+Dark-only hierarchy:
+- **Default:** `bg-base` (#0a0a0a) — page background
+- **Alternating sections:** `bg-surface` (#141414) — cards, panels
+- **Emphasis:** `bg-elevated` (#1f1f1f) — hover states, nested cards
 
-/* Warm cream (secondary sections) */
-background: var(--warm-cream);
-color: var(--warm-charcoal);
-```
-
-**Exception — Dark Sections:**
-- Chat interface: forces dark mode (immersive conversation)
-- Admin dashboard: dark mode (data-heavy)
-- Comparison tables: optional dark mode (user toggle)
-
-```css
-/* Dark section (chat, dashboards) */
-.chat-dark {
-  background: #1a1a1a;
-  color: #ffffff;
-}
-```
+No light mode. All pages use dark theme exclusively.
 
 ### Responsive Breakpoints
 
@@ -269,9 +214,9 @@ color: var(--warm-charcoal);
 
 ### Grid System
 
-**Product grid:** 3-col desktop / 2-col tablet / 1-col mobile, `gap: 20px`
-**Quiz grid:** 2-col tablet+ / 1-col mobile, `gap: 16px`
-**Comparison table:** Full width, sticky header
+- **Product grid:** 3-col desktop / 2-col tablet / 1-col mobile, `gap: 20px`
+- **Quiz grid:** 2-col tablet+ / 1-col mobile, `gap: 16px`
+- **Comparison table:** Full width, sticky header
 
 ---
 
@@ -279,24 +224,24 @@ color: var(--warm-charcoal);
 
 ### Buttons
 
-#### Primary CTA (Coral)
+#### Primary CTA (Lime)
 
 ```css
 .btn-primary {
-  background: var(--accent-coral);
-  color: #ffffff;
+  background: #84CC16;           /* brand-primary */
+  color: #0a0a0a;                /* dark text on lime */
   font-weight: 600;
+  font-family: Source Sans 3;
   padding: 12px 24px;
-  border-radius: var(--radius-sm);
+  border-radius: 8px;
   border: none;
   cursor: pointer;
   transition: all 150ms ease;
 }
 
 .btn-primary:hover {
-  background: var(--accent-coral-hover);
-  transform: scale(1.02);
-  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.24);
+  background: #9ad619;
+  box-shadow: 0 0 20px rgba(132, 204, 22, 0.3);  /* glow-green */
 }
 
 .btn-primary:active {
@@ -304,22 +249,23 @@ color: var(--warm-charcoal);
 }
 ```
 
-#### Secondary (Outline Coral)
+#### Secondary (Outline Lime)
 
 ```css
 .btn-secondary {
   background: transparent;
-  border: 2px solid var(--accent-coral);
-  color: var(--accent-coral);
+  border: 2px solid #84CC16;     /* brand-primary */
+  color: #84CC16;
   font-weight: 600;
+  font-family: Source Sans 3;
   padding: 12px 24px;
-  border-radius: var(--radius-sm);
+  border-radius: 8px;
   cursor: pointer;
   transition: all 150ms ease;
 }
 
 .btn-secondary:hover {
-  background: rgba(249, 115, 22, 0.04);
+  background: rgba(132, 204, 22, 0.1);
 }
 ```
 
@@ -328,110 +274,104 @@ color: var(--warm-charcoal);
 ```css
 .btn-tertiary {
   background: transparent;
-  color: var(--gray-500);
+  color: #A3A3A3;                /* text-secondary */
   font-weight: 500;
+  font-family: Source Sans 3;
   padding: 8px 16px;
-  border-radius: var(--radius-sm);
+  border-radius: 8px;
   cursor: pointer;
   transition: color 150ms ease;
 }
 
 .btn-tertiary:hover {
-  color: var(--accent-coral);
+  color: #84CC16;                /* brand-primary */
 }
 ```
+
+### Product Cards (Catalog)
+
+```css
+.product-card {
+  background: #141414;           /* bg-surface */
+  border: 1px solid hsl(var(--border));
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.product-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.8);  /* shadow-lg */
+}
+```
+
+**Structure:**
+- Image container (dark bg, aspect ratio 3:4)
+- Brand (uppercase, 12px, text-secondary)
+- Product name (600, 16px, text-primary, Source Sans 3)
+- Price (bold, brand-primary #84CC16, JetBrains Mono)
+- Level badge (pill, skill level colors)
+- "Para voce" badge (when profile matches, brand-primary glow)
+- [+ Comparar] button (tertiary)
 
 ### Quiz Cards
 
 **Default state:**
 ```css
 .quiz-card {
-  background: #ffffff;
-  border: 2px solid var(--gray-200);
-  border-radius: var(--radius-md);
+  background: #141414;           /* bg-surface */
+  border: 2px solid hsl(var(--border));
+  border-radius: 12px;
   padding: 20px;
   cursor: pointer;
   transition: all 200ms ease;
 }
 
 .quiz-card:hover {
-  border-color: var(--accent-coral);
-  background: var(--gray-100);
+  border-color: #84CC16;         /* brand-primary */
+  background: #1f1f1f;           /* bg-elevated */
 }
 ```
 
 **Selected state:**
 ```css
 .quiz-card.selected {
-  border-color: var(--accent-coral);
-  background: rgba(249, 115, 22, 0.04);
-  box-shadow: 0 0 0 2px var(--accent-coral);
-}
-
-.quiz-card.selected .checkmark {
-  display: flex;
-  /* Shows checkmark icon */
+  border-color: #84CC16;         /* brand-primary */
+  background: rgba(132, 204, 22, 0.1);
+  box-shadow: 0 0 20px rgba(132, 204, 22, 0.3);  /* glow-green */
 }
 ```
 
 **Structure:**
 - Icon/image on left (48x48px)
-- Label (bold) + description (regular) in center
+- Label (bold, text-primary) + description (regular, text-secondary) in center
 - Checkmark icon on right (visible when selected)
 
 ### Recommendation Cards
 
 ```css
 .recommendation-card {
-  background: #ffffff;
-  border: 1px solid var(--gray-200);
-  border-radius: var(--radius-md);
+  background: #141414;           /* bg-surface */
+  border: 1px solid hsl(var(--border));
+  border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   transition: box-shadow 200ms ease;
 }
 
 .recommendation-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.8);  /* shadow-lg */
 }
 ```
 
 **Structure:**
-1. Badge (e.g., "⭐ MELHOR COMBINACAO GERAL")
-2. Product image (140x200px, rounded-lg)
-3. Brand (uppercase, lime-600, 12px)
-4. Product name (bold, 20px)
-5. Price (coral-500, 24px, bold)
-6. Stock status (gray-500, 14px)
-7. "Por que pra voce" section (lime-50 bg, lime-200 border)
-8. CTA button (full-width, coral primary)
-
-### Product Cards (Catalog)
-
-```css
-.product-card {
-  background: #ffffff;
-  border: 1px solid var(--gray-200);
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  transition: transform 150ms ease, box-shadow 150ms ease;
-}
-
-.product-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-}
-```
-
-**Structure:**
-- Image container (white bg, aspect ratio 3:4)
-- Brand (uppercase, 12px, gray-500)
-- Product name (600, 16px)
-- Price (bold, coral-600, JetBrains Mono)
-- Level badge (pill, skill level colors)
-- "Para voce" badge (when profile matches)
-- [+ Comparar] button (tertiary)
+1. Badge (e.g., "MELHOR COMBINACAO GERAL" with brand-primary accent)
+2. Product image (140x200px, rounded-xl)
+3. Brand (uppercase, text-secondary, 12px, Source Sans 3)
+4. Product name (bold, 20px, text-primary)
+5. Price (brand-primary, 24px, bold, JetBrains Mono)
+6. Stock status (text-muted, 14px)
+7. "Por que pra voce" section (bg-elevated bg, brand-primary border)
+8. CTA button (full-width, brand-primary with glow-green)
 
 ### Chat Components
 
@@ -440,9 +380,9 @@ color: var(--warm-charcoal);
 **User message:**
 ```css
 .chat-bubble-user {
-  background: var(--accent-coral);
-  color: #ffffff;
-  border-radius: var(--radius-lg);
+  background: #84CC16;           /* brand-primary */
+  color: #0a0a0a;                /* dark text on lime */
+  border-radius: 16px;
   padding: 12px 16px;
   max-width: 80%;
   align-self: flex-end;
@@ -452,13 +392,13 @@ color: var(--warm-charcoal);
 **AI message:**
 ```css
 .chat-bubble-ai {
-  background: var(--warm-cream);
-  color: var(--warm-charcoal);
-  border-radius: var(--radius-lg);
+  background: #1f1f1f;           /* bg-elevated */
+  color: #FAFAFA;                /* text-primary */
+  border-radius: 16px;
   padding: 12px 16px;
   max-width: 80%;
   align-self: flex-start;
-  animation: message-enter 250ms ease forwards;
+  animation: slide-in 250ms ease forwards;
 }
 ```
 
@@ -469,45 +409,41 @@ color: var(--warm-charcoal);
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--gray-400);
-  animation: typing-bounce 600ms ease-in-out infinite;
+  background: #737373;           /* text-muted */
+  animation: typing-dot 1.4s ease-in-out infinite;
 }
 
-.typing-dot:nth-child(2) { animation-delay: 150ms; }
-.typing-dot:nth-child(3) { animation-delay: 300ms; }
-
-@keyframes typing-bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
-}
+.typing-dot:nth-child(2) { animation-delay: 200ms; }
+.typing-dot:nth-child(3) { animation-delay: 400ms; }
 ```
 
 ### Interactive Widgets
 
-#### Quiz Pills (Inline Selection)
+#### Quiz Pills
 
 ```css
 .quiz-pill {
   display: inline-flex;
   align-items: center;
   padding: 8px 16px;
-  border: 2px solid var(--gray-300);
-  border-radius: var(--radius-full);
-  background: #ffffff;
-  color: var(--gray-600);
+  border: 2px solid hsl(var(--border));
+  border-radius: 9999px;
+  background: transparent;
+  color: #A3A3A3;                /* text-secondary */
   font-weight: 500;
+  font-family: Source Sans 3;
   cursor: pointer;
   transition: all 150ms ease;
 }
 
 .quiz-pill:hover {
-  border-color: var(--accent-coral);
+  border-color: #84CC16;         /* brand-primary */
 }
 
 .quiz-pill.selected {
-  border-color: var(--accent-coral);
-  background: var(--accent-coral);
-  color: #ffffff;
+  border-color: #84CC16;
+  background: #84CC16;
+  color: #0a0a0a;                /* dark text on lime */
 }
 ```
 
@@ -517,22 +453,22 @@ color: var(--warm-charcoal);
 .toggle-track {
   width: 40px;
   height: 22px;
-  border-radius: var(--radius-full);
-  background: var(--gray-300);
+  border-radius: 9999px;
+  background: #1f1f1f;           /* bg-elevated */
   position: relative;
   cursor: pointer;
   transition: background 150ms ease;
 }
 
 .toggle-track.active {
-  background: var(--accent-coral);
+  background: #84CC16;           /* brand-primary */
 }
 
 .toggle-thumb {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #ffffff;
+  background: #FAFAFA;           /* text-primary */
   position: absolute;
   top: 2px;
   left: 2px;
@@ -551,18 +487,12 @@ color: var(--warm-charcoal);
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--gray-300);
+  background: #525252;           /* text-disabled */
   transition: background 150ms ease;
 }
 
 .progress-dot.active {
-  background: var(--accent-coral);
-}
-
-.progress-line {
-  width: 24px;
-  height: 2px;
-  background: var(--gray-300);
+  background: #84CC16;           /* brand-primary */
 }
 ```
 
@@ -583,9 +513,9 @@ color: var(--warm-charcoal);
 
 ```css
 :root {
-  --ease-enter: cubic-bezier(0, 0, 0.2, 1);   /* Elements entering */
-  --ease-exit: cubic-bezier(0.4, 0, 1, 1);    /* Elements leaving */
-  --ease-move: cubic-bezier(0.4, 0, 0.2, 1);  /* Position changes */
+  --ease-enter: cubic-bezier(0, 0, 0.2, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-move: cubic-bezier(0.4, 0, 0.2, 1);
 }
 ```
 
@@ -594,13 +524,13 @@ color: var(--warm-charcoal);
 **Quiz card selection:**
 ```css
 .quiz-card {
-  transition: all 200ms var(--ease-move);
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .quiz-card.selected {
   transform: scale(0.98);
-  border-color: var(--accent-coral);
-  box-shadow: 0 0 0 2px var(--accent-coral);
+  border-color: #84CC16;
+  box-shadow: 0 0 20px rgba(132, 204, 22, 0.3);
 }
 ```
 
@@ -612,7 +542,7 @@ color: var(--warm-charcoal);
 }
 
 .recommendation-card {
-  animation: results-enter 300ms var(--ease-enter) forwards;
+  animation: results-enter 300ms cubic-bezier(0, 0, 0.2, 1) forwards;
 }
 
 .recommendation-card:nth-child(1) { animation-delay: 0ms; }
@@ -622,15 +552,38 @@ color: var(--warm-charcoal);
 
 **Profile summary reveal:**
 ```css
-.profile-summary {
-  animation: profile-enter 400ms var(--ease-enter) forwards;
-}
-
 @keyframes profile-enter {
   from { opacity: 0; transform: scale(0.95); }
   to { opacity: 1; transform: scale(1); }
 }
+
+.profile-summary {
+  animation: profile-enter 400ms cubic-bezier(0, 0, 0.2, 1) forwards;
+}
 ```
+
+### Tailwind Animations (from config)
+
+| Class | Duration | Usage |
+|-------|----------|-------|
+| `animate-slide-in` | 200ms | Elements entering view |
+| `animate-slide-out` | 200ms | Elements leaving view |
+| `animate-pulse-glow` | 2s infinite | Loading states |
+| `animate-shimmer` | 2s infinite | Skeleton loading |
+| `animate-count-up` | 400ms | Number counters |
+| `animate-typing-dot` | 1.4s infinite | Chat typing indicator |
+
+---
+
+## Box Shadows
+
+| Token | Tailwind Class | Value | Usage |
+|-------|---------------|-------|-------|
+| sm | `shadow-sm` | 0 1px 2px rgba(0,0,0,0.5) | Subtle elevation |
+| md | `shadow-md` | 0 4px 6px -1px rgba(0,0,0,0.7) | Cards |
+| lg | `shadow-lg` | 0 10px 15px -3px rgba(0,0,0,0.8) | Hover elevation |
+| glow-green | `shadow-glow-green` | 0 0 20px rgba(132,204,22,0.3) | Brand primary glow |
+| glow-orange | `shadow-glow-orange` | 0 0 20px rgba(249,115,22,0.3) | Brand secondary glow |
 
 ---
 
@@ -654,58 +607,17 @@ color: var(--warm-charcoal);
 - **Explicit advance:** Step 4 (multi-select) requires "Proximo →" button
 - **Progress indicator:** Animated dots with encouraging copy at each step
 - **Budget slider:** Continuous range with "smart zone" hint (R$400-800 for beginners)
-- **Loading state:** Checklist animation ("✓ Nivel identificado", "◐ Buscando raquetes...")
+- **Loading state:** Checklist animation ("Nivel identificado", "Buscando raquetes...")
 
 ### Results Page Structure
 
-1. **Profile summary card** (gradient coral background, 4 attributes)
+1. **Profile summary card** (brand-primary gradient background, 4 attributes)
 2. **3 recommendation cards** with badges:
-   - ⭐ Melhor combinacao geral
-   - 💰 Melhor custo-beneficio
-   - 🎯 Melhor para evoluir
+   - Melhor combinacao geral
+   - Melhor custo-beneficio
+   - Melhor para evoluir
 3. **"Por que pra voce" section** on each card (2-3 bullet points)
 4. **Secondary CTAs:** "Falar com IA", "Ver catalogo", "Refazer quiz"
-
----
-
-## Dark Mode
-
-### Implementation
-
-- Toggle via `next-themes` (user preference)
-- **Default:** Light mode (warm, approachable)
-- **Forced dark:** `/chat` interface (immersive conversation)
-- **Optional dark:** `/paddles` comparison view, admin dashboard
-
-### Dark Mode Tokens
-
-```css
-[data-theme="dark"] {
-  --warm-white: #1a1a1a;
-  --warm-cream: #111111;
-  --warm-charcoal: #f5f5f5;
-  --gray-100: #1f2937;
-  --gray-200: #374151;
-  --gray-300: #4b5563;
-  --gray-400: #6b7280;
-  --gray-500: #9ca3af;
-  --gray-600: #d1d5db;
-  --gray-700: #e5e7eb;
-  --gray-800: #f3f4f6;
-}
-```
-
-### When to Use Dark Mode
-
-| Screen | Mode | Rationale |
-|--------|------|-----------|
-| Homepage | Light | First impression, warmth |
-| Quiz | Light | Approachable, encouraging |
-| Results | Light | Celebration, clarity |
-| Chat | Dark (forced) | Immersive conversation |
-| Catalog | Light (default) / Dark (toggle) | User preference |
-| Comparison | Light (default) / Dark (toggle) | Data density |
-| Admin | Dark | Dashboard aesthetic |
 
 ---
 
@@ -715,8 +627,8 @@ color: var(--warm-charcoal);
 
 | Check | Requirement | Implementation |
 |-------|-------------|----------------|
-| Color contrast | AA for text | Coral for large text only (3.5:1), charcoal for body (12.6:1) |
-| Focus indicators | Visible 2px outline | 2px coral outline on all interactive elements |
+| Color contrast | AA for text | Lime #84CC16 on dark #0a0a0a = 8.2:1 (AAA). Text-primary #FAFAFA on #0a0a0a = 18:1 (AAA) |
+| Focus indicators | Visible outline | 2px ring on all interactive elements |
 | Touch targets | 48px minimum | All buttons, cards, pills ≥ 48px height |
 | Screen reader | ARIA labels | `aria-label` on image buttons, `role="radio"` on quiz cards |
 | Keyboard nav | Tab order | Visual order matches DOM order, Escape closes modals |
@@ -764,7 +676,7 @@ Before shipping any UI, verify:
 - [ ] No 3-column feature grid with icons
 - [ ] Cards exist for function, not decoration
 - [ ] Section labels are sentence case, not uppercase
-- [ ] Coral used for CTAs only, not body text
+- [ ] Brand-primary (#84CC16) used for CTAs and highlights, not overused
 - [ ] Quiz feels like guidance, not interrogation
 - [ ] Recommendations explain "why", not just "what"
 - [ ] Brazilian Portuguese feels natural, not translated
@@ -775,13 +687,13 @@ Before shipping any UI, verify:
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
-| 2026-04-05 | "Warm Guide" aesthetic | Beginners need guidance, not data dashboard. Light-first reduces intimidation. |
-| 2026-04-05 | Coral primary accent | Warm, energetic, Brazilian sports commerce standard. Outperforms lime for CTAs. |
+| 2026-04-20 | Dark-only design | Premium sports analytics aesthetic. Dark provides better contrast for data presentation and matches sports tech conventions. |
+| 2026-04-20 | Bebas Neue for display | Bold, athletic, high-impact for headlines. Uppercase-only naturally. Loaded via next/font/google for zero layout shift. |
+| 2026-04-20 | Source Sans 3 for body | Clean, readable, slightly warmer than Inter for Portuguese text. Multiple weights for hierarchy. |
+| 2026-04-20 | JetBrains Mono for data | Credible spec tables, clear price display. Retained from v3.0 for data credibility. |
+| 2026-04-20 | Lime #84CC16 primary CTA | High contrast on dark backgrounds (8.2:1). Distinctive brand color. Better accessibility than orange on dark. |
+| 2026-04-20 | Orange #F97316 secondary | Warm accent for emphasis, warnings, secondary highlights. Complements lime without competing. |
 | 2026-04-05 | 7-step quiz | Emotional investment increases conversion. Noom has 40+ questions with 80% completion. |
-| 2026-04-05 | Soft corners (8-12px) | Sharp corners signal "tech" — wrong for conversational guidance. |
+| 2026-04-05 | Soft corners (8-12px) for cards | Approachable feel while maintaining premium look. Sharp corners (2px) reserved for data tables. |
 | 2026-04-05 | "Por que pra voce" section | Wirecutter pattern: explain recommendations, don't just list products. |
-| 2026-04-05 | Dark mode optional | Chat needs immersion; data screens benefit from dark. Light remains default for warmth. |
-| 2026-04-05 | JetBrains Mono retained | Analytical users still need credible spec tables. Keep data credibility layer. |
 | 2026-04-05 | Skill level colors retained | Intuitive visual taxonomy (green/amber/red) works across cultures. |
-
-(End of DESIGN.md v4.0 — 776 lines)

@@ -6,13 +6,19 @@ import { Menu, MessageSquare } from 'lucide-react'
 import { loadQuizProfile, clearQuizProfile, type QuizProfile } from '@/lib/quiz-profile'
 import { PlayerProfileSidebar } from '@/components/ui/player-profile-sidebar'
 import { RecommendationRail } from '@/components/chat/recommendation-rail'
-import type { ChatRecommendation } from '@/types/paddle'
+import type { ChatRecommendation, UserProfile } from '@/types/paddle'
 import dynamic from 'next/dynamic'
 
 const ChatWidget = dynamic(
   () => import('@/components/chat/chat-widget').then((mod) => mod.ChatWidget),
   { loading: () => <div className="flex-1 bg-base animate-pulse" /> }
 )
+
+const GENERIC_PROFILE: UserProfile = {
+  level: 'intermediate',
+  style: 'all-court',
+  budget_max: 2000,
+}
 
 export default function ChatPage() {
   const router = useRouter()
@@ -42,46 +48,36 @@ export default function ChatPage() {
   function handleStartOver() {
     clearQuizProfile()
     setProfile(null)
-    router.push('/quiz')
   }
 
   if (!hydrated) return null
 
-  if (!profile) {
-    return (
-      <main className="min-h-screen bg-base flex flex-col items-center justify-center px-4">
-        <div className="text-center max-w-md">
-          <h1 className="font-display text-3xl text-text-primary tracking-wide mb-4">PICKLEIQ</h1>
-          <p className="font-sans text-text-secondary mb-8">
-            Precisamos conhecer seu perfil para recomendar as melhores raquetes.
-          </p>
-          <button
-            type="button"
-            onClick={() => router.push('/quiz')}
-            className="px-8 py-3 bg-brand-primary text-base font-semibold rounded-rounded hover:shadow-glow-green transition-all"
-          >
-            Fazer Quiz →
-          </button>
-        </div>
-      </main>
-    )
-  }
+  const hasProfile = profile !== null
+  const userProfile: UserProfile = hasProfile
+    ? {
+        level: profile.level === 'competitive' ? 'advanced' : profile.level,
+        style: profile.style === 'baseline-grinder' ? 'power' : profile.style === 'dink-control' ? 'control' : profile.style === 'power-hitter' ? 'spin' : 'all-court',
+        budget_max: profile.budget === 'under-80' ? 200 : profile.budget === '80-150' ? 400 : profile.budget === '150-250' ? 600 : 2000,
+      }
+    : GENERIC_PROFILE
 
   const recCount = accumulatedRecs.size
 
   return (
     <main className="h-screen bg-base flex overflow-hidden">
       {/* Profile sidebar — desktop always visible */}
-      <div className="hidden md:block">
-        <PlayerProfileSidebar
-          profile={profile}
-          onEditProfile={handleEditProfile}
-          onStartOver={handleStartOver}
-        />
-      </div>
+      {hasProfile && (
+        <div className="hidden md:block">
+          <PlayerProfileSidebar
+            profile={profile}
+            onEditProfile={handleEditProfile}
+            onStartOver={handleStartOver}
+          />
+        </div>
+      )}
 
       {/* Profile sidebar — mobile drawer */}
-      {sidebarOpen && (
+      {hasProfile && sidebarOpen && (
         <>
           <div
             className="md:hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-40"
@@ -114,14 +110,16 @@ export default function ChatPage() {
       <div className="flex-1 flex flex-col min-w-0">
         <header className="flex items-center justify-between px-4 md:px-8 py-4 border-b border-border bg-base">
           <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setSidebarOpen(true)}
-              className="md:hidden p-2 text-text-secondary hover:text-text-primary transition-colors"
-              aria-label="Abrir perfil"
-            >
-              <Menu size={20} />
-            </button>
+            {hasProfile && (
+              <button
+                type="button"
+                onClick={() => setSidebarOpen(true)}
+                className="md:hidden p-2 text-text-secondary hover:text-text-primary transition-colors"
+                aria-label="Abrir perfil"
+              >
+                <Menu size={20} />
+              </button>
+            )}
             <div>
               <h1 className="font-display text-xl text-text-primary tracking-wide">
                 PICKLE<span className="text-brand-secondary">IQ</span> ASSISTANT
@@ -146,14 +144,18 @@ export default function ChatPage() {
           </button>
         </header>
 
+        {!hasProfile && (
+          <div className="flex items-center gap-3 px-4 md:px-8 py-2 bg-brand-primary/10 border-b border-brand-primary/20">
+            <p className="font-sans text-sm text-text-primary flex-1">
+              Quer recomendações personalizadas? <button type="button" onClick={() => router.push('/quiz')} className="text-brand-primary font-semibold hover:underline">Complete o quiz →</button>
+            </p>
+          </div>
+        )}
+
         <div className="flex-1 flex overflow-hidden">
           <div className="flex-1 bg-base overflow-hidden">
             <ChatWidget
-              profile={{
-                level: profile.level === 'competitive' ? 'advanced' : profile.level,
-                style: profile.style === 'baseline-grinder' ? 'power' : profile.style === 'dink-control' ? 'control' : profile.style === 'power-hitter' ? 'spin' : 'all-court',
-                budget_max: profile.budget === 'under-80' ? 200 : profile.budget === '80-150' ? 400 : profile.budget === '150-250' ? 600 : 2000,
-              }}
+              profile={userProfile}
               onRecommendations={handleRecommendations}
             />
           </div>

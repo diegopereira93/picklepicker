@@ -15,6 +15,8 @@ const navLinks = [
   { href: "/", label: "HOME" },
   { href: "/quiz", label: "QUIZ" },
   { href: "/catalog", label: "CATÁLOGO" },
+  { href: "/gift", label: "PRESENTE" },
+  { href: "/blog", label: "BLOG" },
 ]
 
 const ClerkAvailableContext = createContext<boolean>(false)

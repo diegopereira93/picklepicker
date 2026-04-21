@@ -8,6 +8,7 @@ import { QuizStepBudgetSlider } from '@/components/quiz/quiz-step-budget-slider'
 import { QuizAnalyzing } from '@/components/quiz/quiz-analyzing'
 import { ProgressIndicator } from '@/components/quiz/progress-indicator'
 import { fetchPaddles } from '@/lib/api'
+import { Button } from '@/components/ui/button'
 
 type GiftStep = 'welcome' | 'recipient' | 'budget' | 'analyzing' | 'results'
 
@@ -24,8 +25,8 @@ export default function GiftPage() {
 
   if (!hydrated) {
     return (
-      <main className="min-h-screen bg-[var(--warm-white)] flex items-center justify-center">
-        <div className="animate-pulse text-gray-400">Carregando...</div>
+      <main className="min-h-screen bg-base flex items-center justify-center">
+        <div className="animate-pulse text-text-muted">Carregando...</div>
       </main>
     )
   }
@@ -106,7 +107,7 @@ export default function GiftPage() {
   if (step === 'welcome') {
     return (
       <main 
-        className="min-h-screen bg-[var(--warm-white)] flex flex-col items-center justify-center p-4"
+        className="min-h-screen bg-base flex flex-col items-center justify-center p-4"
         aria-label="Quiz de presente para raquetes"
       >
         <QuizStepWelcomeGift onStart={() => setStep('recipient')} />
@@ -117,7 +118,7 @@ export default function GiftPage() {
   if (step === 'recipient') {
     return (
       <main 
-        className="min-h-screen bg-[var(--warm-white)] flex flex-col items-center justify-center p-4"
+        className="min-h-screen bg-base flex flex-col items-center justify-center p-4"
         aria-label="Quiz de presente para raquetes"
       >
         <QuizStepGiftRecipient 
@@ -135,7 +136,7 @@ export default function GiftPage() {
   if (step === 'budget') {
     return (
       <main 
-        className="min-h-screen bg-[var(--warm-white)] flex flex-col items-center justify-center p-4"
+        className="min-h-screen bg-base flex flex-col items-center justify-center p-4"
         aria-label="Quiz de presente para raquetes"
       >
         <QuizStepBudgetSlider 
@@ -148,21 +149,14 @@ export default function GiftPage() {
         </div>
         
         <div className="mt-6">
-          <button
-            type="button"
+          <Button
             onClick={startAnalyzing}
             disabled={budget === 0}
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if ((e.key === 'Enter' || e.key === ' ') && budget !== 0) {
-                e.preventDefault()
-                startAnalyzing()
-              }
-            }}
-            className="wg-button-coral text-lg px-8 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
+            size="lg"
+            className="w-full max-w-xs bg-brand-secondary hover:bg-brand-secondary/80 text-white text-lg disabled:opacity-50 disabled:cursor-not-allowed"
           >
             ANALISAR →
-          </button>
+          </Button>
         </div>
       </main>
     )
@@ -171,7 +165,7 @@ export default function GiftPage() {
   if (step === 'analyzing') {
     return (
       <main 
-        className="min-h-screen bg-[var(--warm-white)] flex flex-col items-center justify-center p-4"
+        className="min-h-screen bg-base flex flex-col items-center justify-center p-4"
         aria-label="Quiz de presente para raquetes"
       >
         <QuizAnalyzing onComplete={handleAnalyzingComplete} />
@@ -184,7 +178,7 @@ export default function GiftPage() {
 
   if (step === 'results') {
     return (
-      <main className="min-h-screen bg-[var(--warm-white)] flex flex-col items-center justify-center p-4">
+      <main className="min-h-screen bg-base flex flex-col items-center justify-center p-4">
         <GiftResultsPage 
           paddle={recommendedPaddle}
           recipientLevel={recipientLevel}
@@ -242,7 +236,7 @@ function GiftResultsPage({
   if (!paddle) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-600">Carregando recomendação...</p>
+        <p className="text-text-secondary">Carregando recomendação...</p>
       </div>
     )
   }
@@ -252,14 +246,14 @@ function GiftResultsPage({
       <div className="text-center space-y-2">
         <div className="text-8xl mb-4">🎁</div>
         <h1 className="text-3xl font-bold">Presente perfeito!</h1>
-        <p className="text-gray-600">
+        <p className="text-text-secondary">
           Encontramos a raquete ideal para quem vai receber
         </p>
       </div>
 
-      <div className="mx-auto max-w-xl bg-gray-50 rounded-xl p-6 border border-gray-200">
+      <div className="mx-auto max-w-xl bg-surface rounded-xl p-6 border border-border">
         <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-6 items-center">
-          <div className="w-[100px] h-[150px] rounded-lg overflow-hidden mx-auto md:mx-0 bg-gray-200">
+          <div className="w-[100px] h-[150px] rounded-lg overflow-hidden mx-auto md:mx-0 bg-elevated">
             {paddle.image_url ? (
               <img 
                 src={paddle.image_url} 
@@ -267,27 +261,27 @@ function GiftResultsPage({
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-xs text-gray-500">
+              <div className="w-full h-full flex items-center justify-center text-xs text-text-muted">
                 Foto
               </div>
             )}
           </div>
 
           <div className="text-center md:text-left">
-            <h3 className="text-xl font-bold mb-2">{paddle.name}</h3>
+            <h3 className="text-xl font-bold mb-2 text-text-primary">{paddle.name}</h3>
             {paddle.brand && (
-              <p className="text-xs font-bold uppercase tracking-wider mb-2 text-green-700">
+              <p className="text-xs font-bold uppercase tracking-wider mb-2 text-brand-primary">
                 {paddle.brand}
               </p>
             )}
-            <div className="text-2xl font-bold text-coral mb-4">
+            <div className="text-2xl font-bold text-brand-secondary mb-4">
               R$ {paddle.price_min_brl?.toLocaleString('pt-BR') ?? '—'}
             </div>
 
-            <p className="text-sm text-gray-600 mb-3 bg-yellow-50 p-3 rounded-lg">
+            <p className="text-sm text-text-secondary mb-3 bg-elevated p-3 rounded-lg">
               Esta raquete é perfeita para {recipientLabel} que está começando
             </p>
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-sm text-text-secondary mb-4">
               Melhor avaliada na faixa de {formatCurrency(budget)}
             </p>
           </div>
@@ -295,27 +289,27 @@ function GiftResultsPage({
       </div>
 
       <div className="grid gap-3">
-        <button
-          type="button"
+        <Button
           onClick={onViewMore}
-          className="wg-button-coral text-lg px-6 py-3"
+          size="lg"
+          className="bg-brand-secondary hover:bg-brand-secondary/80 text-white"
         >
-          VER MAIS OPÇÕES →
-        </button>
-        <button
-          type="button"
+          Ver mais opções
+        </Button>
+        <Button
+          variant="outline"
+          size="lg"
           onClick={onPersonalQuiz}
-          className="wg-button-ghost text-lg px-6 py-3"
         >
           Quero fazer o quiz pra mim
-        </button>
-        <button
-          type="button"
+        </Button>
+        <Button
+          variant="ghost"
+          size="lg"
           onClick={onTryAgain}
-          className="wg-button-ghost text-lg px-6 py-3"
         >
           Refazer
-        </button>
+        </Button>
       </div>
     </div>
   )
