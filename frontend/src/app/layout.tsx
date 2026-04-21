@@ -29,9 +29,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PickleIQ — AI Pickleball Paddle Advisor",
+  title: "PickleIQ — Recomendações Inteligentes de Raquetes de Pickleball",
   description:
-    "Find the perfect pickleball paddle with AI. Price comparisons, technical specs, and personalized recommendations.",
+    "Encontre a raquete de pickleball perfeita com IA. Compare preços, veja especificações técnicas e receba recomendações personalizadas em português.",
 };
 
 export default function RootLayout({
@@ -40,7 +40,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${bebasNeue.variable} ${sourceSans3.variable} ${jetbrainsMono.variable}`}>
+    <html lang="pt-BR" suppressHydrationWarning className={`${bebasNeue.variable} ${sourceSans3.variable} ${jetbrainsMono.variable}`}>
       <body className="min-h-screen antialiased flex flex-col font-sans bg-base text-text-primary" suppressHydrationWarning>
         <ThemeProvider attribute="data-theme" defaultTheme="dark" enableSystem={false}>
           <ClerkWrapper>

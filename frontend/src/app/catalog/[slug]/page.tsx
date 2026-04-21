@@ -3,11 +3,12 @@ import { notFound } from 'next/navigation'
 import { fetchPaddles, fetchLatestPrices } from '@/lib/api'
 import { resolveAffiliateUrl } from '@/lib/affiliate'
 import { cn } from '@/lib/utils'
-import { ExternalLink, GitCompare, SearchX, Star, Bell } from 'lucide-react'
+import { ExternalLink, GitCompare, SearchX, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { PriceTag } from '@/components/ui/price-tag'
 import { PriceChart } from '@/components/ui/price-chart'
 import { SafeImage } from '@/components/ui/safe-image'
+import { PriceAlertButton } from '@/components/ui/price-alert-button'
 import Link from 'next/link'
 
 interface PageParams {
@@ -70,8 +71,44 @@ export default async function CatalogDetailPage({
     .filter((p) => p.id !== paddle.id)
     .slice(0, 6)
 
+  const productSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: paddle.name,
+    description: paddle.description || `${paddle.brand} ${paddle.name} — raquete de pickleball`,
+    image: paddle.image_url || undefined,
+    brand: {
+      '@type': 'Brand',
+      name: paddle.brand || 'Unknown',
+    },
+    offers: {
+      '@type': 'Offer',
+      price: paddle.price_brl ?? paddle.price_min_brl ?? 0,
+      priceCurrency: 'BRL',
+      availability: 'https://schema.org/InStock',
+      url: `https://pickleiq.com/catalog/${paddle.model_slug || paddle.id}`,
+      seller: {
+        '@type': 'Organization',
+        name: 'PickleIQ',
+      },
+    },
+    ...(paddle.rating && {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: paddle.rating,
+        reviewCount: paddle.review_count || 1,
+        bestRating: 5,
+        worstRating: 1,
+      },
+    }),
+  }
+
   return (
     <div className="min-h-screen bg-base">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+      />
       <div className="max-w-5xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
           <div className="relative group">
@@ -143,12 +180,15 @@ export default async function CatalogDetailPage({
                   <GitCompare size={16} /> Comparar
                 </Link>
               </Button>
-              <Button 
-                variant="ghost"
-                className="text-text-secondary hover:bg-surface hover:text-text-primary"
-              >
-                <Bell size={16} className="mr-2" /> Alerta de Preco
-              </Button>
+              <PriceAlertButton
+                paddle={{
+                  id: paddle.id,
+                  name: paddle.name,
+                  brand: paddle.brand || '',
+                  price_brl: paddle.price_brl,
+                  price_min_brl: paddle.price_min_brl,
+                }}
+              />
             </div>
           </div>
         </div>

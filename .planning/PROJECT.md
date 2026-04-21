@@ -52,7 +52,7 @@ Users can confidently choose the right pickleball paddle through AI-powered reco
 
 ## Context
 
-**Current state (v2.2.0):** All backend endpoints implemented (similar paddles, price alerts, affiliate tracking, quiz persistence). Full test coverage: 198 backend, 179 frontend, 23 E2E Playwright, 146+ pipeline tests. Project documentation complete (7 docs, 2,108 lines). Launch readiness score improved from 5.0/10 to target range.
+**Current state (v2.4.0):** Starting Site Quality & UX Polish milestone. Source: SITE-INSPECTION-REPORT.md (27 findings). 3 critical bugs (broken Gift/Quiz Results pages, lang=en, profile mismatch), 12 high-priority UX gaps (no search, forced quiz, flat landing, missing SEO), 15 medium-priority polish items. All previous milestones shipped: v2.2.0 (Launch Readiness), v1.7.0 (Backend API), v1.6.0 (UI Redesign).
 
 **Tech stack:** Python 3.12 + FastAPI | Next.js 14 App Router | PostgreSQL + pgvector | Groq (LLM) | Jina AI (embeddings)
 
@@ -68,6 +68,8 @@ Users can confidently choose the right pickleball paddle through AI-powered reco
 - **Tests:** pytest-asyncio (backend) + Vitest (frontend) + Playwright (E2E) — must not introduce regressions
 - **Locale:** PT-BR for all user-facing text
 - **Design system:** Follow DESIGN.md v5.0 (Premium Sports Analytics, dark-only)
+- **Quality gate:** All changes must pass SITE-INSPECTION-REPORT.md criteria
+- **No regressions:** 179 frontend + 196+ backend + 23 E2E tests must stay green
 
 ## Key Decisions
 
@@ -102,4 +104,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-13 after v2.2.0 milestone completion*
+*Last updated: 2026-04-20 — v2.4.0 milestone created (Site Quality & UX Polish)*

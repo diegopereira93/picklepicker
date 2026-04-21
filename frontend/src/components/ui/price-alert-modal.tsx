@@ -31,7 +31,7 @@ export function PriceAlertModal({ paddle, isOpen, onClose }: PriceAlertModalProp
       const payload = {
         paddle_id: paddle.id,
         email,
-        target_price: targetPrice ? parseFloat(targetPrice) : undefined,
+        price_target: targetPrice ? parseFloat(targetPrice) : undefined,
       }
 
       const response = await fetch("/api/price-alerts", {
@@ -41,6 +41,12 @@ export function PriceAlertModal({ paddle, isOpen, onClose }: PriceAlertModalProp
         },
         body: JSON.stringify(payload),
       })
+
+      if (response.status === 401) {
+        toast.error("Entre para criar alertas de preço.")
+        onClose()
+        return
+      }
 
       if (!response.ok) {
         throw new Error("Failed to create alert")

@@ -2,11 +2,12 @@
 
 import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { SlidersHorizontal, X, SearchX, ChevronDown } from 'lucide-react'
+import { SlidersHorizontal, X, SearchX, ChevronDown, Search, ChevronLeft, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { fetchPaddles } from '@/lib/api'
 import { toast } from 'sonner'
 import { ProductCard, ProductCardSkeleton } from '@/components/ui/product-card'
+import { PriceAlertModal } from '@/components/ui/price-alert-modal'
 import type { Paddle, PaddleListResponse } from '@/types/paddle'
 
 // --- Types ---
@@ -27,6 +28,7 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
 ]
 
 const BRANDS = ['Selkirk', 'JOOLA', 'Paddletek', 'Head', 'Wilson', 'Onix', 'Engage', 'Diadem', 'ProLite', 'Vulcan']
+const ITEMS_PER_PAGE = 24
 
 function CatalogPageContent() {
   const router = useRouter()
@@ -54,6 +56,12 @@ function CatalogPageContent() {
   )
 
   const [compareIds, setCompareIds] = useState<string[]>([])
+  const [searchQuery, setSearchQuery] = useState<string>(searchParams.get('q') || '')
+  const [currentPage, setCurrentPage] = useState<number>(
+    searchParams.get('page') ? Number(searchParams.get('page')) : 1
+  )
+  const [alertPaddle, setAlertPaddle] = useState<Paddle | null>(null)
+  const [alertModalOpen, setAlertModalOpen] = useState(false)
 
   const loadProducts = useCallback(async () => {
     setIsLoading(true)
@@ -66,10 +74,19 @@ function CatalogPageContent() {
       brand: selectedBrands.length > 0 ? selectedBrands.join(',') : undefined,
     }
     const data = await fetchPaddles(params)
-    setProducts(data.items)
-    setTotal(data.total)
+    let items = data.items
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim()
+      items = items.filter(
+        p => p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q)
+      )
+    }
+
+    setProducts(items)
+    setTotal(items.length)
     setIsLoading(false)
-  }, [filters, sort, selectedBrands])
+  }, [filters, sort, selectedBrands, searchQuery])
 
   useEffect(() => {
     loadProducts()
@@ -81,6 +98,8 @@ function CatalogPageContent() {
     if (filters.price_max) params.set('price_max', String(filters.price_max))
     if (selectedBrands.length > 0) params.set('brand', selectedBrands.join(','))
     if (sort !== 'relevance') params.set('sort', sort)
+    if (searchQuery.trim()) params.set('q', searchQuery.trim())
+    if (currentPage > 1) params.set('page', String(currentPage))
     router.replace(`/catalog?${params.toString()}`, { scroll: false })
   }
 
@@ -94,6 +113,8 @@ function CatalogPageContent() {
     setFilters({})
     setSelectedBrands([])
     setSort('relevance')
+    setSearchQuery('')
+    setCurrentPage(1)
   }
 
   function handleProductClick(paddle: Paddle) {
@@ -101,22 +122,44 @@ function CatalogPageContent() {
     router.push(`/catalog/${slug}`)
   }
 
-  const hasActiveFilters = selectedBrands.length > 0 || filters.price_min || filters.price_max
+  function handleSearchChange(value: string) {
+    setSearchQuery(value)
+    setCurrentPage(1)
+  }
+
+  const hasActiveFilters = selectedBrands.length > 0 || !!filters.price_min || !!filters.price_max || searchQuery.trim().length > 0
 
   return (
     <main className="min-h-screen bg-base">
-      {/* Mobile filter toggle */}
+      {/* Mobile filter toggle + search */}
       <div className="md:hidden sticky top-0 z-30 bg-base border-b border-border px-4 py-3 flex items-center justify-between">
         <h1 className="font-display text-xl text-text-primary tracking-wide">CATÁLOGO</h1>
-        <button
-          type="button"
-          onClick={() => setFiltersOpen(!filtersOpen)}
-          className="flex items-center gap-2 px-3 py-1.5 bg-surface rounded-rounded text-sm text-text-secondary"
-        >
-          <SlidersHorizontal size={16} />
-          Filtros
-          {hasActiveFilters && <span className="w-2 h-2 rounded-full bg-brand-primary" />}
-        </button>
+        <div className="flex items-center gap-2">
+          <div className="relative">
+            <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-text-muted" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => handleSearchChange(e.target.value)}
+              placeholder="Buscar..."
+              className="w-28 bg-surface border border-border rounded-rounded pl-8 pr-3 py-1.5 text-sm font-sans text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand-primary"
+            />
+            {searchQuery && (
+              <button type="button" onClick={() => handleSearchChange('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary">
+                <X size={12} />
+              </button>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={() => setFiltersOpen(!filtersOpen)}
+            className="flex items-center gap-2 px-3 py-1.5 bg-surface rounded-rounded text-sm text-text-secondary"
+          >
+            <SlidersHorizontal size={16} />
+            Filtros
+            {hasActiveFilters && <span className="w-2 h-2 rounded-full bg-brand-primary" />}
+          </button>
+        </div>
       </div>
 
       <div className="max-w-7xl mx-auto flex">
@@ -167,8 +210,25 @@ function CatalogPageContent() {
                 {isLoading ? 'Carregando...' : `${total} raquetes encontradas`}
               </p>
             </div>
-            {/* Sort dropdown */}
-            <div className="relative">
+            <div className="flex items-center gap-4">
+              {/* Search input */}
+              <div className="relative">
+                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  placeholder="Buscar por nome ou marca..."
+                  className="w-64 bg-surface border border-border rounded-rounded pl-10 pr-8 py-2 text-sm font-sans text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand-primary"
+                />
+                {searchQuery && (
+                  <button type="button" onClick={() => handleSearchChange('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary">
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
+              {/* Sort dropdown */}
+              <div className="relative">
               <button
                 type="button"
                 onClick={() => setSortOpen(!sortOpen)}
@@ -197,20 +257,29 @@ function CatalogPageContent() {
                   </div>
                 </>
               )}
+              </div>
             </div>
           </div>
 
           {/* Mobile result count + sort */}
           <div className="md:hidden flex items-center justify-between mb-4">
             <p className="font-sans text-sm text-text-muted">
-              {isLoading ? 'Carregando...' : `${total} raquetes`}
+              {isLoading ? 'Carregando...' : total > 0 ? `Mostrando ${Math.min(currentPage * ITEMS_PER_PAGE, total)} de ${total} raquetes` : 'Nenhuma raquete'}
             </p>
           </div>
 
+          {/* Result count */}
+          {!isLoading && total > 0 && (
+            <p className="hidden md:block font-sans text-sm text-text-muted mb-4">
+              Mostrando {Math.min(currentPage * ITEMS_PER_PAGE, total)} de {total} raquetes
+            </p>
+          )}
+
           {/* Product Grid */}
           {products.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {products.map(paddle => (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {products.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE).map(paddle => (
                 <div key={paddle.id} onClick={() => handleProductClick(paddle)} className="cursor-pointer">
                   <ProductCard
                     paddle={paddle}
@@ -235,12 +304,39 @@ function CatalogPageContent() {
                       }
                     }}
                     onAlert={() => {
-                      toast.info('Alerta de preco em breve disponivel!')
+                      setAlertPaddle(paddle)
+                      setAlertModalOpen(true)
                     }}
                   />
                 </div>
               ))}
             </div>
+            {total > ITEMS_PER_PAGE && (
+              <div className="flex items-center justify-center gap-4 mt-8">
+                <button
+                  type="button"
+                  disabled={currentPage <= 1}
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  className="flex items-center gap-2 px-4 py-2 bg-surface border border-border rounded-rounded text-sm font-sans text-text-secondary hover:text-text-primary disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  <ChevronLeft size={16} />
+                  Anterior
+                </button>
+                <span className="font-sans text-sm text-text-muted">
+                  Página {currentPage} de {Math.ceil(total / ITEMS_PER_PAGE)}
+                </span>
+                <button
+                  type="button"
+                  disabled={currentPage >= Math.ceil(total / ITEMS_PER_PAGE)}
+                  onClick={() => setCurrentPage(prev => Math.min(Math.ceil(total / ITEMS_PER_PAGE), prev + 1))}
+                  className="flex items-center gap-2 px-4 py-2 bg-surface border border-border rounded-rounded text-sm font-sans text-text-secondary hover:text-text-primary disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  Próximo
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+            )}
+          </>
           ) : !isLoading ? (
             <div className="bg-surface border border-border rounded-lg py-20 flex flex-col items-center justify-center gap-4 text-center px-4">
               <SearchX size={64} className="text-text-muted" />
@@ -268,6 +364,17 @@ function CatalogPageContent() {
           )}
         </div>
       </div>
+
+      {alertPaddle && (
+        <PriceAlertModal
+          paddle={alertPaddle}
+          isOpen={alertModalOpen}
+          onClose={() => {
+            setAlertPaddle(null)
+            setAlertModalOpen(false)
+          }}
+        />
+      )}
     </main>
   )
 }

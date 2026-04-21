@@ -1,45 +1,46 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.2.0
-milestone_name: Launch Readiness: Testes & Correções Críticas
-status: completed
-last_updated: "2026-04-13T22:30:00.000Z"
-last_activity: 2026-04-13 — v2.2.0 milestone completed and archived
+milestone: v2.4.0
+milestone_name: Site Quality & UX Polish
+status: ready to execute
+last_updated: "2026-04-20T00:00:00.000Z"
+last_activity: 2026-04-20 — Phase 28 planned (3 plans, Wave 1)
 progress:
   total_phases: 4
-  completed_phases: 4
-  total_plans: 4
-  completed_plans: 4
-  percent: 100
+  completed_phases: 0
+  total_plans: 3
+  completed_plans: 0
+  percent: 0
 ---
 
 # STATE.md — PickleIQ
 
 ## Current Position
 
-Milestone: v2.2.0 — COMPLETED AND ARCHIVED
-Phase: None — milestone complete
-Status: Ready for next milestone planning
-Last activity: 2026-04-13
+Milestone: v2.4.0 — Site Quality & UX Polish
+Phase: 28 — Critical Bug Fixes & Language Fix
+Status: Planned (3 plans, Wave 1 — all parallel)
+Last activity: 2026-04-20
 
-## Recently Completed
+**Next action:** Run `/gsd-execute-phase 28` to execute all 3 plans in parallel
 
-| Phase | Description | Date | Commit |
-|-------|-------------|------|--------|
-| 24 | Fix Pipeline Tests | 2026-04-12 | 762d654 |
-| 25 | Fix Frontend Tests | 2026-04-12 | 141cf2b |
-| 26 | Playwright E2E Tests | 2026-04-12 | e710a91 |
-| 27 | Backend Deprecation Fixes | 2026-04-12 | 50762c8 |
-| — | E2E selector fixes | 2026-04-12 | 82e119c |
-| — | Project documentation (7 docs) | 2026-04-13 | ca05820 |
-| — | backend/.env.example | 2026-04-13 | 6df9037 |
+## Milestone Overview
+
+| Phase | Goal | Status |
+|-------|------|--------|
+| 28 | Critical Bug Fixes & Language Fix | 📋 Planned (3 plans) |
+| 29 | Core UX — Search, Chat, Pagination, Nav | ⬜ Not started |
+| 30 | Conversion — Landing, SEO, Footer, Design System | ⬜ Not started |
+| 31 | Polish — Compare 3-4, Breadcrumbs, Error Boundaries | ⬜ Not started |
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-13)
+See: .planning/PROJECT.md (updated 2026-04-20)
+Requirements: .planning/REQUIREMENTS.md
+Source: SITE-INSPECTION-REPORT.md (27 findings across 80+ files)
 
 **Core value:** Users can confidently choose the right pickleball paddle through AI-powered recommendations backed by real-time pricing and technical specs
-**Current focus:** Milestone complete — run `/gsd-new-milestone` to start next
+**Current focus:** Site quality pass — fix broken pages, close UX gaps, improve SEO, polish landing page
 
 ## Test Status
 
@@ -78,4 +79,4 @@ From eng review (TODOS.md):
 - T7: Embedding provider reliability (local fallback) → v1.5.0
 
 ---
-*State updated: 2026-04-13 — v2.2.0 milestone completed and archived*
+*State updated: 2026-04-20 — v2.4.0 milestone created from SITE-INSPECTION-REPORT.md*

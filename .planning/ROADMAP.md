@@ -5,11 +5,21 @@
 - ✅ **v1.6.0** — UI Redesign (Phases 16-19) — shipped 2026-04-05
 - ✅ **v1.7.0** — Backend API (Phases 20-23) — shipped 2026-04-13
 - ✅ **v2.2.0** — Launch Readiness (Phases 24-27) — shipped 2026-04-13
+- 🔵 **v2.4.0** — Site Quality & UX Polish (Phases 28-31) — **ACTIVE**
 - 📋 **v1.5.0** — Production Infrastructure (Phase 15) — deferred
 
 ## Current Focus
 
-**Planning next milestone.** Run `/gsd-new-milestone` to start.
+**v2.4.0 — Site Quality & UX Polish** (Phases 28-31)
+
+Full-stack quality pass from SITE-INSPECTION-REPORT.md. Fix 3 critical bugs, 12 high-priority UX gaps, and 15 medium-priority polish items. Goal: "functional beta" → "polished, trustworthy product."
+
+| Phase | Goal | Status |
+|-------|------|--------|
+| 28 | Critical Bug Fixes & Language Fix | ⬜ Not started |
+| 29 | Core UX — Search, Chat, Pagination, Nav | ⬜ Not started |
+| 30 | Conversion — Landing, SEO, Footer, Design System | ⬜ Not started |
+| 31 | Polish — Compare 3-4, Breadcrumbs, Error Boundaries | ⬜ Not started |
 
 ---
 
@@ -454,6 +464,117 @@ Plans:
 
 ---
 
+## Milestone v2.4.0 — Site Quality & UX Polish 🔵 ACTIVE
+
+*Created: 2026-04-20*
+*Source: SITE-INSPECTION-REPORT.md — 27 findings across 80+ files*
+
+**Goal:** Transform site from "functional beta" to "polished, trustworthy product." Fix 3 critical bugs, close 12 high-priority UX gaps, implement SEO fundamentals, and polish landing page for organic traffic.
+
+**Requirements:** See `.planning/REQUIREMENTS.md`
+
+### Phase 28: Critical Bug Fixes & Language Fix
+
+**Goal:** Fix all broken pages and the lang attribute. Stop the bleeding.
+
+| Task | File(s) | Description |
+|------|---------|-------------|
+| 28.1 | `frontend/src/app/gift/page.tsx`, `frontend/src/app/quiz/results/page.tsx` | Replace all `wg-*` legacy CSS classes with current Tailwind/shadcn equivalents. Update Gift page to use dark theme. |
+| 28.2 | `frontend/src/app/layout.tsx` | Change `<html lang="en">` to `<html lang="pt-BR">`. Update all metadata to Portuguese. |
+| 28.3 | `frontend/src/lib/quiz-profile.ts`, `frontend/src/lib/profile.ts` | Unify to single profile storage module. Update quiz and results pages to use same source. |
+| 28.4 | `frontend/src/components/ui/product-card.tsx` | Change "Details" → "Detalhes". Scan all components for remaining English strings. |
+
+**Success criteria:**
+1. Gift page renders correctly with dark theme styling
+2. Quiz results page renders correctly with dark theme styling
+3. `<html lang="pt-BR">` confirmed via browser devtools
+4. Quiz → Results flow works end-to-end without redirect loop
+5. Zero English strings in user-facing UI
+6. All existing tests still pass (179 frontend, 23 E2E)
+
+**Plans:** 3 plans (Wave 1 — all parallel)
+
+Plans:
+- [ ] 28-01-PLAN.md — Fix Gift pages dark theme migration (FR-01)
+- [ ] 28-02-PLAN.md — Fix Quiz Results + Layout lang + Profile storage (FR-01, FR-02, FR-03)
+- [ ] 28-03-PLAN.md — Fix English strings in UI (FR-14)
+
+---
+
+### Phase 29: Core UX — Search, Chat, Pagination, Nav
+
+**Goal:** Close the most impactful UX gaps that block users from finding and comparing paddles.
+
+| Task | File(s) | Description |
+|------|---------|-------------|
+| 29.1 | `frontend/src/app/catalog/page.tsx` | Add search input to catalog header. Client-side filtering by name + brand. URL sync `?q=`. Clear button. |
+| 29.2 | `frontend/src/app/chat/page.tsx` | Allow chat without quiz. Use generic "all-purpose" profile when no quiz completed. Show quiz suggestion card. Remove quiz redirect. |
+| 29.3 | `frontend/src/app/catalog/page.tsx` | Add "Mostrando X de Y raquetes" result count above grid. Dynamic updates. |
+| 29.4 | `frontend/src/app/catalog/page.tsx` | Replace `limit: 200` with pagination: 24 per page, page-based, URL sync `?page=`. |
+| 29.5 | `frontend/src/components/layout/header.tsx` | Add "Presente" and "Blog" to nav links array. Verify mobile nav shows them. |
+
+**Plans:** 2 plans
+
+Plans:
+- [ ] 29-01-PLAN.md — Add search, result count, and pagination to catalog page (FR-04, FR-06, FR-07)
+- [ ] 29-02-PLAN.md — Allow chat without quiz + add Presente/Blog to nav (FR-05, FR-08)
+
+**Success criteria:**
+1. User can search "Selkirk" in catalog and see filtered results
+2. User can open `/chat` without completing quiz first
+3. Result count visible and updates with filters
+4. Catalog paginated at 24 per page with Previous/Next
+5. "Presente" and "Blog" visible in header nav
+
+---
+
+### Phase 30: Conversion — Landing, SEO, Footer, Design System
+
+**Goal:** Improve first impression, search engine discoverability, and trust signals.
+
+| Task | File(s) | Description |
+|------|---------|-------------|
+| 30.1 | `frontend/src/components/home/landing-client.tsx` | Overhaul: alternating section backgrounds (base/surface/elevated), scroll-triggered fade-in animations via IntersectionObserver, real stats from API, sentence-case buttons. |
+| 30.2 | `frontend/src/app/catalog/[slug]/page.tsx`, `frontend/src/app/page.tsx` | Add JSON-LD Product schema on detail pages, Organization schema on homepage. |
+| 30.3 | `frontend/src/app/sitemap.ts` (new), `frontend/src/app/robots.ts` (new) | Create sitemap.xml and robots.txt via Next.js App Router conventions. |
+| 30.4 | `frontend/src/components/layout/footer.tsx` | Expand to 4 columns: Product, Content, Legal, Social. Add Gift, Blog, social links. |
+| 30.5 | `DESIGN.md` | Update to match current dark-theme implementation. Fix font references, color palette, component specs. Remove "light-first" references. |
+| 30.6 | `frontend/src/components/ui/price-alert-modal.tsx`, product cards | Connect Bell icon to price alert modal. Ensure modal creates alert via POST /api/v1/price-alerts. Toast feedback. |
+
+**Success criteria:**
+1. Landing page has ≥3 distinct section backgrounds
+2. Scroll animations fire on sections entering viewport
+3. Stats show real paddle count from API
+4. Buttons use sentence case (not ALL CAPS)
+5. JSON-LD validates via Google Rich Results Test
+6. `/sitemap.xml` returns valid XML with all routes
+7. Footer has 12+ links in 4 columns
+8. DESIGN.md matches implementation with zero contradictions
+9. Price alert Bell icon opens working modal
+
+---
+
+### Phase 31: Polish — Compare 3-4, Breadcrumbs, Error Boundaries
+
+**Goal:** Final polish pass for production-quality feel.
+
+| Task | File(s) | Description |
+|------|---------|-------------|
+| 31.1 | `frontend/src/app/compare/page.tsx`, `frontend/src/components/ui/compare-row.tsx` | Allow up to 4 paddles. Responsive layout (2/3/4 col). URL sync `?a=1&b=2&c=3`. |
+| 31.2 | `frontend/src/app/catalog/[slug]/page.tsx`, compare page | Add breadcrumb navigation. Use JSON-LD BreadcrumbList. |
+| 31.3 | `frontend/src/app/error.tsx` (new), `frontend/src/app/not-found.tsx` (new) | Custom error and 404 pages matching site design. "Voltar ao catálogo" CTAs. |
+| 31.4 | `frontend/src/app/catalog/[slug]/page.tsx` | Alternating row backgrounds in specs table. Better visual scanning. |
+| 31.5 | `frontend/src/app/layout.tsx` | Add skip-to-content link visible on focus. Global, not just landing page. |
+
+**Success criteria:**
+1. Compare page supports 2-4 paddles
+2. Breadcrumbs visible on product detail and compare pages
+3. Custom 404 page renders with site design
+4. Error boundary catches and displays friendly message
+5. Skip link visible on Tab focus from any page
+
+---
+
 ## Deferred Milestones (Planned, Not Started)
 
 ### v1.5.0 — Production Readiness
@@ -487,4 +608,4 @@ See existing v1.5 roadmap for full details.
 
 ---
 *Roadmap created: 2026-04-05*  
-*Last updated: 2026-04-13 — v2.2.0 milestone completed and archived*
+*Last updated: 2026-04-20 — v2.4.0 milestone created from SITE-INSPECTION-REPORT.md*

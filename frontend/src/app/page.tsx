@@ -17,5 +17,26 @@ export const metadata: Metadata = {
 }
 
 export default function Home() {
-  return <LandingClient />
+  const orgSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'PickleIQ',
+    url: 'https://pickleiq.com',
+    logo: 'https://pickleiq.com/logo.png',
+    description: 'Plataforma de inteligência para pickleball. Recomendações personalizadas de raquetes com IA.',
+    sameAs: [
+      'https://instagram.com/pickleiq',
+      'https://youtube.com/@pickleiq',
+    ],
+  }
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
+      />
+      <LandingClient />
+    </>
+  )
 }

@@ -153,7 +153,7 @@ function ProductCard({
               className="flex-1 gap-1"
               onClick={(e) => { e.stopPropagation(); onViewDetails?.() }}
             >
-              Details
+              Detalhes
             </Button>
             <Button
               variant="ghost"
@@ -162,7 +162,7 @@ function ProductCard({
               onClick={(e) => { e.stopPropagation(); onCompare?.() }}
             >
               <GitCompare className="w-4 h-4" />
-              Compare
+              Comparar
             </Button>
             <Button
               variant="ghost"
