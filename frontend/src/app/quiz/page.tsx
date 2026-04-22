@@ -112,13 +112,6 @@ export default function QuizPage() {
   const isTextStep = currentStepData?.type === 'text'
 
   useEffect(() => {
-    const existing = loadQuizProfile()
-    if (existing && existing.completedAt) {
-      router.push('/chat')
-    }
-  }, [router])
-
-  useEffect(() => {
     if (isTextStep && inputRef.current) {
       inputRef.current.focus()
     }

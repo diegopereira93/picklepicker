@@ -43,8 +43,8 @@ services:
     env_file:
       - .env
     environment:
-      # Browser calls host port, not Docker service name
       NEXT_PUBLIC_FASTAPI_URL: http://localhost:8000
+      FASTAPI_INTERNAL_URL: http://backend:8000
       WATCHPACK_POLLING: "true"
     volumes:
       - ./frontend:/app

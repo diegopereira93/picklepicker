@@ -1,6 +1,14 @@
 import type { Paddle, PaddleListResponse, LatestPriceResponse } from '@/types/paddle'
 
-const API_BASE = (process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000') + '/api/v1'
+function getApiBase(): string {
+  // Server-side (SSR) inside Docker container: use internal Docker service name
+  // Client-side (browser): use localhost which reaches host via Docker port mapping
+  const baseUrl = typeof window === 'undefined'
+    ? process.env.FASTAPI_INTERNAL_URL || process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
+    : process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
+  return baseUrl + '/api/v1'
+}
+const API_BASE = getApiBase()
 
 const EMPTY_LIST: PaddleListResponse = { items: [], total: 0, limit: 20, offset: 0 }
 
