@@ -15,6 +15,15 @@ interface PageParams {
   slug: string
 }
 
+function toSlug(p: { brand?: string; name: string; model_slug?: string | null }): string {
+  if (p.model_slug) return p.model_slug
+  return `${p.brand}-${p.name}`.toLowerCase().replace(/\s+/g, '-')
+}
+
+function findBySlug<T extends { id: number; name: string; brand?: string; model_slug?: string | null }>(items: T[], slug: string): T | undefined {
+  return items.find((p) => toSlug(p) === slug || p.id.toString() === slug)
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -22,9 +31,7 @@ export async function generateMetadata({
 }): Promise<Metadata | null> {
   const slug = decodeURIComponent(params.slug)
   const allPaddles = await fetchPaddles({ limit: 100 })
-  const paddle = allPaddles.items.find(
-    (p) => p.model_slug === slug || p.id.toString() === slug
-  )
+  const paddle = findBySlug(allPaddles.items, slug)
 
   if (!paddle) {
     return {
@@ -58,9 +65,7 @@ export default async function CatalogDetailPage({
   const slug = decodeURIComponent(params.slug)
   const allPaddles = await fetchPaddles({ limit: 100 })
 
-  let paddle = allPaddles.items.find(
-    (p) => p.model_slug === slug || p.id.toString() === slug
-  )
+  const paddle = findBySlug(allPaddles.items, slug)
 
   if (!paddle) {
     notFound()
@@ -260,7 +265,7 @@ export default async function CatalogDetailPage({
           </div>
         </div>
 
-        {priceData && priceData.latest_prices.length > 0 && (
+        {priceData?.latest_prices?.length > 0 && (
           <div className="bg-elevated rounded-lg border border-border p-6 mt-8">
             <h2 className="font-sans font-semibold text-lg text-text-primary mb-4">
               HISTÓRICO DE PREÇO
