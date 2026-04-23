@@ -599,6 +599,7 @@ Plans:
 |-------|------|----------|--------|
 | 32 | Production Cache & Backend Auth | B1 🔴, B2 🔴 | ⬜ Not started |
 | 33 | RAG Pipeline Reliability | B3 🟡, B4 🟡, B5 🟡 | 🔵 Planned (2 plans, Wave 1→2) |
+| 34 | Backend Hygiene & Config Cleanup | B6 🟡, B7 🟡, B8 🟢 | 🔵 Planned (1 plan, Wave 1) |
 
 ### Phase 33: RAG Pipeline Reliability
 
@@ -638,14 +639,10 @@ Plans:
 
 **Goal:** Fix medium/low backend hygiene issues that accumulate tech debt.
 
-**Tasks:**
+**Plans:** 1 plan (Wave 1)
 
-| Task | File(s) | Description |
-|------|---------|-------------|
-| 34.1 | `backend/pyproject.toml` | Move `pytest-asyncio` from `dependencies` to `[project.optional-dependencies] dev`. Same for any other test-only deps. |
-| 34.2 | `backend/app/main.py` | Update `FastAPI(title="PickleIQ", version="0.1.0")` to read version from `VERSION` file or hardcode current `2.3.0`. |
-| 34.3 | `backend/app/main.py` | Review CORS config: `allow_credentials=True` should only apply to specific origins, not wildcards. Add validation on startup. |
-| 34.4 | `backend/tests/` | Verify all tests pass after dependency moves. Add test for CORS config validation. |
+Plans:
+- [ ] 34-01-PLAN.md — Move pytest-asyncio to dev extras, fix version from VERSION file, add CORS validation (B6, B7, B8)
 
 **Success criteria:**
 1. `pytest-asyncio` not in production dependencies
