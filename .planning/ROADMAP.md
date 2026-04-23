@@ -609,23 +609,30 @@ Plans:
 1. `RedisCache` class in `backend/app/cache.py` is a Python dict. TTL parameter exists but is ignored. In production with multiple Railway instances, each instance has its own cache — no sharing.
 2. All 14 backend endpoints are publicly accessible. Price alerts (`POST /price-alerts`), affiliate clicks (`POST /affiliate-clicks`), and user endpoints have zero identity verification.
 
+**Requirements:** B1, B2 (from INSPECTION-REPORT.md)
+
+**Plans:** 2 plans (Wave 1 — parallel)
+
+Plans:
+- [ ] 32-01-PLAN.md — Redis cache with SETEX TTL + in-memory fallback (B1)
+- [ ] 32-02-PLAN.md — Clerk JWT auth middleware + protected endpoints (B2)
+
 **Tasks:**
 
 | Task | File(s) | Description |
 |------|---------|-------------|
-| 32.1 | `backend/app/cache.py` | Replace `RedisCache` dict with real Redis via `redis[hiredis]`. Use `REDIS_URL` env var. Implement proper TTL with `SETEX`. Keep in-memory fallback for dev/localhost. |
-| 32.2 | `backend/pyproject.toml` | Add `redis[hiredis]>=5.0` to dependencies. |
-| 32.3 | `backend/app/middleware/auth.py` (new) | Create Clerk JWT verification middleware. Validate `Authorization: Bearer <token>` against Clerk JWKS. Extract `clerk_id` from token claims. |
-| 32.4 | `backend/app/api/price_alerts.py`, `affiliate_clicks.py` | Add auth dependency to POST endpoints. Price alerts require Clerk auth — use `clerk_id` from token. Affiliate clicks remain public (legitimate for anonymous users). |
-| 32.5 | `backend/app/api/users.py` | Protect `GET /users/{clerk_id}` and `POST /users/migrate` with auth middleware. Users can only access their own data. |
-| 32.6 | `backend/tests/test_cache.py`, `test_auth_middleware.py` | Add tests: (a) Redis cache set/get with TTL, (b) Fallback to memory when Redis unavailable, (c) Auth middleware rejects invalid/expired tokens, (d) Protected endpoints return 401 without token, (e) Public endpoints still work without token. |
-| 32.7 | `backend/app/main.py` | Register auth middleware. Add `REDIS_URL` to env config. |
+| 32.1 | `backend/app/cache.py`, `backend/pyproject.toml` | Replace `RedisCache` dict with real Redis via `redis[hiredis]`. Use `REDIS_URL` env var. Implement proper TTL with `SETEX`. Keep in-memory fallback for dev/localhost. |
+| 32.2 | `backend/app/middleware/auth.py` (new) | Create Clerk JWT verification middleware. Validate `Authorization: Bearer <token>` against Clerk JWKS. Extract `clerk_id` from token claims. Use PyJWT + cryptography for RS256 verification. |
+| 32.3 | `backend/app/api/price_alerts.py`, `backend/app/api/users.py` | Add auth dependency to POST /price-alerts, GET /users/profile/me, POST /users/profile, POST /users/migrate. Use `clerk_id` as user identifier. Remove naive `extract_user_id_from_token`. |
+| 32.4 | `backend/app/main.py` | Log cache initialization mode in lifespan startup. No global auth middleware (auth is per-endpoint via `Depends()`). |
+| 32.5 | `backend/tests/test_auth_middleware.py` (new) | Add tests: (a) Auth middleware rejects invalid/expired/missing tokens, (b) Protected endpoints return 401 without token, (c) Public endpoints still work without token. |
+| 32.6 | `backend/app/schemas.py` | Change `PriceAlertCreate.user_id` and `PriceAlertResponse.user_id` from `int` to `str` (to store `clerk_id` TEXT values). |
 
 **Success criteria:**
 1. `RedisCache` uses real Redis when `REDIS_URL` is set
-2. TTL works — cached entries expire correctly
+2. TTL works — cached entries expire correctly (SETEX)
 3. Protected endpoints return 401 without valid Clerk JWT
-4. Public endpoints (health, paddles, chat) work without auth
+4. Public endpoints (health, paddles, chat, affiliate-clicks) work without auth
 5. All existing tests pass + new cache/auth tests pass
 
 ---
