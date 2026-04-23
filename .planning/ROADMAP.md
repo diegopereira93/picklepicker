@@ -598,44 +598,7 @@ Plans:
 | Phase | Goal | Findings | Status |
 |-------|------|----------|--------|
 | 32 | Production Cache & Backend Auth | B1 🔴, B2 🔴 | ⬜ Not started |
-| 33 | RAG Pipeline Reliability | B3 🟡, B4 🟡, B5 🟡 | ⬜ Not started |
-| 34 | Backend Hygiene & Config Cleanup | B6 🟡, B7 🟡, B8 🟢 | ⬜ Not started |
-
-### Phase 32: Production Cache & Backend Auth
-
-**Goal:** Replace fake in-memory cache with Redis. Add authentication middleware to protected endpoints.
-
-**Root causes:**
-1. `RedisCache` class in `backend/app/cache.py` is a Python dict. TTL parameter exists but is ignored. In production with multiple Railway instances, each instance has its own cache — no sharing.
-2. All 14 backend endpoints are publicly accessible. Price alerts (`POST /price-alerts`), affiliate clicks (`POST /affiliate-clicks`), and user endpoints have zero identity verification.
-
-**Requirements:** B1, B2 (from INSPECTION-REPORT.md)
-
-**Plans:** 2 plans (Wave 1 — parallel)
-
-Plans:
-- [ ] 32-01-PLAN.md — Redis cache with SETEX TTL + in-memory fallback (B1)
-- [ ] 32-02-PLAN.md — Clerk JWT auth middleware + protected endpoints (B2)
-
-**Tasks:**
-
-| Task | File(s) | Description |
-|------|---------|-------------|
-| 32.1 | `backend/app/cache.py`, `backend/pyproject.toml` | Replace `RedisCache` dict with real Redis via `redis[hiredis]`. Use `REDIS_URL` env var. Implement proper TTL with `SETEX`. Keep in-memory fallback for dev/localhost. |
-| 32.2 | `backend/app/middleware/auth.py` (new) | Create Clerk JWT verification middleware. Validate `Authorization: Bearer <token>` against Clerk JWKS. Extract `clerk_id` from token claims. Use PyJWT + cryptography for RS256 verification. |
-| 32.3 | `backend/app/api/price_alerts.py`, `backend/app/api/users.py` | Add auth dependency to POST /price-alerts, GET /users/profile/me, POST /users/profile, POST /users/migrate. Use `clerk_id` as user identifier. Remove naive `extract_user_id_from_token`. |
-| 32.4 | `backend/app/main.py` | Log cache initialization mode in lifespan startup. No global auth middleware (auth is per-endpoint via `Depends()`). |
-| 32.5 | `backend/tests/test_auth_middleware.py` (new) | Add tests: (a) Auth middleware rejects invalid/expired/missing tokens, (b) Protected endpoints return 401 without token, (c) Public endpoints still work without token. |
-| 32.6 | `backend/app/schemas.py` | Change `PriceAlertCreate.user_id` and `PriceAlertResponse.user_id` from `int` to `str` (to store `clerk_id` TEXT values). |
-
-**Success criteria:**
-1. `RedisCache` uses real Redis when `REDIS_URL` is set
-2. TTL works — cached entries expire correctly (SETEX)
-3. Protected endpoints return 401 without valid Clerk JWT
-4. Public endpoints (health, paddles, chat, affiliate-clicks) work without auth
-5. All existing tests pass + new cache/auth tests pass
-
----
+| 33 | RAG Pipeline Reliability | B3 🟡, B4 🟡, B5 🟡 | 🔵 Planned (2 plans, Wave 1→2) |
 
 ### Phase 33: RAG Pipeline Reliability
 
@@ -645,6 +608,12 @@ Plans:
 1. `eval_gate.py` returns hardcoded scores `[4.5, 4.3, 4.1...]` — no actual LLM evaluation happens. Quality of AI responses is unmeasured.
 2. If both Jina AI and HuggingFace fail, `EmbeddingManager` returns a 768-dimensional zero vector. pgvector cosine similarity with zero vectors returns arbitrary results.
 3. Groq LLM timeout is 8 seconds — prompts with 3+ paddle recommendations + user profile can exceed this, causing degraded template responses.
+
+**Plans:** 2 plans (Wave 1→2)
+
+Plans:
+- [ ] 33-01-PLAN.md — Fix embedding fallback (raise error, not zero vector) + increase LLM timeout to 15s (B4, B5)
+- [ ] 33-02-PLAN.md — Replace eval_gate mock with real quality metrics + RAG response logging (B3)
 
 **Tasks:**
 
