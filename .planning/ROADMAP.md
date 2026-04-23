@@ -6,6 +6,9 @@
 - ✅ **v1.7.0** — Backend API (Phases 20-23) — shipped 2026-04-13
 - ✅ **v2.2.0** — Launch Readiness (Phases 24-27) — shipped 2026-04-13
 - 🔵 **v2.4.0** — Site Quality & UX Polish (Phases 28-31) — **ACTIVE**
+- 📋 **v2.5.0** — Backend Hardening & RAG Reliability (Phases 32-34) — from INSPECTION-REPORT.md
+- 📋 **v2.6.0** — Pipeline & Infra Hardening (Phases 35-37) — from INSPECTION-REPORT.md
+- 📋 **v2.7.0** — Build & Test Quality (Phases 38-39) — from INSPECTION-REPORT.md
 - 📋 **v1.5.0** — Production Infrastructure (Phase 15) — deferred
 
 ## Current Focus
@@ -19,7 +22,7 @@ Full-stack quality pass from SITE-INSPECTION-REPORT.md. Fix 3 critical bugs, 12 
 | 28 | Critical Bug Fixes & Language Fix | ⬜ Not started |
 | 29 | Core UX — Search, Chat, Pagination, Nav | ⬜ Not started |
 | 30 | Conversion — Landing, SEO, Footer, Design System | ⬜ Not started |
-| 31 | Polish — Compare 3-4, Breadcrumbs, Error Boundaries | ⬜ Not started |
+| 31 | Polish — Compare 3-4, Breadcrumbs, Error Boundaries | 🔵 Planned (3 plans, Wave 1→2) |
 
 ---
 
@@ -573,6 +576,257 @@ Plans:
 4. Error boundary catches and displays friendly message
 5. Skip link visible on Tab focus from any page
 
+**Plans:** 3 plans (Wave 1→2)
+
+Plans:
+- [ ] 31-01-PLAN.md — Compare 3-4 paddles refactor
+- [ ] 31-02-PLAN.md — Breadcrumbs + alternating rows
+- [ ] 31-03-PLAN.md — Error pages + skip link
+
+---
+
+## Planned Milestones (from INSPECTION-REPORT.md)
+
+*Source: INSPECTION-REPORT.md — Deep architectural inspection (22 Abr 2026)*
+*These milestones address findings NOT covered by v2.4.0 (which focused on visual/UX issues from SITE-INSPECTION-REPORT.md)*
+
+### v2.5.0 — Backend Hardening & RAG Reliability
+
+*Created: 2026-04-22*
+*Goal: Fix critical production risks — fake cache, zero auth, fragile RAG pipeline. Make backend production-grade.*
+
+| Phase | Goal | Findings | Status |
+|-------|------|----------|--------|
+| 32 | Production Cache & Backend Auth | B1 🔴, B2 🔴 | ⬜ Not started |
+| 33 | RAG Pipeline Reliability | B3 🟡, B4 🟡, B5 🟡 | ⬜ Not started |
+| 34 | Backend Hygiene & Config Cleanup | B6 🟡, B7 🟡, B8 🟢 | ⬜ Not started |
+
+### Phase 32: Production Cache & Backend Auth
+
+**Goal:** Replace fake in-memory cache with Redis. Add authentication middleware to protected endpoints.
+
+**Root causes:**
+1. `RedisCache` class in `backend/app/cache.py` is a Python dict. TTL parameter exists but is ignored. In production with multiple Railway instances, each instance has its own cache — no sharing.
+2. All 14 backend endpoints are publicly accessible. Price alerts (`POST /price-alerts`), affiliate clicks (`POST /affiliate-clicks`), and user endpoints have zero identity verification.
+
+**Tasks:**
+
+| Task | File(s) | Description |
+|------|---------|-------------|
+| 32.1 | `backend/app/cache.py` | Replace `RedisCache` dict with real Redis via `redis[hiredis]`. Use `REDIS_URL` env var. Implement proper TTL with `SETEX`. Keep in-memory fallback for dev/localhost. |
+| 32.2 | `backend/pyproject.toml` | Add `redis[hiredis]>=5.0` to dependencies. |
+| 32.3 | `backend/app/middleware/auth.py` (new) | Create Clerk JWT verification middleware. Validate `Authorization: Bearer <token>` against Clerk JWKS. Extract `clerk_id` from token claims. |
+| 32.4 | `backend/app/api/price_alerts.py`, `affiliate_clicks.py` | Add auth dependency to POST endpoints. Price alerts require Clerk auth — use `clerk_id` from token. Affiliate clicks remain public (legitimate for anonymous users). |
+| 32.5 | `backend/app/api/users.py` | Protect `GET /users/{clerk_id}` and `POST /users/migrate` with auth middleware. Users can only access their own data. |
+| 32.6 | `backend/tests/test_cache.py`, `test_auth_middleware.py` | Add tests: (a) Redis cache set/get with TTL, (b) Fallback to memory when Redis unavailable, (c) Auth middleware rejects invalid/expired tokens, (d) Protected endpoints return 401 without token, (e) Public endpoints still work without token. |
+| 32.7 | `backend/app/main.py` | Register auth middleware. Add `REDIS_URL` to env config. |
+
+**Success criteria:**
+1. `RedisCache` uses real Redis when `REDIS_URL` is set
+2. TTL works — cached entries expire correctly
+3. Protected endpoints return 401 without valid Clerk JWT
+4. Public endpoints (health, paddles, chat) work without auth
+5. All existing tests pass + new cache/auth tests pass
+
+---
+
+### Phase 33: RAG Pipeline Reliability
+
+**Goal:** Fix the 3 issues that can silently degrade or break AI recommendations.
+
+**Root causes:**
+1. `eval_gate.py` returns hardcoded scores `[4.5, 4.3, 4.1...]` — no actual LLM evaluation happens. Quality of AI responses is unmeasured.
+2. If both Jina AI and HuggingFace fail, `EmbeddingManager` returns a 768-dimensional zero vector. pgvector cosine similarity with zero vectors returns arbitrary results.
+3. Groq LLM timeout is 8 seconds — prompts with 3+ paddle recommendations + user profile can exceed this, causing degraded template responses.
+
+**Tasks:**
+
+| Task | File(s) | Description |
+|------|---------|-------------|
+| 33.1 | `backend/app/agents/eval_gate.py` | Replace hardcoded scores with real evaluation: log prompt + response pairs, compute basic quality metrics (response length, has_price_mention, has_brand_mention). Store results in `eval_results` table. Not a full LLM-as-judge — that's v1.5.1. |
+| 33.2 | `backend/app/services/embedding.py` (or equivalent) | Replace zero-vector fallback with explicit error handling: if all embedding providers fail, return HTTP 503 from chat endpoint with message "Serviço temporariamente indisponível". Never silently return garbage results. |
+| 33.3 | `backend/app/agents/rag_agent.py` | Increase LLM timeout from 8s to 15s. Add streaming-aware timeout (Groq streams tokens — first token timeout vs total timeout). Log timeout events to Telegram via existing alert middleware. |
+| 33.4 | `backend/app/agents/rag_agent.py` | Add response quality logging: log prompt length, response length, paddle IDs returned, latency_ms. Feed into eval_gate metrics. |
+| 33.5 | `backend/tests/` | Add tests: (a) Embedding failure returns 503 not zero vector, (b) LLM timeout triggers degraded response (not crash), (c) eval_gate logs real metrics, (d) Timeout increased to 15s verified. |
+
+**Success criteria:**
+1. Zero vector never returned from embedding service
+2. Embedding failure → 503 response, not random results
+3. LLM timeout is 15s with streaming awareness
+4. eval_gate logs actual quality metrics (not hardcoded)
+5. All existing tests pass
+
+---
+
+### Phase 34: Backend Hygiene & Config Cleanup
+
+**Goal:** Fix medium/low backend hygiene issues that accumulate tech debt.
+
+**Tasks:**
+
+| Task | File(s) | Description |
+|------|---------|-------------|
+| 34.1 | `backend/pyproject.toml` | Move `pytest-asyncio` from `dependencies` to `[project.optional-dependencies] dev`. Same for any other test-only deps. |
+| 34.2 | `backend/app/main.py` | Update `FastAPI(title="PickleIQ", version="0.1.0")` to read version from `VERSION` file or hardcode current `2.3.0`. |
+| 34.3 | `backend/app/main.py` | Review CORS config: `allow_credentials=True` should only apply to specific origins, not wildcards. Add validation on startup. |
+| 34.4 | `backend/tests/` | Verify all tests pass after dependency moves. Add test for CORS config validation. |
+
+**Success criteria:**
+1. `pytest-asyncio` not in production dependencies
+2. FastAPI version matches `VERSION` file
+3. CORS config validated on startup
+4. All existing tests pass
+
+---
+
+### v2.6.0 — Pipeline & Infra Hardening
+
+*Created: 2026-04-22*
+*Goal: Make data pipeline reliable and infrastructure secure. Auto-refresh MV, expand retailers, harden security headers.*
+
+| Phase | Goal | Findings | Status |
+|-------|------|----------|--------|
+| 35 | Pipeline Reliability | P1 🟡, P3 🟡, P4 🟡 | ⬜ Not started |
+| 36 | Retailer Expansion Foundation | P2 🟡, P5 🟢 | ⬜ Not started |
+| 37 | Security & Infra Hardening | I1 🟡, I2 🟡, I3 🟡, F7 🟡 | ⬜ Not started |
+
+### Phase 35: Pipeline Reliability
+
+**Goal:** Auto-refresh materialized view, process `needs_reembed` flag, add versioned migrations.
+
+**Root causes:**
+1. `latest_prices` materialized view requires manual `REFRESH` after every crawler run. If forgotten, product pages show stale prices.
+2. `paddles.needs_reembed` column exists but no worker reads it. Changed paddles never get re-embedded.
+3. All schema changes go in a single `schema.sql` file. No migration history, no rollback capability.
+
+**Tasks:**
+
+| Task | File(s) | Description |
+|------|---------|-------------|
+| 35.1 | `.github/workflows/scraper.yml` | Add `REFRESH MATERIALIZED VIEW CONCURRENTLY latest_prices` as final step after all crawlers complete. Single step, runs after the 3 sequential crawlers. |
+| 35.2 | `pipeline/` or `backend/workers/` | Create `reembed_worker.py`: query `SELECT id FROM paddles WHERE needs_reembed = TRUE LIMIT 50`, generate embeddings via Jina/HF, update `paddle_embeddings`, set `needs_reembed = FALSE`. Add as manual-trigger GitHub Actions workflow (not cron — run on-demand). |
+| 35.3 | `pipeline/db/` | Create `migrations/` directory with numbered SQL files (`001_initial.sql`, `002_price_alerts.sql`, etc.). Extract existing schema.sql into initial migration. Create `run_migrations.py` script that applies pending migrations with a `schema_migrations` tracking table. |
+| 35.4 | `pipeline/tests/` | Add tests: (a) MV refresh completes without error, (b) reembed worker processes flagged paddles, (c) migration runner applies pending migrations, (d) migration runner skips already-applied migrations. |
+
+**Success criteria:**
+1. `latest_prices` MV auto-refreshes after every crawler run
+2. `needs_reembed` flag has a consumer that processes flagged paddles
+3. Schema changes tracked in numbered migrations
+4. All existing pipeline tests pass
+
+---
+
+### Phase 36: Retailer Expansion Foundation
+
+**Goal:** Prepare pipeline for additional Brazilian retailers beyond the current 3.
+
+**Root causes:**
+1. Only Brazil Store, Dropshot, and JOOLA are scraped. Brazilian pickleball market has dozens of retailers.
+2. `review_queue` only logs uncertain duplicates — never blocks them. Conservative but risks duplicate paddles in catalog.
+
+**Tasks:**
+
+| Task | File(s) | Description |
+|------|---------|-------------|
+| 36.1 | `pipeline/crawlers/` | Create crawler template/abstract base class with shared logic: retry with tenacity, dedup integration, price snapshot insert, error logging. Make existing 3 crawlers use it. |
+| 36.2 | `pipeline/db/schema.sql` | Add `retailers.is_active` column. Document process for adding new retailers (INSERT into retailers table + create crawler class). |
+| 36.3 | `pipeline/dedup/` | Improve review_queue handling: add `review_status` column (pending/auto-approved/manually-reviewed). Add CLI command `python -m pipeline.dedup.review` to list pending items. Keep conservative (don't auto-block). |
+| 36.4 | `pipeline/tests/` | Add tests: (a) New crawler can be added by extending base class, (b) Review queue tracks status correctly, (c) `is_active` flag filters inactive retailers. |
+
+**Success criteria:**
+1. Crawler base class abstracts shared retry/dedup/insert logic
+2. New retailer = extend base class + INSERT into retailers table
+3. Review queue has status tracking (not just log-only)
+4. All existing pipeline tests pass
+
+---
+
+### Phase 37: Security & Infra Hardening
+
+**Goal:** Fix security headers, consolidate CI workflows, clean up docker-compose.
+
+**Tasks:**
+
+| Task | File(s) | Description |
+|------|---------|-------------|
+| 37.1 | `frontend/vercel.json` (or root `vercel.json`) | Add security headers: Content-Security-Policy (strict for pickleiq.com), Strict-Transport-Security (max-age=31536000; includeSubDomains), Permissions-Policy (camera=(), microphone=(), geolocation=()), X-XSS-Protection. |
+| 37.2 | `.github/workflows/scraper.yml` | Consolidate 3 separate cron triggers (02:00, 02:05, 02:10) into single workflow with sequential steps: crawl Brazil Store → crawl Dropshot → crawl JOOLA → refresh MV. |
+| 37.3 | `docker-compose.yml` | Separate dev compose from production reference. Keep current as `docker-compose.dev.yml`. Add `docker-compose.prod.yml` with production-like configs (resource limits, health checks, restart policies). |
+| 37.4 | `frontend/next.config.mjs` | Restrict `remotePatterns` from `**` wildcard to specific domains: `pickleiq.com`, `railway.app`, `supabase.co`, and retailer CDN domains. |
+| 37.5 | Tests | Verify security headers present via `curl -I`. Verify scraper workflow runs as single job. Verify image loading still works with restricted domains. |
+
+**Success criteria:**
+1. Security headers include CSP, HSTS, Permissions-Policy
+2. Single scraper workflow with 3 sequential steps
+3. Docker compose files separated (dev vs prod reference)
+4. Image remotePatterns restricted to known domains
+5. All existing tests pass
+
+---
+
+### v2.7.0 — Build & Test Quality
+
+*Created: 2026-04-22*
+*Goal: Make build a real quality gate. Fix test anti-patterns. Enforce coverage.*
+
+| Phase | Goal | Findings | Status |
+|-------|------|----------|--------|
+| 38 | Build Quality Gates | F6 🟡, F8 🟡, F9 🟢, F3 🟡 | ⬜ Not started |
+| 39 | Test Suite Hardening | T1 🟡, T2 🟡, T3 🟡, T4 🟡, T5 🟢 | ⬜ Not started |
+
+### Phase 38: Build Quality Gates
+
+**Goal:** Remove build safety nets that hide errors. Fix TypeScript/ESLint bypasses.
+
+**Root causes:**
+1. `next.config.mjs` has `ignoreBuildErrors: true` — TypeScript errors pass silently into production.
+2. `next.config.mjs` has `eslint: ignoreDuringBuilds: true` — lint issues never caught in CI.
+3. `tailwind.config.ts` has `darkMode: ["class"]` but app is dark-only — unnecessary config.
+4. Almost all pages are CSR — only `/catalog/[slug]` is SSR. SEO impact on landing, quiz, chat pages.
+
+**Tasks:**
+
+| Task | File(s) | Description |
+|------|---------|-------------|
+| 38.1 | `frontend/next.config.mjs` | Remove `ignoreBuildErrors: true`. Fix all TypeScript errors that surface. Run `next build` and fix each error. |
+| 38.2 | `frontend/next.config.mjs` | Remove `eslint: ignoreDuringBuilds: true`. Fix all ESLint errors that surface. |
+| 38.3 | `frontend/tailwind.config.ts` | Remove `darkMode: ["class"]` since theme is dark-only. If dark mode toggle is planned for future, keep but document. |
+| 38.4 | `frontend/src/app/page.tsx`, `frontend/src/app/catalog/page.tsx` | Evaluate SSR migration for landing page and catalog listing. At minimum: add `generateMetadata()` for SEO. Full SSR is stretch goal. |
+| 38.5 | `frontend/` | Run `next build` and `next lint` — both must pass with zero errors. |
+| 38.6 | `frontend/src/tests/` | Add tests for any new components created during TS/lint fixes. |
+
+**Success criteria:**
+1. `next build` passes with zero TypeScript errors (no `ignoreBuildErrors`)
+2. `next lint` passes with zero errors (no `ignoreDuringBuilds`)
+3. `darkMode` config matches actual usage (dark-only or documented toggle plan)
+4. Landing page has `generateMetadata()` for SEO at minimum
+5. All existing frontend tests pass
+
+---
+
+### Phase 39: Test Suite Hardening
+
+**Goal:** Fix test anti-patterns — fake E2E, ambiguous assertions, mock-only eval tests, conftest conflicts.
+
+**Tasks:**
+
+| Task | File(s) | Description |
+|------|---------|-------------|
+| 39.1 | `backend/tests/test_e2e_embeddings.py` | Rename to `test_embeddings_integration.py` (not E2E). Document that it uses mocked httpx, not real APIs. Add real E2E embedding test as separate file (optional, needs API keys). |
+| 39.2 | `backend/tests/` | Search for `assert response.status_code in [200, 404]` patterns. Replace with explicit assertions: if both are valid, test both paths separately. If 404 is expected, assert 404 only. |
+| 39.3 | `backend/tests/test_price_alerts.py` | Remove standalone conftest.py that conflicts with global `backend/tests/conftest.py`. Use autouse fixtures from global conftest. |
+| 39.4 | `backend/tests/test_eval_gate.py` | Update tests to validate actual eval metrics (after Phase 33 changes), not hardcoded score serialization. |
+| 39.5 | `backend/pyproject.toml` | Add `fail_under = 80` to `[tool.pytest.ini_options]` or `[tool.coverage.run]`. Enforce 80% coverage threshold in CI. |
+| 39.6 | `backend/tests/` | Run full test suite: all pass, zero ambiguous assertions, zero conftest conflicts. |
+
+**Success criteria:**
+1. No test file named `test_e2e_*` that uses only mocks
+2. Zero `status_code in [200, 404]` patterns
+3. Single conftest.py per test directory (no conflicting fixtures)
+4. eval_gate tests validate real metrics
+5. Coverage threshold enforced (`fail_under = 80`)
+6. All tests pass
+
 ---
 
 ## Deferred Milestones (Planned, Not Started)
@@ -607,5 +861,5 @@ See existing v1.5 roadmap for full details.
 | Affiliate disclosure | Required by BR consumer law | P1 (external) |
 
 ---
-*Roadmap created: 2026-04-05*  
-*Last updated: 2026-04-20 — v2.4.0 milestone created from SITE-INSPECTION-REPORT.md*
+*Roadmap created: 2026-04-05*
+*Last updated: 2026-04-22 — v2.5.0, v2.6.0, v2.7.0 milestones created from INSPECTION-REPORT.md*
