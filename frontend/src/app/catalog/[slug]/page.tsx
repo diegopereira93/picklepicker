@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { PriceTag } from '@/components/ui/price-tag'
 import { PriceChart } from '@/components/ui/price-chart'
 import { SafeImage } from '@/components/ui/safe-image'
+import { Breadcrumb } from '@/components/ui/breadcrumb'
 import { PriceAlertButton } from '@/components/ui/price-alert-button'
 import Link from 'next/link'
 
@@ -115,6 +116,14 @@ export default async function CatalogDetailPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
       />
       <div className="max-w-5xl mx-auto px-4 py-8">
+        <Breadcrumb
+          items={[
+            { label: 'Início', href: '/' },
+            { label: 'Catálogo', href: '/catalog' },
+            { label: `${paddle.brand} ${paddle.name}` },
+          ]}
+          className="mb-6"
+        />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
           <div className="relative group">
             <div className="bg-elevated rounded-lg overflow-hidden">
@@ -228,12 +237,12 @@ export default async function CatalogDetailPage({
               { label: 'Grip size', value: paddle.specs?.grip_size },
               { label: 'Core thickness (mm)', value: paddle.specs?.core_thickness_mm },
               { label: 'Face material', value: paddle.specs?.face_material },
-            ].map((spec) => (
+            ].map((spec, index) => (
               <div 
                 key={spec.label} 
                 className={cn(
-                  'grid grid-cols-2 gap-4',
-                  'px-4 py-3'
+                  'grid grid-cols-2 gap-4 px-4 py-3',
+                  index % 2 === 0 ? 'bg-surface' : 'bg-elevated'
                 )}
               >
                 <dt className="font-sans text-sm text-text-muted">{spec.label}</dt>

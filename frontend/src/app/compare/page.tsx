@@ -14,15 +14,35 @@ import { PriceTag } from '@/components/ui/price-tag'
 import { SafeImage } from '@/components/ui/safe-image'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Breadcrumb } from '@/components/ui/breadcrumb'
 import type { Paddle } from '@/types/paddle'
 
-const RADAR_DATA = [
-  { attribute: 'Power', fullMark: 10, valueA: 5, valueB: 5 },
-  { attribute: 'Control', fullMark: 10, valueA: 5, valueB: 5 },
-  { attribute: 'Spin', fullMark: 10, valueA: 5, valueB: 5 },
-  { attribute: 'Speed', fullMark: 10, valueA: 5, valueB: 5 },
-  { attribute: 'Sweet Spot', fullMark: 10, valueA: 5, valueB: 5 },
-]
+interface RadarDataPoint {
+  attribute: string
+  fullMark: number
+  valueA: number
+  valueB: number
+}
+
+function buildRadarData(a: Paddle, b: Paddle): RadarDataPoint[] {
+  const estimate = (p: Paddle, attr: string): number => {
+    const specMap: Record<string, number> = {
+      'Power': (p.specs?.swingweight ?? 110) / 15,
+      'Control': (p.specs?.twistweight ?? 6) * 1.2,
+      'Spin': p.specs?.face_material?.toLowerCase().includes('carbon') ? 7.5 : 5,
+      'Speed': (p.specs?.weight_oz ?? 8) * 0.9,
+      'Sweet Spot': (p.specs?.twistweight ?? 6) * 1.1,
+    }
+    return Math.min(10, Math.max(1, specMap[attr] ?? 5))
+  }
+  return [
+    { attribute: 'Power', fullMark: 10, valueA: estimate(a, 'Power'), valueB: estimate(b, 'Power') },
+    { attribute: 'Control', fullMark: 10, valueA: estimate(a, 'Control'), valueB: estimate(b, 'Control') },
+    { attribute: 'Spin', fullMark: 10, valueA: estimate(a, 'Spin'), valueB: estimate(b, 'Spin') },
+    { attribute: 'Speed', fullMark: 10, valueA: estimate(a, 'Speed'), valueB: estimate(b, 'Speed') },
+    { attribute: 'Sweet Spot', fullMark: 10, valueA: estimate(a, 'Sweet Spot'), valueB: estimate(b, 'Sweet Spot') },
+  ]
+}
 
 interface CompareVerdictProps {
   paddleA: Paddle
@@ -127,7 +147,7 @@ function CompareVerdict({ paddleA, paddleB }: CompareVerdictProps) {
   )
 }
 
-function buildComparisonPrompt(a: Paddle, b: Paddle, profile: any): string {
+function buildComparisonPrompt(a: Paddle, b: Paddle, profile: ReturnType<typeof loadQuizProfile>): string {
   const prompt = `Compare estas duas raquetes de pickleball:
 
 ${a.brand} ${a.name}
@@ -166,66 +186,90 @@ function getBudgetMax(budget: string): number {
   return budgetMap[budget] ?? 600
 }
 
-function buildSpecs(a: Paddle, b: Paddle) {
-  const priceA = a.price_min_brl ?? a.price_brl ?? 0
-  const priceB = b.price_min_brl ?? b.price_brl ?? 0
+type WinnerLetter = 'a' | 'b' | 'c' | 'd' | 'tie' | null
+
+function buildSpecs(paddles: Paddle[]) {
+  const INDEX_LETTERS: ('a' | 'b' | 'c' | 'd')[] = ['a', 'b', 'c', 'd']
+
+  const computeWinners = (
+    values: (string | number | null)[],
+    lowerIsBetter: boolean
+  ): WinnerLetter[] => {
+    const numeric = values.map(v => typeof v === 'number' ? v : null)
+    const valid = numeric.filter((v): v is number => v !== null)
+    if (valid.length < 2) return values.map(() => null)
+    const best = lowerIsBetter ? Math.min(...valid) : Math.max(...valid)
+    const hasMultiple = valid.filter(v => v === best).length > 1
+    if (hasMultiple) return values.map(() => 'tie' as const)
+    return numeric.map(v => v === best ? INDEX_LETTERS[numeric.indexOf(v)] : null)
+  }
+
+  const priceValues = paddles.map(p => p.price_min_brl ?? p.price_brl ?? null)
+  const priceDisplay = paddles.map(p => {
+    const price = p.price_min_brl ?? p.price_brl
+    return price != null ? `R$ ${price}` : null
+  })
+
   return [
-    { attribute: 'Preco', valueA: `R$ ${priceA}`, valueB: `R$ ${priceB}`, winner: priceA < priceB ? 'a' : priceB < priceA ? 'b' : 'tie' },
-    { attribute: 'Peso', valueA: a.specs?.weight_oz ? `${a.specs.weight_oz} oz` : '-', valueB: b.specs?.weight_oz ? `${b.specs.weight_oz} oz` : '-' },
-    { attribute: 'Swingweight', valueA: a.specs?.swingweight?.toString() ?? '-', valueB: b.specs?.swingweight?.toString() ?? '-' },
-    { attribute: 'Twistweight', valueA: a.specs?.twistweight?.toString() ?? '-', valueB: b.specs?.twistweight?.toString() ?? '-' },
-    { attribute: 'Grip Size', valueA: a.specs?.grip_size ?? '-', valueB: b.specs?.grip_size ?? '-' },
-    { attribute: 'Core Thickness', valueA: a.specs?.core_thickness_mm ? `${a.specs.core_thickness_mm}mm` : '-', valueB: b.specs?.core_thickness_mm ? `${b.specs.core_thickness_mm}mm` : '-' },
-    { attribute: 'Face Material', valueA: a.specs?.face_material ?? '-', valueB: b.specs?.face_material ?? '-' },
-    { attribute: 'Nivel', valueA: a.skill_level ?? '-', valueB: b.skill_level ?? '-' },
-    { attribute: 'Rating', valueA: a.rating?.toString() ?? '-', valueB: b.rating?.toString() ?? '-' },
-    { attribute: 'Estoque', valueA: a.in_stock ? 'Em estoque' : 'Fora de estoque', valueB: b.in_stock ? 'Em estoque' : 'Fora de estoque' },
+    { attribute: 'Preco', values: priceDisplay, winners: computeWinners(priceValues, true) },
+    { attribute: 'Peso', values: paddles.map(p => p.specs?.weight_oz != null ? `${p.specs.weight_oz} oz` : null), winners: paddles.map(() => null) },
+    { attribute: 'Swingweight', values: paddles.map(p => p.specs?.swingweight != null ? p.specs.swingweight : null), winners: computeWinners(paddles.map(p => p.specs?.swingweight != null ? p.specs.swingweight : null), false) },
+    { attribute: 'Twistweight', values: paddles.map(p => p.specs?.twistweight != null ? p.specs.twistweight : null), winners: computeWinners(paddles.map(p => p.specs?.twistweight != null ? p.specs.twistweight : null), false) },
+    { attribute: 'Grip Size', values: paddles.map(p => p.specs?.grip_size ?? null), winners: paddles.map(() => null) },
+    { attribute: 'Core Thickness', values: paddles.map(p => p.specs?.core_thickness_mm != null ? `${p.specs.core_thickness_mm}mm` : null), winners: paddles.map(() => null) },
+    { attribute: 'Face Material', values: paddles.map(p => p.specs?.face_material ?? null), winners: paddles.map(() => null) },
+    { attribute: 'Nivel', values: paddles.map(p => p.skill_level ?? null), winners: paddles.map(() => null) },
+    { attribute: 'Rating', values: paddles.map(p => p.rating != null ? p.rating : null), winners: computeWinners(paddles.map(p => p.rating != null ? p.rating : null), false) },
+    { attribute: 'Estoque', values: paddles.map(p => p.in_stock ? 'Em estoque' : 'Fora de estoque'), winners: paddles.map(() => null) },
   ]
 }
 
+const PADDLE_PARAM_KEYS = ['a', 'b', 'c', 'd']
+
 function CompareContent() {
   const searchParams = useSearchParams()
-  const paddleAId = searchParams.get('a')
-  const paddleBId = searchParams.get('b')
 
-  const [paddleA, setPaddleA] = useState<Paddle | null>(null)
-  const [paddleB, setPaddleB] = useState<Paddle | null>(null)
+  const paddleIds = PADDLE_PARAM_KEYS
+    .map(key => searchParams.get(key))
+    .filter(Boolean)
+    .map(Number)
+    .filter(id => id > 0)
+
+  const [paddles, setPaddles] = useState<Paddle[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     async function load() {
-      if (!paddleAId || !paddleBId) {
+      if (paddleIds.length < 2 || paddleIds.length > 4) {
         setIsLoading(false)
         return
       }
-      const [a, b] = await Promise.all([
-        fetchPaddle(Number(paddleAId)),
-        fetchPaddle(Number(paddleBId)),
-      ])
-      setPaddleA(a)
-      setPaddleB(b)
+      const results = await Promise.all(paddleIds.map(id => fetchPaddle(id)))
+      setPaddles(results.filter(Boolean) as Paddle[])
       setIsLoading(false)
     }
     load()
-  }, [paddleAId, paddleBId])
+  }, [searchParams])
 
-  const priceA = paddleA?.price_min_brl ?? paddleA?.price_brl ?? 0
-  const priceB = paddleB?.price_min_brl ?? paddleB?.price_brl ?? 0
-  const specs = paddleA && paddleB ? buildSpecs(paddleA, paddleB) : []
+  const count = paddleIds.length
+  const invalidCount = count < 2 || count > 4
+  const isNotFound = !isLoading && !invalidCount && paddles.length === 0
 
-  const isEmpty = !paddleAId || !paddleBId
-  const isNotFound = !isLoading && !isEmpty && (!paddleA || !paddleB)
+  const specs = paddles.length >= 2 ? buildSpecs(paddles) : []
+  const radarData = paddles.length === 2 ? buildRadarData(paddles[0], paddles[1]) : []
 
   return (
     <div className="min-h-screen bg-base">
-      {isEmpty && (
+      {invalidCount && (
         <div className="max-w-md mx-auto text-center py-20 px-4">
           <GitCompare className="w-16 h-16 text-text-muted mx-auto mb-4" />
           <h1 className="font-display text-2xl text-text-primary tracking-wide mb-4">
             COMPARAR RAQUETES
           </h1>
           <p className="font-sans text-text-secondary mb-8">
-            Selecione duas raquetes para ver a comparacao detalhada.
+            {count === 0 || count === 1
+              ? 'Selecione entre 2 e 4 raquetes para comparar.'
+              : 'Selecione entre 2 e 4 raquetes para comparar.'}
           </p>
           <Link
             href="/catalog"
@@ -238,8 +282,8 @@ function CompareContent() {
 
       {isLoading && (
         <div className="max-w-5xl mx-auto px-4 md:px-8 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-            {[1, 2].map(i => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-8">
+            {(paddleIds.length > 0 ? paddleIds : [1, 2]).map((_id, i) => (
               <div key={i} className="space-y-4">
                 <Skeleton className="h-64 rounded-lg w-full" />
                 <Skeleton className="h-4 w-24" />
@@ -270,8 +314,15 @@ function CompareContent() {
         </div>
       )}
 
-      {!isEmpty && !isLoading && !isNotFound && paddleA && paddleB && (
+      {!invalidCount && !isLoading && !isNotFound && paddles.length >= 2 && (
         <div className="max-w-5xl mx-auto px-4 md:px-8 py-8">
+          <Breadcrumb
+            items={[
+              { label: 'Início', href: '/' },
+              { label: 'Comparar Raquetes' },
+            ]}
+            className="mb-4"
+          />
           <Link
             href="/catalog"
             className="inline-flex items-center gap-1.5 text-text-muted hover:text-text-primary text-sm transition-colors mb-6"
@@ -280,8 +331,8 @@ function CompareContent() {
             Catalogo
           </Link>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-            {[paddleA, paddleB].map((paddle, i) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-8">
+            {paddles.map((paddle) => (
               <div key={paddle.id} className="bg-surface border border-border rounded-lg p-5">
                 <div className="aspect-[4/3] rounded-lg overflow-hidden bg-elevated mb-3">
                   <SafeImage
@@ -298,7 +349,7 @@ function CompareContent() {
                   {paddle.name}
                 </h1>
                 <div className="mt-3">
-                  <PriceTag price={i === 0 ? priceA : priceB} currency="BRL" size="lg" />
+                  <PriceTag price={paddle.price_min_brl ?? paddle.price_brl ?? 0} currency="BRL" size="lg" />
                 </div>
                 <Button
                   variant="default"
@@ -328,71 +379,61 @@ function CompareContent() {
               <CompareRow
                 key={row.attribute}
                 attribute={row.attribute}
-                valueA={row.valueA}
-                valueB={row.valueB}
-                winner={row.winner as 'a' | 'b' | 'tie'}
+                values={row.values}
+                winners={row.winners}
               />
             ))}
           </div>
 
-          <div className="bg-elevated rounded-lg border border-border p-6 mb-8">
-            <h2 className="font-sans font-semibold text-lg text-text-primary mb-4">
-              Comparacao de Desempenho
-            </h2>
-            <RadarChart data={RADAR_DATA} />
-            <div className="flex gap-6 justify-center mt-4">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-brand-primary" />
-                <span className="font-sans text-sm text-text-secondary">{paddleA.name}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-brand-secondary" />
-                <span className="font-sans text-sm text-text-secondary">{paddleB.name}</span>
+          {paddles.length === 2 && (
+            <div className="bg-elevated rounded-lg border border-border p-6 mb-8">
+              <h2 className="font-sans font-semibold text-lg text-text-primary mb-4">
+                Comparacao de Desempenho
+              </h2>
+              <RadarChart data={radarData} />
+              <div className="flex gap-6 justify-center mt-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-brand-primary" />
+                  <span className="font-sans text-sm text-text-secondary">{paddles[0].name}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-brand-secondary" />
+                  <span className="font-sans text-sm text-text-secondary">{paddles[1].name}</span>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
-          <div className="bg-surface rounded-lg border border-border p-6 mb-8">
-            <h2 className="font-sans font-semibold text-lg text-text-primary mb-4 flex items-center gap-2">
-              <Brain className="w-5 h-5 text-brand-primary" />
-              Veredito IA
-            </h2>
-            <CompareVerdict paddleA={paddleA} paddleB={paddleB} />
-          </div>
+          {paddles.length === 2 && (
+            <div className="bg-surface rounded-lg border border-border p-6 mb-8">
+              <h2 className="font-sans font-semibold text-lg text-text-primary mb-4 flex items-center gap-2">
+                <Brain className="w-5 h-5 text-brand-primary" />
+                Veredito IA
+              </h2>
+              <CompareVerdict paddleA={paddles[0]} paddleB={paddles[1]} />
+            </div>
+          )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Button
-              variant="default"
-              className="bg-brand-primary hover:bg-brand-primary/90 text-base hover:shadow-glow-green"
-              asChild
-            >
-              <a
-                href={resolveAffiliateUrl({ paddleId: String(paddleA.id), page: 'compare-cta' })}
-                target="_blank"
-                rel="noopener noreferrer sponsored"
-                className="flex items-center justify-center gap-2 py-3"
-                onClick={() => trackAffiliateClick(String(paddleA.id), 'brazil-store', 'compare-cta')}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {paddles.map((paddle) => (
+              <Button
+                key={paddle.id}
+                variant="default"
+                className="bg-brand-primary hover:bg-brand-primary/90 text-base hover:shadow-glow-green"
+                asChild
               >
-                Comprar {paddleA.name}
-                <ExternalLink size={16} />
-              </a>
-            </Button>
-            <Button
-              variant="default"
-              className="bg-brand-primary hover:bg-brand-primary/90 text-base hover:shadow-glow-green"
-              asChild
-            >
-              <a
-                href={resolveAffiliateUrl({ paddleId: String(paddleB.id), page: 'compare-cta' })}
-                target="_blank"
-                rel="noopener noreferrer sponsored"
-                className="flex items-center justify-center gap-2 py-3"
-                onClick={() => trackAffiliateClick(String(paddleB.id), 'brazil-store', 'compare-cta')}
-              >
-                Comprar {paddleB.name}
-                <ExternalLink size={16} />
-              </a>
-            </Button>
+                <a
+                  href={resolveAffiliateUrl({ paddleId: String(paddle.id), page: 'compare-cta' })}
+                  target="_blank"
+                  rel="noopener noreferrer sponsored"
+                  className="flex items-center justify-center gap-2 py-3"
+                  onClick={() => trackAffiliateClick(String(paddle.id), 'brazil-store', 'compare-cta')}
+                >
+                  Comprar {paddle.name}
+                  <ExternalLink size={16} />
+                </a>
+              </Button>
+            ))}
           </div>
         </div>
       )}

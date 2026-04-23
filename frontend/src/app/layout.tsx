@@ -44,8 +44,14 @@ export default function RootLayout({
       <body className="min-h-screen antialiased flex flex-col font-sans bg-base text-text-primary" suppressHydrationWarning>
         <ThemeProvider attribute="data-theme" defaultTheme="dark" enableSystem={false}>
           <ClerkWrapper>
+              <a
+                href="#main-content"
+                className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-brand-primary focus:text-base focus:rounded focus:font-semibold"
+              >
+                Pular para o conteúdo
+              </a>
             <Header />
-            <main className="flex-1">{children}</main>
+            <main id="main-content" className="flex-1">{children}</main>
             <Footer />
             <Toaster richColors position="top-right" theme="dark" />
           </ClerkWrapper>
