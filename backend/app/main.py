@@ -34,6 +34,7 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info("FastAPI startup — initializing...")
     await get_pool()  # Initialize DB connection pool
+    logger.info("cache.init", mode="redis" if os.getenv("REDIS_URL") else "memory_fallback")
     yield
     # Shutdown
     logger.info("FastAPI shutdown — cleaning up...")

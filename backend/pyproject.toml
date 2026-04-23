@@ -11,6 +11,10 @@ dependencies = [
     "structlog>=24.1.0",
     "groq>=0.4.0",
     "httpx>=0.27.0",
+    "redis[hiredis]>=5.0",
+    "PyJWT>=2.8.0",
+    "cryptography>=41.0.0",
+    "requests>=2.31.0",
 ]
 
 [build-system]

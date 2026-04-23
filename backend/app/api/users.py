@@ -1,18 +1,10 @@
-from fastapi import APIRouter, HTTPException, status, Request
+from fastapi import APIRouter, HTTPException, status, Request, Depends
 from pydantic import BaseModel, field_validator
 from typing import Optional
 from app.db import get_connection
+from app.middleware.auth import require_clerk_auth, ClerkAuthState
 
 router = APIRouter(prefix="/users", tags=["users"])
-
-
-def extract_user_id_from_token(request: Request) -> Optional[str]:
-    auth_header = request.headers.get("authorization")
-    if not auth_header:
-        return None
-    if auth_header.lower().startswith("bearer "):
-        return auth_header[7:]
-    return auth_header
 
 
 class UserProfileRequest(BaseModel):
@@ -55,8 +47,11 @@ class UserProfileResponse(BaseModel):
 
 
 @router.post("/profile", response_model=UserProfileResponse, status_code=status.HTTP_201_CREATED)
-async def save_user_profile(request: UserProfileRequest, req: Request):
-    user_id = extract_user_id_from_token(req) or request.user_id
+async def save_user_profile(
+    request: UserProfileRequest,
+    auth: ClerkAuthState = Depends(require_clerk_auth),
+):
+    user_id = auth.clerk_id
     async with get_connection() as conn:
         result = await conn.execute(
             """
@@ -89,11 +84,9 @@ async def save_user_profile(request: UserProfileRequest, req: Request):
 
 
 @router.get("/profile/me", response_model=UserProfileResponse)
-async def get_my_profile(req: Request):
-    user_id = extract_user_id_from_token(req)
-    if not user_id:
-        raise HTTPException(status_code=401, detail="Authentication required")
-    
+async def get_my_profile(auth: ClerkAuthState = Depends(require_clerk_auth)):
+    user_id = auth.clerk_id
+
     async with get_connection() as conn:
         result = await conn.execute(
             """
@@ -116,7 +109,10 @@ async def get_my_profile(req: Request):
 
 
 @router.post("/migrate")
-async def migrate_anonymous_profile(old_uuid: str, new_user_id: str):
+async def migrate_anonymous_profile(
+    old_uuid: str,
+    auth: ClerkAuthState = Depends(require_clerk_auth),
+):
     async with get_connection() as conn:
         result = await conn.execute(
             """
@@ -140,7 +136,7 @@ async def migrate_anonymous_profile(old_uuid: str, new_user_id: str):
                     updated_at = NOW()
                 """,
                 {
-                    "new_user_id": new_user_id,
+                    "new_user_id": auth.clerk_id,
                     "level": row[0],
                     "style": row[1],
                     "budget_max": row[2],
