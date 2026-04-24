@@ -5,24 +5,22 @@
 - ✅ **v1.6.0** — UI Redesign (Phases 16-19) — shipped 2026-04-05
 - ✅ **v1.7.0** — Backend API (Phases 20-23) — shipped 2026-04-13
 - ✅ **v2.2.0** — Launch Readiness (Phases 24-27) — shipped 2026-04-13
-- 🔵 **v2.4.0** — Site Quality & UX Polish (Phases 28-31) — **ACTIVE**
-- 📋 **v2.5.0** — Backend Hardening & RAG Reliability (Phases 32-34) — from INSPECTION-REPORT.md
-- 📋 **v2.6.0** — Pipeline & Infra Hardening (Phases 35-37) — from INSPECTION-REPORT.md
-- 📋 **v2.7.0** — Build & Test Quality (Phases 38-39) — from INSPECTION-REPORT.md
+- ✅ **v2.4.0** — Site Quality & UX Polish (Phases 28-31) — shipped 2026-04-20
+- ✅ **v2.5.0** — Backend Hardening & RAG Reliability (Phases 32-34) — shipped 2026-04-24
+- ✅ **v2.6.0** — Pipeline & Infra Hardening (Phases 35-37) — shipped 2026-04-24
+- ✅ **v2.7.0** — Build & Test Quality (Phases 38-39) — shipped 2026-04-24
 - 📋 **v1.5.0** — Production Infrastructure (Phase 15) — deferred
 
 ## Current Focus
 
-**v2.4.0 — Site Quality & UX Polish** (Phases 28-31)
+**v2.7.0 — Build & Test Quality ✅ COMPLETE (2026-04-24)**
 
-Full-stack quality pass from SITE-INSPECTION-REPORT.md. Fix 3 critical bugs, 12 high-priority UX gaps, and 15 medium-priority polish items. Goal: "functional beta" → "polished, trustworthy product."
+Build quality gates active. `next build` and `next lint` pass with zero errors.
 
 | Phase | Goal | Status |
 |-------|------|--------|
-| 28 | Critical Bug Fixes & Language Fix | ⬜ Not started |
-| 29 | Core UX — Search, Chat, Pagination, Nav | ⬜ Not started |
-| 30 | Conversion — Landing, SEO, Footer, Design System | ⬜ Not started |
-| 31 | Polish — Compare 3-4, Breadcrumbs, Error Boundaries | 🔵 Planned (3 plans, Wave 1→2) |
+| 38 | Build Quality Gates | ✅ Complete |
+| 39 | Test Suite Hardening | ✅ Complete |
 
 ---
 
@@ -467,7 +465,7 @@ Plans:
 
 ---
 
-## Milestone v2.4.0 — Site Quality & UX Polish 🔵 ACTIVE
+## Milestone v2.4.0 — Site Quality & UX Polish ✅ COMPLETE
 
 *Created: 2026-04-20*
 *Source: SITE-INSPECTION-REPORT.md — 27 findings across 80+ files*
@@ -597,9 +595,9 @@ Plans:
 
 | Phase | Goal | Findings | Status |
 |-------|------|----------|--------|
-| 32 | Production Cache & Backend Auth | B1 🔴, B2 🔴 | ⬜ Not started |
-| 33 | RAG Pipeline Reliability | B3 🟡, B4 🟡, B5 🟡 | 🔵 Planned (2 plans, Wave 1→2) |
-| 34 | Backend Hygiene & Config Cleanup | B6 🟡, B7 🟡, B8 🟢 | 🔵 Planned (1 plan, Wave 1) |
+| 32 | Production Cache & Backend Auth | B1 🔴, B2 🔴 | ✅ Complete |
+| 33 | RAG Pipeline Reliability | B3 🟡, B4 🟡, B5 🟡 | ✅ Complete |
+| 34 | Backend Hygiene & Config Cleanup | B6 🟡, B7 🟡, B8 🟢 | ✅ Complete |
 
 ### Phase 33: RAG Pipeline Reliability
 
@@ -613,8 +611,8 @@ Plans:
 **Plans:** 2 plans (Wave 1→2)
 
 Plans:
-- [ ] 33-01-PLAN.md — Fix embedding fallback (raise error, not zero vector) + increase LLM timeout to 15s (B4, B5)
-- [ ] 33-02-PLAN.md — Replace eval_gate mock with real quality metrics + RAG response logging (B3)
+- [x] 33-01-PLAN.md — Fix embedding fallback (raise error, not zero vector) + increase LLM timeout to 15s (B4, B5) ✅
+- [x] 33-02-PLAN.md — Replace eval_gate mock with real quality metrics + RAG response logging (B3) ✅
 
 **Tasks:**
 
@@ -659,9 +657,9 @@ Plans:
 
 | Phase | Goal | Findings | Status |
 |-------|------|----------|--------|
-| 35 | Pipeline Reliability | P1 🟡, P3 🟡, P4 🟡 | ⬜ Not started |
-| 36 | Retailer Expansion Foundation | P2 🟡, P5 🟢 | ⬜ Not started |
-| 37 | Security & Infra Hardening | I1 🟡, I2 🟡, I3 🟡, F7 🟡 | ⬜ Not started |
+| 35 | Pipeline Reliability | P1 🟡, P3 🟡, P4 🟡 | ✅ Complete |
+| 36 | Retailer Expansion Foundation | P2 🟡, P5 🟢 | ✅ Complete |
+| 37 | Security & Infra Hardening | I1 🟡, I2 🟡, I3 🟡, F7 🟡 | ✅ Complete |
 
 ### Phase 35: Pipeline Reliability
 
@@ -737,15 +735,16 @@ Plans:
 
 ---
 
-### v2.7.0 — Build & Test Quality
+### v2.7.0 — Build & Test Quality ✅ COMPLETE
 
 *Created: 2026-04-22*
+*Shipped: 2026-04-24*
 *Goal: Make build a real quality gate. Fix test anti-patterns. Enforce coverage.*
 
 | Phase | Goal | Findings | Status |
 |-------|------|----------|--------|
-| 38 | Build Quality Gates | F6 🟡, F8 🟡, F9 🟢, F3 🟡 | ⬜ Not started |
-| 39 | Test Suite Hardening | T1 🟡, T2 🟡, T3 🟡, T4 🟡, T5 🟢 | ⬜ Not started |
+| 38 | Build Quality Gates | F6 🟡, F8 🟡, F9 🟢, F3 🟡 | ✅ Complete |
+| 39 | Test Suite Hardening | T1 🟡, T2 🟡, T3 🟡, T4 🟡, T5 🟢 | ✅ Complete |
 
 ### Phase 38: Build Quality Gates
 
@@ -835,4 +834,4 @@ See existing v1.5 roadmap for full details.
 
 ---
 *Roadmap created: 2026-04-05*
-*Last updated: 2026-04-22 — v2.5.0, v2.6.0, v2.7.0 milestones created from INSPECTION-REPORT.md*
+*Last updated: 2026-04-24 — v2.7.0 shipped (Phases 38-39 complete)*
