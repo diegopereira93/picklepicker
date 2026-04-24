@@ -1,0 +1,73 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: pickleiq
+      POSTGRES_USER: pickleiq
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./pipeline/db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pickleiq"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.dev
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      # Override localhost URLs to Docker service names
+      DATABASE_URL: postgresql://pickleiq:${POSTGRES_PASSWORD:-changeme}@postgres:5432/pickleiq
+    volumes:
+      - ./backend:/app/backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile.dev
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      NEXT_PUBLIC_FASTAPI_URL: http://localhost:8000
+      FASTAPI_INTERNAL_URL: http://backend:8000
+      WATCHPACK_POLLING: "true"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  pipeline:
+    build:
+      context: .
+      dockerfile: pipeline/Dockerfile
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://pickleiq:${POSTGRES_PASSWORD:-changeme}@postgres:5432/pickleiq
+    volumes:
+      - ./pipeline:/app/pipeline
+    depends_on:
+      postgres:
+        condition: service_healthy
+    profiles:
+      - cli
+
+volumes:
+  postgres_data:

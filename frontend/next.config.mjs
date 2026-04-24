@@ -24,14 +24,27 @@ const nextConfig = {
   },
   images: {
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**',
-      },
-      {
-        protocol: 'http',
-        hostname: '**',
-      },
+      // PickleIQ own domain
+      { protocol: 'https', hostname: 'pickleiq.com' },
+      { protocol: 'https', hostname: '*.pickleiq.com' },
+      // Railway backend (API images)
+      { protocol: 'https', hostname: '*.railway.app' },
+      // Supabase storage
+      { protocol: 'https', hostname: '*.supabase.co' },
+      // Brazil Pickleball Store CDN
+      { protocol: 'https', hostname: 'brazilpickleballstore.com.br' },
+      { protocol: 'https', hostname: '*.brazilpickleballstore.com.br' },
+      // Dropshot Brasil CDN
+      { protocol: 'https', hostname: 'dropshot.com.br' },
+      { protocol: 'https', hostname: '*.dropshot.com.br' },
+      // JOOLA / Shopify CDN
+      { protocol: 'https', hostname: 'joola.com' },
+      { protocol: 'https', hostname: '*.shopify.com' },
+      { protocol: 'https', hostname: '*.myshopify.com' },
+      // Google user content (placeholder images)
+      { protocol: 'https', hostname: '*.googleusercontent.com' },
+      // Local development
+      { protocol: 'http', hostname: 'localhost' },
     ],
   },
 };
