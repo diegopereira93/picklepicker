@@ -16,6 +16,7 @@ interface ProductCardProps {
   matchScore?: number
   priceDelta?: number
   isPricePulsing?: boolean
+  isCompareSelected?: boolean
   onCompare?: () => void
   onAlert?: () => void
   onViewDetails?: () => void
@@ -28,6 +29,7 @@ function ProductCard({
   matchScore,
   priceDelta,
   isPricePulsing = false,
+  isCompareSelected = false,
   onCompare,
   onAlert,
   onViewDetails,
@@ -156,13 +158,13 @@ function ProductCard({
               Detalhes
             </Button>
             <Button
-              variant="ghost"
+              variant={isCompareSelected ? 'default' : 'ghost'}
               size="sm"
               className="gap-1"
               onClick={(e) => { e.stopPropagation(); onCompare?.() }}
             >
               <GitCompare className="w-4 h-4" />
-              Comparar
+              {isCompareSelected ? 'Selecionado' : 'Comparar'}
             </Button>
             <Button
               variant="ghost"

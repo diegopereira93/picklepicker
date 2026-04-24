@@ -26,6 +26,7 @@ function buildUrl(path: string, params?: Record<string, string | number | boolea
 
 export async function fetchPaddles(params?: {
   brand?: string
+  skill_level?: string
   price_min?: number
   price_max?: number
   in_stock?: boolean

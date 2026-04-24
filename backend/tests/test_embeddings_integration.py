@@ -1,4 +1,4 @@
-"""End-to-end tests for embedding service with Gemini and Jina APIs."""
+"""Integration tests for embedding service with mocked httpx responses (not real E2E — no API calls made)."""
 
 import pytest
 from unittest.mock import patch, MagicMock, AsyncMock
@@ -27,8 +27,8 @@ def sample_paddle_document():
     Material da face Polypropylene."""
 
 
-class TestGeminiEmbeddingE2E:
-    """E2E tests for Gemini embedding endpoint (text-embedding-004)."""
+class TestGeminiEmbeddingIntegration:
+    """Integration tests for Gemini embedding endpoint (text-embedding-004)."""
 
     @pytest.mark.asyncio
     async def test_gemini_api_request_format(self, embedding_manager, sample_paddle_document):
@@ -138,7 +138,7 @@ class TestGeminiEmbeddingE2E:
                 await embedding_manager._try_gemini("test text")
 
 
-class TestJinaEmbeddingE2E:
+class TestJinaEmbeddingIntegration:
     """E2E tests for Jina embedding endpoint (embeddings-v3)."""
 
     @pytest.mark.asyncio
@@ -221,7 +221,7 @@ class TestJinaEmbeddingE2E:
                 await embedding_manager._try_jina("test text")
 
 
-class TestEmbeddingFallbackE2E:
+class TestEmbeddingFallbackIntegration:
     """E2E tests for fallback behavior: Gemini -> Jina."""
 
     @pytest.mark.asyncio
@@ -328,7 +328,7 @@ class TestEmbeddingFallbackE2E:
             assert all(x == 0.0 for x in result)
 
 
-class TestEmbeddingBatchE2E:
+class TestEmbeddingBatchIntegration:
     """E2E tests for batch embedding operations."""
 
     @pytest.mark.asyncio
@@ -391,7 +391,7 @@ class TestEmbeddingBatchE2E:
                 assert len(result) == 768
 
 
-class TestEmbeddingErrorModesE2E:
+class TestEmbeddingErrorModesIntegration:
     """E2E tests for embedding error handling modes."""
 
     @pytest.mark.asyncio
@@ -448,7 +448,7 @@ class TestEmbeddingErrorModesE2E:
                 await embedding_manager._try_gemini("test text")
 
 
-class TestEmbeddingPerformanceE2E:
+class TestEmbeddingPerformanceIntegration:
     """E2E performance tests for embedding operations."""
 
     @pytest.mark.asyncio
@@ -500,8 +500,8 @@ class TestEmbeddingPerformanceE2E:
             assert len(result) == 768
 
 
-class TestEmbeddingEndToEndIntegration:
-    """Full end-to-end integration tests with realistic scenarios."""
+class TestEmbeddingFullFlowIntegration:
+    """Full flow integration tests with realistic scenarios."""
 
     @pytest.mark.asyncio
     async def test_full_flow_paddle_recommendation(self, embedding_manager):

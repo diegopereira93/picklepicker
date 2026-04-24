@@ -6,10 +6,9 @@ interface QuizStepBudgetSliderProps {
   value: number
   onSelect: (value: number) => void
   onBack: () => void
-  onNext: () => void
 }
 
-export function QuizStepBudgetSlider({ value, onSelect, onBack, onNext }: QuizStepBudgetSliderProps) {
+export function QuizStepBudgetSlider({ value, onSelect, onBack }: QuizStepBudgetSliderProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onSelect(Number(e.target.value))
   }
@@ -21,8 +20,6 @@ export function QuizStepBudgetSlider({ value, onSelect, onBack, onNext }: QuizSt
       maximumFractionDigits: 0,
     }).format(val)
   }
-
-  const smartZoneRange = `${formatCurrency(BUDGET_SMART_ZONE.min)} - ${formatCurrency(BUDGET_SMART_ZONE.max)}`
 
   return (
     <div className="max-w-3xl mx-auto wg-animate-step-enter space-y-8">

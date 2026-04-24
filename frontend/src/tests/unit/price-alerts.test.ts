@@ -33,7 +33,7 @@ describe('POST /api/price-alerts', () => {
 
   it('returns 401 for anonymous user', async () => {
     const { auth } = await import('@clerk/nextjs/server')
-    vi.mocked(auth).mockResolvedValue({ userId: null } as any)
+    vi.mocked(auth).mockResolvedValue({ userId: null } as { userId: string | null })
 
     const { POST } = await import('@/app/api/price-alerts/route')
     const req = new NextRequest('http://localhost/api/price-alerts', {
@@ -49,7 +49,7 @@ describe('POST /api/price-alerts', () => {
 
   it('returns 201 and alert for authenticated user', async () => {
     const { auth } = await import('@clerk/nextjs/server')
-    vi.mocked(auth).mockResolvedValue({ userId: 'user_abc' } as any)
+    vi.mocked(auth).mockResolvedValue({ userId: 'user_abc' } as { userId: string | null })
 
     const alertData = { id: 1, price_target: 200, created_at: '2026-01-01' }
     mockFetch.mockResolvedValue({
@@ -71,7 +71,7 @@ describe('POST /api/price-alerts', () => {
 
   it('forwards user_id to backend', async () => {
     const { auth } = await import('@clerk/nextjs/server')
-    vi.mocked(auth).mockResolvedValue({ userId: 'user_xyz' } as any)
+    vi.mocked(auth).mockResolvedValue({ userId: 'user_xyz' } as { userId: string | null })
 
     mockFetch.mockResolvedValue({
       ok: true,
@@ -97,7 +97,7 @@ describe('POST /api/price-alerts', () => {
 
   it('returns 500 when backend fails', async () => {
     const { auth } = await import('@clerk/nextjs/server')
-    vi.mocked(auth).mockResolvedValue({ userId: 'user_abc' } as any)
+    vi.mocked(auth).mockResolvedValue({ userId: 'user_abc' } as { userId: string | null })
 
     mockFetch.mockResolvedValue({ ok: false })
 

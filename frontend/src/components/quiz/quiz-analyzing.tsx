@@ -16,28 +16,24 @@ export function QuizAnalyzing({ onComplete }: QuizAnalyzingProps) {
       setTimeout(() => setCompletedTasks(2), 1500),
     ]
 
-    let progressInterval: number | undefined
-    let completeTimeout: number | undefined
-
-    if (progress < 100) {
-      progressInterval = window.setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 100) {
-            if (completeTimeout) clearTimeout(completeTimeout)
-            completeTimeout = setTimeout(() => {
-              onComplete()
-            }, 1000)
-            return 100
+    let completed = false
+    const progressInterval = window.setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(progressInterval)
+          if (!completed) {
+            completed = true
+            setTimeout(() => onComplete(), 1000)
           }
-          return prev + 4
-        })
-      }, 100)
-    }
+          return 100
+        }
+        return prev + 4
+      })
+    }, 100)
 
     return () => {
       taskTimeouts.forEach(clearTimeout)
-      if (progressInterval) clearInterval(progressInterval)
-      if (completeTimeout) clearTimeout(completeTimeout)
+      clearInterval(progressInterval)
     }
   }, [onComplete])
 

@@ -17,7 +17,7 @@ describe('lib/clerk - getUserId', () => {
 
   it('returns userId when user is authenticated', async () => {
     const { auth } = await import('@clerk/nextjs/server')
-    vi.mocked(auth).mockResolvedValue({ userId: 'user_abc123' } as any)
+    vi.mocked(auth).mockResolvedValue({ userId: 'user_abc123' } as { userId: string | null })
 
     const { getUserId } = await import('@/lib/clerk')
     const userId = await getUserId()
@@ -26,7 +26,7 @@ describe('lib/clerk - getUserId', () => {
 
   it('returns null when user is anonymous', async () => {
     const { auth } = await import('@clerk/nextjs/server')
-    vi.mocked(auth).mockResolvedValue({ userId: null } as any)
+    vi.mocked(auth).mockResolvedValue({ userId: null } as { userId: string | null })
 
     const { getUserId } = await import('@/lib/clerk')
     const userId = await getUserId()
@@ -35,7 +35,7 @@ describe('lib/clerk - getUserId', () => {
 
   it('requireUserId throws when user is not authenticated', async () => {
     const { auth } = await import('@clerk/nextjs/server')
-    vi.mocked(auth).mockResolvedValue({ userId: null } as any)
+    vi.mocked(auth).mockResolvedValue({ userId: null } as { userId: string | null })
 
     const { requireUserId } = await import('@/lib/clerk')
     await expect(requireUserId()).rejects.toThrow('Unauthorized')
@@ -43,7 +43,7 @@ describe('lib/clerk - getUserId', () => {
 
   it('requireUserId returns userId when authenticated', async () => {
     const { auth } = await import('@clerk/nextjs/server')
-    vi.mocked(auth).mockResolvedValue({ userId: 'user_xyz' } as any)
+    vi.mocked(auth).mockResolvedValue({ userId: 'user_xyz' } as { userId: string | null })
 
     const { requireUserId } = await import('@/lib/clerk')
     const userId = await requireUserId()

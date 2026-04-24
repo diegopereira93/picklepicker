@@ -22,7 +22,7 @@ describe('POST /api/users/migrate', () => {
 
   it('returns 401 for anonymous user', async () => {
     const { auth } = await import('@clerk/nextjs/server')
-    vi.mocked(auth).mockResolvedValue({ userId: null } as any)
+    vi.mocked(auth).mockResolvedValue({ userId: null } as { userId: string | null })
 
     const { POST } = await import('@/app/api/users/migrate/route')
     const req = new NextRequest('http://localhost/api/users/migrate', {
@@ -38,7 +38,7 @@ describe('POST /api/users/migrate', () => {
 
   it('returns 200 success for authenticated user with old_uuid', async () => {
     const { auth } = await import('@clerk/nextjs/server')
-    vi.mocked(auth).mockResolvedValue({ userId: 'user_clerk_abc' } as any)
+    vi.mocked(auth).mockResolvedValue({ userId: 'user_clerk_abc' } as { userId: string | null })
 
     mockFetch.mockResolvedValue({
       ok: true,
@@ -59,7 +59,7 @@ describe('POST /api/users/migrate', () => {
 
   it('forwards old_uuid and new_user_id to backend', async () => {
     const { auth } = await import('@clerk/nextjs/server')
-    vi.mocked(auth).mockResolvedValue({ userId: 'user_clerk_xyz' } as any)
+    vi.mocked(auth).mockResolvedValue({ userId: 'user_clerk_xyz' } as { userId: string | null })
 
     mockFetch.mockResolvedValue({
       ok: true,
@@ -85,7 +85,7 @@ describe('POST /api/users/migrate', () => {
 
   it('returns 500 when backend migration fails', async () => {
     const { auth } = await import('@clerk/nextjs/server')
-    vi.mocked(auth).mockResolvedValue({ userId: 'user_abc' } as any)
+    vi.mocked(auth).mockResolvedValue({ userId: 'user_abc' } as { userId: string | null })
 
     mockFetch.mockResolvedValue({ ok: false })
 

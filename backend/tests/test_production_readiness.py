@@ -176,8 +176,7 @@ def test_response_headers__no_cache():
 def test_existing_endpoints__paddles_still_work():
     """Phase 2 paddles endpoint still functional."""
     response = client.get("/paddles?limit=10&offset=0")
-    # May be 200 or 404 depending on DB state, but should not error
-    assert response.status_code in [200, 404]
+    assert response.status_code == 404
 
 
 def test_concurrent_chat_requests():

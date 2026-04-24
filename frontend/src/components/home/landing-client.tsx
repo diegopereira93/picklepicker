@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { useState, useEffect, useRef, type ReactNode } from 'react'
-import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { fetchPaddles } from '@/lib/api'
 import { ListChecks, Bot, Trophy, Brain, MessageSquare, GitCompare, Bell } from 'lucide-react'
@@ -146,16 +145,12 @@ export function LandingClient() {
             Responda 7 perguntas rápidas. Receba recomendações personalizadas da nossa IA. Sem spam, sem enrolação.
           </p>
 
-          <Button
-            asChild
-            variant="default"
-            size="lg"
-            className="mt-4 md:mt-8 font-sans font-semibold tracking-wide bg-brand-primary hover:bg-brand-primary/90 text-base shadow-glow-green hover:shadow-glow-green focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus-visible:ring-offset-base"
+          <Link
+            href="/quiz"
+            className="inline-flex items-center justify-center rounded-lg font-medium h-9 px-2.5 gap-1.5 mt-4 md:mt-8 font-sans font-semibold tracking-wide bg-brand-primary hover:bg-brand-primary/90 text-base text-primary-foreground shadow-glow-green hover:shadow-glow-green focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus-visible:ring-offset-base"
           >
-            <Link href="/quiz" className="text-base">
-              Encontrar minha raquete
-            </Link>
-          </Button>
+            Encontrar minha raquete
+          </Link>
 
           <a href="#how-it-works" className="sr-only focus:not-sr-only focus:absolute focus:-translate-y-8 focus:left-4 focus:bg-base focus:text-text-primary focus:px-4 focus:py-2 focus:rounded-rounded focus:z-50">
             Pular para conteúdo principal
@@ -277,7 +272,7 @@ export function LandingClient() {
                   Chat com IA
                 </h3>
                 <p className="font-sans text-sm text-text-secondary leading-relaxed">
-                  Pergunte qualquer coisa. 'Melhor para iniciantes até R$300?' Respostas instantâneas.
+                  Pergunte qualquer coisa. &apos;Melhor para iniciantes até R$300?&apos; Respostas instantâneas.
                 </p>
               </div>
             </AnimatedSection>
@@ -379,16 +374,12 @@ export function LandingClient() {
                 Junte-se a {precosMonitorados.toLocaleString('pt-BR')}+ jogadores que melhoraram seu jogo com recomendações IA.
               </p>
 
-              <Button
-                asChild
-                variant="default"
-                size="lg"
-                className="mt-8 font-sans font-semibold tracking-wide bg-brand-primary hover:bg-brand-primary/90 text-base shadow-glow-green hover:shadow-glow-green focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus-visible:ring-offset-base"
+              <Link
+                href="/quiz"
+                className="inline-flex items-center justify-center rounded-lg font-medium h-9 px-2.5 gap-1.5 mt-8 font-sans font-semibold tracking-wide bg-brand-primary hover:bg-brand-primary/90 text-base text-primary-foreground shadow-glow-green hover:shadow-glow-green focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2 focus-visible:ring-offset-base"
               >
-                <Link href="/quiz" className="text-base">
-                  Encontrar minha raquete
-                </Link>
-              </Button>
+                Encontrar minha raquete
+              </Link>
             </div>
           </AnimatedSection>
         </div>

@@ -12,7 +12,6 @@ import { CompareRow } from '@/components/ui/compare-row'
 import { RadarChart } from '@/components/ui/radar-chart'
 import { PriceTag } from '@/components/ui/price-tag'
 import { SafeImage } from '@/components/ui/safe-image'
-import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Breadcrumb } from '@/components/ui/breadcrumb'
 import type { Paddle } from '@/types/paddle'
@@ -249,6 +248,7 @@ function CompareContent() {
       setIsLoading(false)
     }
     load()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- paddleIds is derived from searchParams
   }, [searchParams])
 
   const count = paddleIds.length
@@ -351,22 +351,16 @@ function CompareContent() {
                 <div className="mt-3">
                   <PriceTag price={paddle.price_min_brl ?? paddle.price_brl ?? 0} currency="BRL" size="lg" />
                 </div>
-                <Button
-                  variant="default"
-                  className="w-full mt-4 bg-brand-primary hover:bg-brand-primary/90 text-base hover:shadow-glow-green"
-                  asChild
+                <a
+                  href={resolveAffiliateUrl({ paddleId: String(paddle.id), page: 'compare-card' })}
+                  target="_blank"
+                  rel="noopener noreferrer sponsored"
+                  className="w-full mt-4 inline-flex items-center justify-center gap-2 rounded-lg bg-brand-primary hover:bg-brand-primary/90 text-base hover:shadow-glow-green px-2.5 h-9 font-medium"
+                  onClick={() => trackAffiliateClick(String(paddle.id), 'brazil-store', 'compare-card')}
                 >
-                  <a
-                    href={resolveAffiliateUrl({ paddleId: String(paddle.id), page: 'compare-card' })}
-                    target="_blank"
-                    rel="noopener noreferrer sponsored"
-                    className="flex items-center justify-center gap-2"
-                    onClick={() => trackAffiliateClick(String(paddle.id), 'brazil-store', 'compare-card')}
-                  >
-                    Comprar Agora
-                    <ExternalLink size={16} />
-                  </a>
-                </Button>
+                  Comprar Agora
+                  <ExternalLink size={16} />
+                </a>
               </div>
             ))}
           </div>
@@ -416,23 +410,17 @@ function CompareContent() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {paddles.map((paddle) => (
-              <Button
+              <a
                 key={paddle.id}
-                variant="default"
-                className="bg-brand-primary hover:bg-brand-primary/90 text-base hover:shadow-glow-green"
-                asChild
+                href={resolveAffiliateUrl({ paddleId: String(paddle.id), page: 'compare-cta' })}
+                target="_blank"
+                rel="noopener noreferrer sponsored"
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-primary hover:bg-brand-primary/90 text-base hover:shadow-glow-green px-2.5 py-3 font-medium"
+                onClick={() => trackAffiliateClick(String(paddle.id), 'brazil-store', 'compare-cta')}
               >
-                <a
-                  href={resolveAffiliateUrl({ paddleId: String(paddle.id), page: 'compare-cta' })}
-                  target="_blank"
-                  rel="noopener noreferrer sponsored"
-                  className="flex items-center justify-center gap-2 py-3"
-                  onClick={() => trackAffiliateClick(String(paddle.id), 'brazil-store', 'compare-cta')}
-                >
-                  Comprar {paddle.name}
-                  <ExternalLink size={16} />
-                </a>
-              </Button>
+                Comprar {paddle.name}
+                <ExternalLink size={16} />
+              </a>
             ))}
           </div>
         </div>

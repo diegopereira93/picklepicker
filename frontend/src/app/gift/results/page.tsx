@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import type { Paddle } from '@/types/paddle'
-import { fetchPaddles } from '@/lib/api'
 import { Button } from '@/components/ui/button'
+import { SafeImage } from '@/components/ui/safe-image'
 
 export default function GiftResultsPage() {
   const [recommendedPaddle, setRecommendedPaddle] = useState<Paddle | null>(null)
@@ -21,11 +21,12 @@ export default function GiftResultsPage() {
       name: 'Adidas Signature Pro',
       brand: 'Adidas',
       price_min_brl: 599,
-      image_url: 'https://example.com/adidas-signature.jpg'
+      image_url: 'https://example.com/adidas-signature.jpg',
+      created_at: new Date().toISOString(),
     })
   }, [])
 
-  if (!hydrated) return null
+  if (!hydrated || !recommendedPaddle) return null
 
   const levelLabels: Record<string, string> = {
     'beginner': 'iniciante',
@@ -57,7 +58,7 @@ export default function GiftResultsPage() {
           <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-6 items-center">
             <div className="w-[100px] h-[150px] rounded-lg overflow-hidden mx-auto md:mx-0 bg-elevated">
               {recommendedPaddle.image_url ? (
-                <img 
+                <SafeImage 
                   src={recommendedPaddle.image_url} 
                   alt={recommendedPaddle.name} 
                   className="w-full h-full object-cover"

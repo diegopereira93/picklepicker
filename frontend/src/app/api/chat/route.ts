@@ -27,6 +27,7 @@ export async function POST(request: Request) {
   }
 
   function extractText(msg: typeof lastUserMessage): string {
+    if (!msg) return ''
     if (msg.content) return msg.content
     if (msg.parts) {
       return msg.parts
@@ -56,7 +57,7 @@ export async function POST(request: Request) {
     message: trimmedMessage,
     skill_level,
     budget_brl: Math.max(profile?.budget_max ?? 600, 1),
-    style: profile?.style || null,
+    style: profile?.style ?? undefined,
   }
 
   let fastapiResponse: Response

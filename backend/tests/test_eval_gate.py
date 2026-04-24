@@ -1,4 +1,8 @@
-"""Tests for LLM Evaluation Gate."""
+"""Tests for LLM Evaluation Gate.
+
+Scores are computed from quality metrics (response length, price/brand/spec mentions,
+Portuguese detection) applied to simulated responses. See eval_gate.py for details.
+"""
 
 import json
 import pytest
@@ -45,7 +49,6 @@ async def test_eval_gate__10_queries_evaluated():
 async def test_eval_gate__selection_logic_groq():
     """Test that Groq is selected when avg >= 4.0."""
     result = await run_eval_gate(threshold=4.0)
-    # Given our mock scores average to 4.25, Groq should be selected
     if result.avg_score >= 4.0:
         assert result.selected_model == "groq"
         assert "4.0 threshold" in result.reasoning.lower() or "cost-effective" in result.reasoning.lower()

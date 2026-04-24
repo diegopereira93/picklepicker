@@ -9,10 +9,6 @@ function getAuthToken(): string | null {
   return localStorage.getItem(AUTH_TOKEN_KEY)
 }
 
-function isAuthenticated(): boolean {
-  return !!getAuthToken()
-}
-
 export function getOrCreateUserId(): string {
   if (typeof window === 'undefined') return ''
   const authId = localStorage.getItem(AUTH_USER_ID_KEY)

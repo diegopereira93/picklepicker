@@ -40,9 +40,7 @@ def test_get_paddles__limit_max():
 def test_get_paddle_detail__404():
     """Test GET /paddles/{id} returns 404 for nonexistent paddle."""
     response = client.get("/paddles/99999")
-    # Will return 200 with null data due to mock DB, or 404 if real DB
-    # For now, just verify endpoint exists and responds
-    assert response.status_code in [200, 404]
+    assert response.status_code == 404
 
 
 def test_health__200():
@@ -54,17 +52,15 @@ def test_health__200():
 
 
 def test_get_paddle_prices__endpoint_exists():
-    """Test GET /paddles/{id}/prices endpoint is defined."""
-    # Just verify endpoint exists (will 404 with mock DB)
+    """Test GET /paddles/{id}/prices endpoint returns 404 with mock DB (no data)."""
     response = client.get("/paddles/1/prices")
-    assert response.status_code in [200, 404]
+    assert response.status_code == 404
 
 
 def test_get_paddle_latest_prices__endpoint_exists():
-    """Test GET /paddles/{id}/latest-prices endpoint is defined."""
-    # Just verify endpoint exists (will 404 with mock DB)
+    """Test GET /paddles/{id}/latest-prices endpoint returns 404 with mock DB (no data)."""
     response = client.get("/paddles/1/latest-prices")
-    assert response.status_code in [200, 404]
+    assert response.status_code == 404
 
 
 def test_openapi_schema__includes_paddles():
@@ -124,6 +120,6 @@ def test_get_similar_paddles__no_embeddings_returns_404():
 
 
 def test_get_similar_paddles__endpoint_exists():
-    """Test GET /api/v1/paddles/{id}/similar endpoint is defined."""
+    """Test GET /api/v1/paddles/{id}/similar endpoint returns 404 with mock DB."""
     response = client.get("/api/v1/paddles/1/similar")
-    assert response.status_code in [200, 404]
+    assert response.status_code == 404

@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { fetchPaddles, fetchLatestPrices } from '@/lib/api'
 import { resolveAffiliateUrl } from '@/lib/affiliate'
 import { cn } from '@/lib/utils'
-import { ExternalLink, GitCompare, SearchX, Star } from 'lucide-react'
+import { ExternalLink, GitCompare, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { PriceTag } from '@/components/ui/price-tag'
 import { PriceChart } from '@/components/ui/price-chart'
@@ -172,27 +172,23 @@ export default async function CatalogDetailPage({
             <Button 
               variant="default" 
               className="w-full mt-6 bg-brand-primary hover:bg-brand-primary/80 border-none"
-              asChild
-            >
-              <a 
+              render={<a 
                 href={resolveAffiliateUrl({ paddleId: String(paddle.id), page: 'product-detail' })} 
                 target="_blank" 
                 rel="noopener noreferrer sponsored"
                 className="flex items-center justify-center gap-2"
-              >
+              />}
+            >
                 Comprar Agora <ExternalLink size={16} />
-              </a>
             </Button>
 
             <div className="flex gap-4 mt-4">
               <Button 
                 variant="ghost"
                 className="text-text-primary hover:bg-surface hover:text-text-primary"
-                asChild
+                render={<Link href={`/compare?a=${paddle.id}`} className="flex items-center gap-2" />}
               >
-                <Link href={`/compare?a=${paddle.id}`} className="flex items-center gap-2">
                   <GitCompare size={16} /> Comparar
-                </Link>
               </Button>
               <PriceAlertButton
                 paddle={{
@@ -274,40 +270,44 @@ export default async function CatalogDetailPage({
           </div>
         </div>
 
-        {priceData?.latest_prices?.length > 0 && (
-          <div className="bg-elevated rounded-lg border border-border p-6 mt-8">
-            <h2 className="font-sans font-semibold text-lg text-text-primary mb-4">
-              HISTÓRICO DE PREÇO
-            </h2>
-            <PriceChart
-              prices={priceData.latest_prices.map((p) => ({
-                date: new Date(p.scraped_at).toLocaleDateString('pt-BR'),
-                price: p.price_brl,
-              }))}
-              variant="full"
-            />
-            <div className="flex gap-8 mt-4">
-              <div>
-                <p className="font-sans text-sm text-text-muted mb-1">Menor preço</p>
-                <p className="font-mono text-sm text-brand-primary">
-                  R$ {Math.min(...priceData.latest_prices.map(p => p.price_brl)).toFixed(2)}
-                </p>
-              </div>
-              <div>
-                <p className="font-sans text-sm text-text-muted mb-1">Maior preço</p>
-                <p className="font-mono text-sm text-brand-secondary">
-                  R$ {Math.max(...priceData.latest_prices.map(p => p.price_brl)).toFixed(2)}
-                </p>
-              </div>
-              <div>
-                <p className="font-sans text-sm text-text-muted mb-1">Preço atual</p>
-                <p className="font-mono text-sm text-text-primary">
-                  R$ {priceData.latest_prices[0]?.price_brl.toFixed(2) || '-'}
-                </p>
+        {(() => {
+          const prices = priceData?.latest_prices
+          if (!prices?.length) return null
+          return (
+            <div className="bg-elevated rounded-lg border border-border p-6 mt-8">
+              <h2 className="font-sans font-semibold text-lg text-text-primary mb-4">
+                HISTÓRICO DE PREÇO
+              </h2>
+              <PriceChart
+                data={prices.map((p) => ({
+                  date: new Date(p.scraped_at).toLocaleDateString('pt-BR'),
+                  price: p.price_brl,
+                }))}
+                variant="full"
+              />
+              <div className="flex gap-8 mt-4">
+                <div>
+                  <p className="font-sans text-sm text-text-muted mb-1">Menor preço</p>
+                  <p className="font-mono text-sm text-brand-primary">
+                    R$ {Math.min(...prices.map(p => p.price_brl)).toFixed(2)}
+                  </p>
+                </div>
+                <div>
+                  <p className="font-sans text-sm text-text-muted mb-1">Maior preço</p>
+                  <p className="font-mono text-sm text-brand-secondary">
+                    R$ {Math.max(...prices.map(p => p.price_brl)).toFixed(2)}
+                  </p>
+                </div>
+                <div>
+                  <p className="font-sans text-sm text-text-muted mb-1">Preço atual</p>
+                  <p className="font-mono text-sm text-text-primary">
+                    R$ {prices[0]?.price_brl.toFixed(2) || '-'}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )
+        })()}
 
         {paddle.description && (
           <div className="mt-8">

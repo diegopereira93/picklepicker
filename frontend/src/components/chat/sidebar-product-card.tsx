@@ -27,11 +27,6 @@ export function SidebarProductCard({ paddle, score, affiliateUrl }: SidebarProdu
     return '#B91C1C';
   };
 
-  const formatSpec = (value: number | string | null | undefined) => {
-    if (value == null || value === '') return '—';
-    return String(value);
-  };
-
   const scoreColor = score != null ? getScoreColor(score) : null
   const scoreLabel = score != null ? getScoreLabel(score) : null
 
@@ -112,7 +107,7 @@ export function SidebarProductCard({ paddle, score, affiliateUrl }: SidebarProdu
           <div
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-sm"
             style={{
-              backgroundColor: scoreColor,
+              backgroundColor: scoreColor ?? undefined,
               color: scoreColor === '#FDE047' ? 'var(--color-black)' : 'var(--color-white)',
               fontSize: 'var(--font-size-caption)',
               fontWeight: 700,

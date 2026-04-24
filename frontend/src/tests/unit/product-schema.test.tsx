@@ -4,6 +4,7 @@
 import { describe, it, expect } from 'vitest'
 import { render } from '@testing-library/react'
 import { ProductSchema } from '@/components/schema/product-schema'
+import type { Paddle } from '@/types/paddle'
 
 const mockPaddle = {
   id: 1,
@@ -31,7 +32,7 @@ const url = 'https://pickleiq.com/paddles/selkirk/vanguard-power-air'
 describe('ProductSchema', () => {
   it('renders a script tag with type application/ld+json', () => {
     const { container } = render(
-      <ProductSchema paddle={mockPaddle as any} url={url} />
+      <ProductSchema paddle={mockPaddle as Paddle} url={url} />
     )
     const scriptTag = container.querySelector('script[type="application/ld+json"]')
     expect(scriptTag).not.toBeNull()
@@ -39,7 +40,7 @@ describe('ProductSchema', () => {
 
   it('contains @type Product in JSON-LD', () => {
     const { container } = render(
-      <ProductSchema paddle={mockPaddle as any} url={url} />
+      <ProductSchema paddle={mockPaddle as Paddle} url={url} />
     )
     const scriptTag = container.querySelector('script[type="application/ld+json"]')
     const json = JSON.parse(scriptTag!.textContent || '{}')
@@ -48,7 +49,7 @@ describe('ProductSchema', () => {
 
   it('includes product name in schema', () => {
     const { container } = render(
-      <ProductSchema paddle={mockPaddle as any} url={url} />
+      <ProductSchema paddle={mockPaddle as Paddle} url={url} />
     )
     const scriptTag = container.querySelector('script[type="application/ld+json"]')
     const json = JSON.parse(scriptTag!.textContent || '{}')
@@ -57,7 +58,7 @@ describe('ProductSchema', () => {
 
   it('includes brand in schema', () => {
     const { container } = render(
-      <ProductSchema paddle={mockPaddle as any} url={url} />
+      <ProductSchema paddle={mockPaddle as Paddle} url={url} />
     )
     const scriptTag = container.querySelector('script[type="application/ld+json"]')
     const json = JSON.parse(scriptTag!.textContent || '{}')
@@ -67,7 +68,7 @@ describe('ProductSchema', () => {
 
   it('includes offers with price and currency', () => {
     const { container } = render(
-      <ProductSchema paddle={mockPaddle as any} url={url} />
+      <ProductSchema paddle={mockPaddle as Paddle} url={url} />
     )
     const scriptTag = container.querySelector('script[type="application/ld+json"]')
     const json = JSON.parse(scriptTag!.textContent || '{}')
@@ -78,7 +79,7 @@ describe('ProductSchema', () => {
 
   it('includes aggregateRating when rating and review_count present', () => {
     const { container } = render(
-      <ProductSchema paddle={mockPaddle as any} url={url} />
+      <ProductSchema paddle={mockPaddle as Paddle} url={url} />
     )
     const scriptTag = container.querySelector('script[type="application/ld+json"]')
     const json = JSON.parse(scriptTag!.textContent || '{}')
@@ -90,7 +91,7 @@ describe('ProductSchema', () => {
 
   it('sets InStock availability when in_stock is true', () => {
     const { container } = render(
-      <ProductSchema paddle={mockPaddle as any} url={url} />
+      <ProductSchema paddle={mockPaddle as Paddle} url={url} />
     )
     const scriptTag = container.querySelector('script[type="application/ld+json"]')
     const json = JSON.parse(scriptTag!.textContent || '{}')
@@ -100,7 +101,7 @@ describe('ProductSchema', () => {
   it('sets OutOfStock availability when in_stock is false', () => {
     const outOfStockPaddle = { ...mockPaddle, in_stock: false }
     const { container } = render(
-      <ProductSchema paddle={outOfStockPaddle as any} url={url} />
+      <ProductSchema paddle={outOfStockPaddle as Paddle} url={url} />
     )
     const scriptTag = container.querySelector('script[type="application/ld+json"]')
     const json = JSON.parse(scriptTag!.textContent || '{}')
@@ -109,7 +110,7 @@ describe('ProductSchema', () => {
 
   it('includes URL in schema', () => {
     const { container } = render(
-      <ProductSchema paddle={mockPaddle as any} url={url} />
+      <ProductSchema paddle={mockPaddle as Paddle} url={url} />
     )
     const scriptTag = container.querySelector('script[type="application/ld+json"]')
     const json = JSON.parse(scriptTag!.textContent || '{}')
@@ -118,7 +119,7 @@ describe('ProductSchema', () => {
 
   it('produces valid JSON without syntax errors', () => {
     const { container } = render(
-      <ProductSchema paddle={mockPaddle as any} url={url} />
+      <ProductSchema paddle={mockPaddle as Paddle} url={url} />
     )
     const scriptTag = container.querySelector('script[type="application/ld+json"]')
     expect(() => JSON.parse(scriptTag!.textContent || '{}')).not.toThrow()

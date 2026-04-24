@@ -1,6 +1,5 @@
 import { clerkMiddleware } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
 
 // Check if Clerk keys are available
 const hasClerkKeys = process.env.CLERK_SECRET_KEY && process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
@@ -8,7 +7,7 @@ const hasClerkKeys = process.env.CLERK_SECRET_KEY && process.env.NEXT_PUBLIC_CLE
 // Use Clerk middleware only if keys are available, otherwise use a simple passthrough
 export default hasClerkKeys
   ? clerkMiddleware()
-  : function middleware(request: NextRequest) {
+  : function middleware() {
       return NextResponse.next();
     };
 

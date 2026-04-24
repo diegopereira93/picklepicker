@@ -1,9 +1,9 @@
 "use client"
 
+import dynamic from "next/dynamic"
 import Link from "next/link"
-import { useState, createContext, useContext, ReactNode } from "react"
+import { useState } from "react"
 import { Menu } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import {
   Sheet,
   SheetContent,
@@ -11,6 +11,16 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet"
+
+const ClerkAuthButtons = dynamic(
+  () => import("./clerk-auth-buttons").then(m => ({ default: m.ClerkAuthButtons })),
+  { ssr: false }
+)
+const MobileClerkAuth = dynamic(
+  () => import("./clerk-auth-buttons").then(m => ({ default: m.MobileClerkAuth })),
+  { ssr: false }
+)
+
 const navLinks = [
   { href: "/", label: "HOME" },
   { href: "/quiz", label: "QUIZ" },
@@ -19,71 +29,10 @@ const navLinks = [
   { href: "/blog", label: "BLOG" },
 ]
 
-const ClerkAvailableContext = createContext<boolean>(false)
-
-export function ClerkAvailableProvider({
-  available,
-  children
-}: {
-  available: boolean
-  children: ReactNode
-}) {
-  return (
-    <ClerkAvailableContext.Provider value={available}>
-      {children}
-    </ClerkAvailableContext.Provider>
-  )
-}
-
-function useClerkAvailable() {
-  return useContext(ClerkAvailableContext)
-}
-
-function AuthButtons() {
-  const clerkAvailable = useClerkAvailable()
-  if (!clerkAvailable) {
-    return null
-  }
-  const { SignInButton, UserButton, useAuth } = require("@clerk/nextjs")
-  const { isSignedIn } = useAuth()
-  return (
-    <>
-      {!isSignedIn && (
-        <SignInButton mode="modal">
-          <Button variant="outline" size="sm">Entrar</Button>
-        </SignInButton>
-      )}
-      {isSignedIn && <UserButton afterSignOutUrl="/" />}
-    </>
-  )
-}
-
-function MobileAuth() {
-  const clerkAvailable = useClerkAvailable()
-  if (!clerkAvailable) {
-    return null
-  }
-  const { SignInButton, UserButton, useAuth } = require("@clerk/nextjs")
-  const { isSignedIn } = useAuth()
-  return (
-    <>
-      {!isSignedIn && (
-        <SignInButton mode="modal">
-          <Button variant="outline" className="mt-2 w-full">Entrar</Button>
-        </SignInButton>
-      )}
-      {isSignedIn && (
-        <div className="mt-2">
-          <UserButton afterSignOutUrl="/" />
-        </div>
-      )}
-    </>
-  )
-}
+export { ClerkAvailableProvider } from "./clerk-available-provider"
 
 export function Header() {
   const [open, setOpen] = useState(false)
-  const clerkAvailable = useClerkAvailable()
 
   return (
     <header className="sticky top-0 z-50 w-full bg-surface/95 backdrop-blur-md border-b border-border">
@@ -111,7 +60,7 @@ export function Header() {
           >
             Encontrar raquete
           </Link>
-          {clerkAvailable && <AuthButtons />}
+          <ClerkAuthButtons />
         </div>
 
         <div className="md:hidden flex ml-auto">
@@ -138,7 +87,7 @@ export function Header() {
                     {link.label}
                   </Link>
                 ))}
-                {clerkAvailable && <MobileAuth />}
+                <MobileClerkAuth />
               </nav>
             </SheetContent>
           </Sheet>

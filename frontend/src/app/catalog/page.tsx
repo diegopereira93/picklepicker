@@ -8,7 +8,7 @@ import { fetchPaddles } from '@/lib/api'
 import { toast } from 'sonner'
 import { ProductCard, ProductCardSkeleton } from '@/components/ui/product-card'
 import { PriceAlertModal } from '@/components/ui/price-alert-modal'
-import type { Paddle, PaddleListResponse } from '@/types/paddle'
+import type { Paddle } from '@/types/paddle'
 
 // --- Types ---
 interface CatalogFilters {
@@ -92,23 +92,6 @@ function CatalogPageContent() {
     loadProducts()
   }, [loadProducts])
 
-  function updateUrl() {
-    const params = new URLSearchParams()
-    if (filters.price_min) params.set('price_min', String(filters.price_min))
-    if (filters.price_max) params.set('price_max', String(filters.price_max))
-    if (selectedBrands.length > 0) params.set('brand', selectedBrands.join(','))
-    if (sort !== 'relevance') params.set('sort', sort)
-    if (searchQuery.trim()) params.set('q', searchQuery.trim())
-    if (currentPage > 1) params.set('page', String(currentPage))
-    router.replace(`/catalog?${params.toString()}`, { scroll: false })
-  }
-
-  function toggleBrand(brand: string) {
-    setSelectedBrands(prev =>
-      prev.includes(brand) ? prev.filter(b => b !== brand) : [...prev, brand]
-    )
-  }
-
   function clearFilters() {
     setFilters({})
     setSelectedBrands([])
@@ -167,7 +150,6 @@ function CatalogPageContent() {
         <aside className="hidden md:block w-[260px] flex-shrink-0 sticky top-0 h-screen overflow-y-auto bg-surface border-r border-border p-4">
           <FilterContent
             selectedBrands={selectedBrands}
-            onToggleBrand={toggleBrand}
             filters={filters}
             setFilters={setFilters}
             hasActiveFilters={hasActiveFilters}
@@ -189,7 +171,6 @@ function CatalogPageContent() {
               </div>
               <FilterContent
                 selectedBrands={selectedBrands}
-                onToggleBrand={toggleBrand}
                 filters={filters}
                 setFilters={setFilters}
                 hasActiveFilters={hasActiveFilters}
@@ -390,7 +371,6 @@ export default function CatalogPage() {
 // --- Filter Content (shared between desktop sidebar and mobile sheet) ---
 function FilterContent({
   selectedBrands,
-  onToggleBrand,
   filters,
   setFilters,
   hasActiveFilters,
@@ -398,7 +378,6 @@ function FilterContent({
   brands,
 }: {
   selectedBrands: string[]
-  onToggleBrand: (brand: string) => void
   filters: CatalogFilters
   setFilters: React.Dispatch<React.SetStateAction<CatalogFilters>>
   hasActiveFilters: boolean

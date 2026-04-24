@@ -3,7 +3,7 @@ import { fetchPaddles } from '@/lib/api'
 
 const BASE_URL = 'https://pickleiq.com'
 
-export default async function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Fetch all paddle slugs for dynamic catalog routes
   let paddleEntries: MetadataRoute.Sitemap = []
   try {

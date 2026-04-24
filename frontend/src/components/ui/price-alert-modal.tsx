@@ -54,7 +54,7 @@ export function PriceAlertModal({ paddle, isOpen, onClose }: PriceAlertModalProp
 
       toast.success("Alerta criado com sucesso!")
       onClose()
-    } catch (error) {
+    } catch {
       toast.error("Erro ao criar alerta. Tente novamente.")
     } finally {
       setIsLoading(false)

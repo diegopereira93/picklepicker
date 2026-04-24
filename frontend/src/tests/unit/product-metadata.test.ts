@@ -45,7 +45,7 @@ describe('generateProductMetadata', () => {
   it('returns OG image set to product image_url', async () => {
     const { generateProductMetadata } = await importSeo()
     const metadata = await generateProductMetadata('selkirk', 'vanguard-power-air', mockPaddle)
-    const ogImages = (metadata.openGraph as any)?.images
+    const ogImages = (metadata.openGraph as Record<string, unknown>)?.images
     expect(Array.isArray(ogImages)).toBe(true)
     expect(ogImages[0].url).toBe('https://example.com/selkirk-vanguard.jpg')
   })
@@ -55,8 +55,8 @@ describe('generateProductMetadata', () => {
     const metadata = await generateProductMetadata('selkirk', 'vanguard-power-air', mockPaddle)
     // canonical can be in alternates.canonical or metadata.canonical
     const canonical =
-      (metadata as any).canonical ||
-      (metadata.alternates as any)?.canonical
+      (metadata as Record<string, unknown>).canonical ||
+      (metadata.alternates as Record<string, unknown>)?.canonical
     expect(canonical).toContain('catalog')
     expect(canonical).toContain('vanguard-power-air')
   })
@@ -71,8 +71,8 @@ describe('generateProductMetadata', () => {
   it('sets robots to index, follow', async () => {
     const { generateProductMetadata } = await importSeo()
     const metadata = await generateProductMetadata('selkirk', 'vanguard-power-air', mockPaddle)
-    expect((metadata as any).robots).toContain('index')
-    expect((metadata as any).robots).toContain('follow')
+    expect((metadata as Record<string, unknown>).robots).toContain('index')
+    expect((metadata as Record<string, unknown>).robots).toContain('follow')
   })
 })
 

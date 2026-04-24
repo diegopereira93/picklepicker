@@ -1,4 +1,4 @@
-"""End-to-end tests for the complete chat pipeline."""
+"""Integration tests for the chat pipeline using TestClient (not real E2E — uses mocked DB pool)."""
 
 import pytest
 import sys

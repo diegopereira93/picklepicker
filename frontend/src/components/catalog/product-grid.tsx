@@ -37,8 +37,8 @@ function ProductGrid({ paddles, selected, onSelect, userProfile }: ProductGridPr
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {paddles.map((p) => {
         const isSelected = selected.has(p.id)
-        const skillBadge = getSkillLevelBadge(p.skill_level || undefined)
-        const paraVoce = getParaVoceBadge(userProfile, p.skill_level || null)
+        const skillBadge = getSkillLevelBadge(p.skill_level ?? null)
+        const paraVoce = getParaVoceBadge(userProfile ?? null, p.skill_level ?? null)
 
         return (
           <div

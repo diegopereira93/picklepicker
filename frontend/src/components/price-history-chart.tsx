@@ -11,6 +11,9 @@ import {
   YAxis,
   ResponsiveContainer,
 } from 'recharts'
+import type { Formatter, ValueType, NameType } from 'recharts/types/component/DefaultTooltipContent'
+import type { TooltipPayload } from 'recharts/types/state/tooltipSlice'
+import type { ReactNode } from 'react'
 import { getPriceHistory, PriceHistoryPoint } from '@/lib/price-history'
 
 const RETAILER_COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6']
@@ -133,11 +136,13 @@ export default function PriceHistoryChart({
             }}
           />
           <Tooltip
-            formatter={(value: number, name: string) => [
-              `R$ ${value.toFixed(2)}`,
-              name.replace('_price', ''),
-            ]}
-            labelFormatter={(label: string) => `Data: ${label}`}
+            formatter={
+              ((value: ValueType | undefined, name: NameType | undefined) => [
+                `R$ ${Number(value).toFixed(2)}`,
+                String(name).replace('_price', ''),
+              ]) as Formatter<ValueType, NameType>
+            }
+            labelFormatter={((label: ReactNode) => `Data: ${label}`) as (label: ReactNode, payload: TooltipPayload) => ReactNode}
           />
           <Legend
             formatter={(value: string) => value.replace('_price', '')}

@@ -7,7 +7,6 @@ import type { Paddle } from '@/types/paddle'
 import { loadQuizProfile, clearQuizProfile, type QuizProfile } from '@/lib/quiz-profile'
 import { fetchPaddles } from '@/lib/api'
 import { SafeImage } from '@/components/ui/safe-image'
-import { Button } from '@/components/ui/button'
 
 const budgetLabels: Record<string, string> = {
   'under-80': 'Até R$ 200',
@@ -200,11 +199,12 @@ export default function QuizResultsPage() {
                 </div>
 
                 <div className="mt-4">
-                  <Button asChild className="w-full bg-brand-secondary hover:bg-brand-secondary/80 text-white">
-                    <Link href={`/catalog/${encodeURIComponent(paddle.model_slug || String(paddle.id))}`}>
-                      VER NO SITE →
-                    </Link>
-                  </Button>
+                  <Link
+                    href={`/catalog/${encodeURIComponent(paddle.model_slug || String(paddle.id))}`}
+                    className="inline-flex items-center justify-center rounded-lg font-medium h-8 px-2.5 gap-1.5 w-full bg-brand-secondary hover:bg-brand-secondary/80 text-white"
+                  >
+                    VER NO SITE →
+                  </Link>
                 </div>
               </div>
             ))}
@@ -214,25 +214,28 @@ export default function QuizResultsPage() {
             <p className="text-text-primary mb-4">
               Nenhuma raquete encontrada para seu nível.
             </p>
-            <Button asChild className="bg-brand-secondary hover:bg-brand-secondary/80 text-white">
-              <Link href="/catalog">
-                VER CATÁLOGO COMPLETO
-              </Link>
-            </Button>
+            <Link
+              href="/catalog"
+              className="inline-flex items-center justify-center rounded-lg font-medium h-8 px-2.5 gap-1.5 bg-brand-secondary hover:bg-brand-secondary/80 text-white"
+            >
+              VER CATÁLOGO COMPLETO
+            </Link>
           </div>
         )}
 
         <div className="mt-12 flex flex-wrap gap-4 justify-center">
-          <Button asChild variant="outline">
-            <Link href="/chat">
-              Falar com nossa IA
-            </Link>
-          </Button>
-          <Button asChild variant="ghost">
-            <Link href="/catalog">
-              Ver catálogo completo
-            </Link>
-          </Button>
+          <Link
+            href="/chat"
+            className="inline-flex items-center justify-center rounded-lg font-medium h-8 px-2.5 gap-1.5 border-border bg-background hover:bg-muted hover:text-foreground"
+          >
+            Falar com nossa IA
+          </Link>
+          <Link
+            href="/catalog"
+            className="inline-flex items-center justify-center rounded-lg font-medium h-8 px-2.5 gap-1.5 hover:bg-muted hover:text-foreground"
+          >
+            Ver catálogo completo
+          </Link>
         </div>
 
         <div className="mt-12 text-center">

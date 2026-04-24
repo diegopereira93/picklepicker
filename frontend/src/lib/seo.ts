@@ -15,8 +15,8 @@ export async function fetchProductData(brand: string, modelSlug: string): Promis
     const requestedSlug = modelSlug.toLowerCase()
     const matches = items.filter(
       (item: Record<string, unknown>) =>
-        item.model_slug?.toLowerCase() === requestedSlug ||
-        item.name?.toString().toLowerCase().replace(/\s+/g, '-') === requestedSlug
+        typeof item.model_slug === 'string' && item.model_slug.toLowerCase() === requestedSlug ||
+        typeof item.name === 'string' && item.name.toLowerCase().replace(/\s+/g, '-') === requestedSlug
     )
     // Prefer paddle with a real image when duplicates exist
     const paddle = matches.find((item: Record<string, unknown>) => item.image_url) ?? matches[0] ?? null

@@ -2,6 +2,7 @@
 
 import { cn } from '@/lib/utils'
 import { Clock } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
 
 interface PriceTagProps {
   price: number

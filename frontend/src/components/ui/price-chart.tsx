@@ -2,6 +2,8 @@
 
 import { cn } from '@/lib/utils'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts'
+import type { Formatter, ValueType, NameType } from 'recharts/types/component/DefaultTooltipContent'
+import type { ReactNode } from 'react'
 
 interface PricePoint {
   date: string
@@ -55,7 +57,9 @@ function PriceChart({ data, variant, currentPrice, className }: PriceChartProps)
               borderRadius: '8px',
             }}
             labelStyle={{ color: '#FAFAFA', fontFamily: 'var(--font-mono)', fontSize: 12 }}
-            formatter={(value: number) => [`R$ ${value.toFixed(2)}`, 'Price']}
+            formatter={
+              ((value: ValueType | undefined) => [`R$ ${Number(value).toFixed(2)}`, 'Price'] as [ReactNode, NameType]) as Formatter<ValueType, NameType>
+            }
           />
           {currentPrice && (
             <ReferenceLine

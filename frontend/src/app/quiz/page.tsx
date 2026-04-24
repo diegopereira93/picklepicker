@@ -6,12 +6,13 @@ import { cn } from '@/lib/utils'
 import {
   Trophy, Target, Zap, Crown, Flame, Crosshair, Sparkles, Scale,
   Wallet, Banknote, PiggyBank, Gem, Feather, Dumbbell, HelpCircle,
-  Home, Sun, ArrowLeftRight, Search, Shuffle, TrendingUp,
+  Home, Sun, ArrowLeftRight,
 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { QuizProgressBar } from '@/components/ui/quiz-progress-bar'
 import { QuizOptionCard } from '@/components/ui/quiz-option-card'
 import {
-  saveQuizProfile, loadQuizProfile, type QuizProfile,
+  saveQuizProfile, type QuizProfile,
 } from '@/lib/quiz-profile'
 import { Button } from '@/components/ui/button'
 
@@ -19,13 +20,13 @@ interface QuizOption {
   value: string
   label: string
   description: string
-  icon: React.ComponentType<{ className?: string }>
+  icon: LucideIcon
 }
 
 interface QuizStep {
   key: keyof Omit<QuizProfile, 'completedAt' | 'targetPaddle'> | 'targetPaddle'
   question: string
-  type: 'choice' | 'text'
+  type?: 'choice' | 'text'
   options?: QuizOption[]
   placeholder?: string
 }
@@ -141,7 +142,7 @@ export default function QuizPage() {
   }
 
   function finishQuiz(targetPaddleValue: string) {
-    const finalAnswers = { ...answers, targetPaddle: targetPaddleValue }
+    const finalAnswers: Record<string, string | undefined> = { ...answers, targetPaddle: targetPaddleValue }
     const profile: QuizProfile = {
       level: (finalAnswers.level as QuizProfile['level']) || 'beginner',
       style: (finalAnswers.style as QuizProfile['style']) || 'all-round',

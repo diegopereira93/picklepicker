@@ -28,7 +28,8 @@ export function CatalogClient() {
       try {
         const result = await fetchPaddles({ limit: 100 })
         setPaddles(result.items)
-        setUserProfile(getProfile())
+        const profile = await getProfile()
+        setUserProfile(profile)
       } catch (err) {
         console.error('[CatalogClient] failed:', err)
       } finally {
@@ -38,7 +39,7 @@ export function CatalogClient() {
     load()
   }, [])
 
-  const brands = useMemo(() => [...new Set(paddles.map(p => p.brand).filter(Boolean))].sort(), [paddles])
+  const brands = useMemo(() => Array.from(new Set(paddles.map(p => p.brand).filter(Boolean))).sort(), [paddles])
   const levels = ['beginner', 'intermediate', 'advanced']
 
   const filtered = useMemo(() => {

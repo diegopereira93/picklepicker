@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import type { UserProfile, Paddle } from '@/types/paddle'
+import type { Paddle } from '@/types/paddle'
 import { QuizStepWelcomeGift } from '@/components/quiz/quiz-step-welcome-gift'
 import { QuizStepGiftRecipient } from '@/components/quiz/quiz-step-gift-recipient'
 import { QuizStepBudgetSlider } from '@/components/quiz/quiz-step-budget-slider'
@@ -9,6 +9,7 @@ import { QuizAnalyzing } from '@/components/quiz/quiz-analyzing'
 import { ProgressIndicator } from '@/components/quiz/progress-indicator'
 import { fetchPaddles } from '@/lib/api'
 import { Button } from '@/components/ui/button'
+import { SafeImage } from '@/components/ui/safe-image'
 
 type GiftStep = 'welcome' | 'recipient' | 'budget' | 'analyzing' | 'results'
 
@@ -94,14 +95,6 @@ export default function GiftPage() {
     } catch (err) {
       console.error('[fetchMatchingPaddles] failed:', err)
     }
-  }
-
-  function formatCurrency(val: number) {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-      maximumFractionDigits: 0,
-    }).format(val)
   }
 
   if (step === 'welcome') {
@@ -211,7 +204,7 @@ function GiftResultsPage({
   onViewMore,
   onPersonalQuiz
 }: { 
-  paddle: any
+  paddle: Paddle | null
   recipientLevel: string
   budget: number
   onTryAgain: () => void
@@ -255,7 +248,7 @@ function GiftResultsPage({
         <div className="grid grid-cols-1 md:grid-cols-[auto_1fr] gap-6 items-center">
           <div className="w-[100px] h-[150px] rounded-lg overflow-hidden mx-auto md:mx-0 bg-elevated">
             {paddle.image_url ? (
-              <img 
+              <SafeImage 
                 src={paddle.image_url} 
                 alt={paddle.name} 
                 className="w-full h-full object-cover"

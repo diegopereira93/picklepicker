@@ -88,7 +88,7 @@ test-frontend: ## Roda testes do frontend (via Docker)
 
 test-e2e: db-up ## Roda testes E2E (requer DB rodando, via pipeline container)
 	@echo "$(BLUE)🎭 Rodando testes E2E via pipeline container...$(NC)"
-	docker compose run --rm pipeline python test_e2e_scraper.py
+	docker compose run --rm pipeline python test_scraper_integration.py
 	@echo "$(GREEN)✅ Testes E2E concluídos!$(NC)"
 
 # ============================================

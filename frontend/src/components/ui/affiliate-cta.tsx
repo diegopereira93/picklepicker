@@ -1,14 +1,11 @@
 'use client'
 
 import { ExternalLink } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { resolveAffiliateUrl, trackAffiliateClick } from '@/lib/affiliate'
-import { useEffect } from 'react'
 
 interface AffiliateCTAProps {
   affiliateUrl?: string
   paddleId: string
-  paddleName: string
   store?: string
   page?: string
   price?: number
@@ -21,7 +18,6 @@ interface AffiliateCTAProps {
 export function AffiliateCTA({
   affiliateUrl,
   paddleId,
-  paddleName,
   store,
   page = 'unknown',
   price,
@@ -52,27 +48,22 @@ export function AffiliateCTA({
           a partir de R$ {price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
         </p>
       )}
-      <Button
-        variant="default"
-        size={size === 'lg' ? 'lg' : 'default'}
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer sponsored"
+        onClick={handleClick}
         className={`
+          inline-flex items-center justify-center rounded-lg font-medium
+          ${size === 'lg' ? 'h-9 px-2.5 gap-1.5 py-6 text-lg font-semibold' : 'h-8 px-2.5 gap-1.5'}
           w-full bg-brand-primary hover:bg-brand-primary/90 text-base
           hover:shadow-glow-green transition-all
-          ${size === 'lg' ? 'py-6 text-lg font-semibold' : ''}
+          flex items-center justify-center gap-2
         `}
-        asChild
-        onClick={handleClick}
       >
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer sponsored"
-          className="flex items-center justify-center gap-2"
-        >
-          {label}
-          <ExternalLink size={size === 'lg' ? 18 : 16} />
-        </a>
-      </Button>
+        {label}
+        <ExternalLink size={size === 'lg' ? 18 : 16} />
+      </a>
     </div>
   )
 }

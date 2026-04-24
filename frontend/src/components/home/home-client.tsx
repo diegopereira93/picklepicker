@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import type { Paddle, UserProfile } from '@/types/paddle'
 import { fetchPaddles } from '@/lib/api'
@@ -22,11 +21,12 @@ export function HomeClient() {
   const [isLoadingFeatured, setIsLoadingFeatured] = useState(false)
 
   useEffect(() => {
-    const existing = getProfile()
-    if (existing) {
-      setIsReturning(true)
-      fetchMatchingPaddle(existing)
-    }
+    getProfile().then(existing => {
+      if (existing) {
+        setIsReturning(true)
+        fetchMatchingPaddle(existing)
+      }
+    })
     fetchFeaturedPaddles()
   }, [])
 
@@ -116,12 +116,12 @@ export function HomeClient() {
                   </div>
                 )}
                 <div className="flex flex-col sm:flex-row gap-4 justify-center mt-6">
-                  <Button asChild size="lg" className="wg-button-coral">
-                    <Link href="/chat">Falar com o PickleIQ</Link>
-                  </Button>
-                  <Button asChild variant="outline" size="lg" className="wg-button-outline">
-                    <Link href="/catalog">Ver catalogo</Link>
-                  </Button>
+                  <Link href="/chat" className="inline-flex items-center justify-center rounded-lg font-medium h-9 px-2.5 gap-1.5 wg-button-coral">
+                    Falar com o PickleIQ
+                  </Link>
+                  <Link href="/catalog" className="inline-flex items-center justify-center rounded-lg font-medium h-9 px-2.5 gap-1.5 wg-button-outline border-border bg-background hover:bg-muted hover:text-foreground">
+                    Ver catalogo
+                  </Link>
                 </div>
               </div>
             ) : (
@@ -135,9 +135,9 @@ export function HomeClient() {
                 {recommendation && <RecommendationCard paddle={recommendation} />}
                 {quizComplete && (
                   <div className="mt-8">
-                    <Button asChild size="lg" className="wg-button-coral">
-                      <Link href="/chat">Ver recomendacoes no chat →</Link>
-                    </Button>
+                    <Link href="/chat" className="inline-flex items-center justify-center rounded-lg font-medium h-9 px-2.5 gap-1.5 wg-button-coral">
+                      Ver recomendacoes no chat →
+                    </Link>
                   </div>
                 )}
               </>

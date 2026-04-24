@@ -4,7 +4,6 @@
  */
 import { render, screen, waitFor } from '@testing-library/react'
 import { vi, describe, it, expect, beforeEach } from 'vitest'
-import userEvent from '@testing-library/user-event'
 
 // Mock getPriceHistory before importing the component
 vi.mock('@/lib/price-history', () => ({
