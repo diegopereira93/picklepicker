@@ -19,9 +19,18 @@ from app.routers.affiliate import router as affiliate_router
 from app.logging_config import configure_logging
 from app.middleware.alerts import alerter
 from app.db import get_pool, close_pool
+from pathlib import Path
 import structlog
 
 logger = structlog.get_logger()
+
+
+def _load_version() -> str:
+    """Read version from VERSION file at project root."""
+    version_file = Path(__file__).resolve().parent.parent.parent / "VERSION"
+    if version_file.exists():
+        return version_file.read_text().strip()
+    return "0.0.0-dev"
 
 
 # Initialize logging based on environment
@@ -41,11 +50,25 @@ async def lifespan(app: FastAPI):
     await close_pool()  # Close DB connection pool
 
 
-app = FastAPI(title="PickleIQ", version="0.1.0", lifespan=lifespan)
+app = FastAPI(title="PickleIQ", version=_load_version(), lifespan=lifespan)
+
+# CORS configuration with validation
+_cors_origins_raw = os.getenv("CORS_ORIGINS", "http://localhost:3000,https://pickleiq.com").split(",")
+_cors_origins = [origin.strip() for origin in _cors_origins_raw if origin.strip()]
+
+if "*" in _cors_origins:
+    logger.warning(
+        "cors_misconfiguration",
+        detail="Wildcard origin with credentials is insecure and rejected by browsers. "
+               "Set CORS_ORIGINS to specific domains."
+    )
+    _cors_origins = [o for o in _cors_origins if o != "*"]
+    if not _cors_origins:
+        _cors_origins = ["http://localhost:3000"]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.getenv("CORS_ORIGINS", "http://localhost:3000,https://pickleiq.com").split(","),
+    allow_origins=_cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
