@@ -250,5 +250,42 @@ async def re_embed_flagged_paddles(db_pool=None) -> dict:
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-    asyncio.run(batch_embed_paddles())
+    import argparse
+    import json
+    import sys
+
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    )
+
+    parser = argparse.ArgumentParser(
+        description="Batch embedding service for paddle embeddings"
+    )
+    parser.add_argument(
+        "--reembed",
+        action="store_true",
+        help="Re-embed paddles flagged with needs_reembed=true",
+    )
+    parser.add_argument(
+        "--batch-size",
+        type=int,
+        default=50,
+        help="Number of paddles to process per batch (default: 50)",
+    )
+    args = parser.parse_args()
+
+    async def _main():
+        if args.reembed:
+            result = await re_embed_flagged_paddles()
+        else:
+            result = await batch_embed_paddles(batch_size=args.batch_size)
+        return result
+
+    try:
+        result = asyncio.run(_main())
+        print(json.dumps(result))
+    except Exception as e:
+        logger.error(f"CLI failed: {e}", exc_info=True)
+        print(json.dumps({"status": "error", "message": str(e)}))
+        sys.exit(1)

@@ -1,0 +1,65 @@
+name: Re-embed Flagged Paddles
+
+on:
+  workflow_dispatch:
+    inputs:
+      batch_size:
+        description: "Number of paddles to process per batch"
+        required: false
+        default: 50
+        type: number
+
+jobs:
+  reembed:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ./pipeline
+          pip install -e ./backend
+
+      - name: Run re-embedding
+        id: reembed
+        run: |
+          echo "Re-embedding flagged paddles (batch_size=${{ github.event.inputs.batch_size || 50 }})..."
+          result=$(python -m pipeline.embeddings.batch_embedder --reembed --batch-size ${{ github.event.inputs.batch_size || 50 }})
+          echo "result=$result" >> $GITHUB_OUTPUT
+          echo "$result"
+
+      - name: Print summary
+        if: always()
+        run: |
+          result="${{ steps.reembed.outputs.result }}"
+          if [ -n "$result" ]; then
+            echo "Re-embedding result: $result"
+          else
+            echo "No result captured (step may have failed)"
+          fi
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          python3 -c "
+          import asyncio
+          import os
+          import sys
+          sys.path.insert(0, '.')
+          from pipeline.alerts.telegram import send_telegram_alert
+          msg = '🚨 Re-embed workflow FAILED. Check: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+          asyncio.run(send_telegram_alert(msg))
+          "

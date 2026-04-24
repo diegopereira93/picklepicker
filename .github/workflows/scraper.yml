@@ -71,6 +71,31 @@ jobs:
           asyncio.run(count_paddles())
           "
 
+      - name: Refresh latest_prices materialized view
+        if: always()
+        run: |
+          python3 -c "
+          import asyncio
+          import sys
+          sys.path.insert(0, '.')
+          from pipeline.db.connection import get_pool
+          from pipeline.alerts.telegram import send_telegram_alert
+
+          async def main():
+              try:
+                  pool = await get_pool()
+                  async with pool.acquire() as conn:
+                      await conn.execute('REFRESH MATERIALIZED VIEW CONCURRENTLY latest_prices')
+                  print('✅ latest_prices materialized view refreshed successfully')
+              except Exception as e:
+                  msg = f'🚨 Failed to refresh latest_prices MV: {e}\nCheck: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+                  print(msg)
+                  await send_telegram_alert(msg)
+                  sys.exit(1)
+
+          asyncio.run(main())
+          "
+
       - name: Check data freshness
         if: always()
         run: |
