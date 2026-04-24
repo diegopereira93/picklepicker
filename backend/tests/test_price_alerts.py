@@ -4,8 +4,19 @@ import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 from fastapi.testclient import TestClient
 from app.main import app
+from app.middleware.auth import ClerkAuthState, require_clerk_auth
 
-client = TestClient(app)
+_mock_auth = ClerkAuthState(clerk_id="user_test_123", email="test@example.com")
+
+
+@pytest.fixture(autouse=True)
+def override_auth():
+    app.dependency_overrides[require_clerk_auth] = lambda: _mock_auth
+    yield
+    app.dependency_overrides.pop(require_clerk_auth, None)
+
+
+client = TestClient(app, raise_server_exceptions=False)
 
 
 @pytest.fixture
@@ -26,7 +37,7 @@ def mock_price_alerts_db():
             return None
         return {
             "id": 1,
-            "user_id": 1,
+            "user_id": "user_test_123",
             "paddle_id": 1,
             "target_price_brl": 500.0,
             "is_active": True,
@@ -61,7 +72,7 @@ def test_create_price_alert__201(mock_price_alerts_db):
     mock_price_alerts_db(False)
 
     payload = {
-        "user_id": 1,
+        "user_id": "user_test_123",
         "paddle_id": 1,
         "target_price_brl": 500.0
     }
@@ -72,7 +83,7 @@ def test_create_price_alert__201(mock_price_alerts_db):
 def test_create_price_alert__missing_fields__422():
     """Test POST /price-alerts returns 422 for missing required fields."""
     payload = {
-        "user_id": 1
+        "user_id": "user_test_123"
     }
     response = client.post("/api/v1/price-alerts", json=payload)
     assert response.status_code == 422
@@ -83,7 +94,7 @@ def test_create_price_alert__duplicate__409(mock_price_alerts_db):
     mock_price_alerts_db(True)
 
     payload = {
-        "user_id": 1,
+        "user_id": "user_test_123",
         "paddle_id": 1,
         "target_price_brl": 500.0
     }
@@ -96,7 +107,7 @@ def test_create_price_alert__duplicate__409(mock_price_alerts_db):
 
 def test_list_price_alerts__200():
     """Test GET /price-alerts?user_id=X returns user's alerts."""
-    user_id = 1
+    user_id = "user_test_123"
     response = client.get(f"/api/v1/price-alerts?user_id={user_id}")
     assert response.status_code == 200
     data = response.json()

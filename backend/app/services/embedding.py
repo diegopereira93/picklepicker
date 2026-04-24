@@ -18,6 +18,16 @@ logger = structlog.get_logger()
 _local_model = None
 
 
+class EmbeddingUnavailableError(Exception):
+    """Raised when all embedding providers fail."""
+    def __init__(self, providers_tried: list[str]):
+        self.providers_tried = providers_tried
+        super().__init__(
+            f"All embedding providers failed: {', '.join(providers_tried)}. "
+            "Service temporarily unavailable."
+        )
+
+
 def _get_local_model():
     """Lazy load sentence-transformers model."""
     global _local_model
@@ -54,7 +64,7 @@ class EmbeddingManager:
         """Generate embedding using best available provider.
 
         Raises ValueError for empty text.
-        Raises RuntimeError only when ALL providers fail (zero vector is returned instead).
+        Raises EmbeddingUnavailableError when ALL providers fail.
         """
         if not text or not text.strip():
             raise ValueError("Texto vazio não pode ser processado")
@@ -97,9 +107,11 @@ class EmbeddingManager:
         except Exception as e:
             logger.error("huggingface_failed", error=str(e))
 
-        # Final fallback: zero vector
-        logger.warning("embedding_fallback_zero_vector")
-        return [0.0] * self.DIMENSIONS
+        providers_tried = ["gemini", "jina"]
+        if self._hf_key:
+            providers_tried.append("huggingface")
+        logger.error("embedding_all_providers_failed", providers=providers_tried)
+        raise EmbeddingUnavailableError(providers_tried)
 
     async def _get_embedding_jina_priority(self, text: str) -> List[float]:
         """Generate embedding with Jina priority (new default)."""
@@ -119,9 +131,11 @@ class EmbeddingManager:
         except Exception as e:
             logger.error("huggingface_failed", error=str(e))
 
-        # Final fallback: zero vector
-        logger.warning("embedding_fallback_zero_vector")
-        return [0.0] * self.DIMENSIONS
+        providers_tried = ["jina"]
+        if self._hf_key:
+            providers_tried.append("huggingface")
+        logger.error("embedding_all_providers_failed", providers=providers_tried)
+        raise EmbeddingUnavailableError(providers_tried)
 
     async def _try_gemini(self, text: str) -> List[float]:
         """Generate embedding via Gemini API (requires GEMINI_API_KEY)."""

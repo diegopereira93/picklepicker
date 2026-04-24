@@ -1,29 +1,28 @@
 """Price Alerts API endpoints."""
 
 import logging
-from fastapi import APIRouter, HTTPException, Query, status
+from fastapi import APIRouter, HTTPException, Query, status, Depends
 from psycopg.rows import dict_row
 from app.schemas import PriceAlertCreate, PriceAlertResponse
 from app.db import get_connection
+from app.middleware.auth import require_clerk_auth, ClerkAuthState
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/price-alerts", tags=["price-alerts"])
 
 
 @router.post("", response_model=PriceAlertResponse, status_code=status.HTTP_201_CREATED)
-async def create_price_alert(alert: PriceAlertCreate):
-    """Create a new price alert.
-
-    Checks for duplicate alerts (same user_id + paddle_id with is_active=true)
-    and returns 409 Conflict if one exists.
-    """
+async def create_price_alert(
+    alert: PriceAlertCreate,
+    auth: ClerkAuthState = Depends(require_clerk_auth),
+):
     async with get_connection() as conn:
         async with conn.cursor(row_factory=dict_row) as cur:
             duplicate_check = """
                 SELECT id FROM price_alerts
                 WHERE user_id = %s AND paddle_id = %s AND is_active = TRUE
             """
-            await cur.execute(duplicate_check, [alert.user_id, alert.paddle_id])
+            await cur.execute(duplicate_check, [auth.clerk_id, alert.paddle_id])
             existing = await cur.fetchone()
 
             if existing:
@@ -39,7 +38,7 @@ async def create_price_alert(alert: PriceAlertCreate):
             """
             await cur.execute(
                 insert_query,
-                [alert.user_id, alert.paddle_id, alert.target_price_brl]
+                [auth.clerk_id, alert.paddle_id, alert.target_price_brl]
             )
             result = await cur.fetchone()
 
@@ -53,8 +52,7 @@ async def create_price_alert(alert: PriceAlertCreate):
 
 
 @router.get("", response_model=list[PriceAlertResponse], status_code=status.HTTP_200_OK)
-async def list_price_alerts(user_id: int = Query(..., description="Filter by user ID")):
-    """List all price alerts for a specific user."""
+async def list_price_alerts(user_id: str = Query(..., description="Filter by user ID")):
     async with get_connection() as conn:
         async with conn.cursor(row_factory=dict_row) as cur:
             query = """

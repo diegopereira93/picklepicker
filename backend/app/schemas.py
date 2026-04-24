@@ -100,7 +100,7 @@ class SimilarPaddlesResponse(BaseModel):
 
 class PriceAlertCreate(BaseModel):
     """Request body for creating a price alert."""
-    user_id: int
+    user_id: str
     paddle_id: int
     target_price_brl: float
 
@@ -110,7 +110,7 @@ class PriceAlertCreate(BaseModel):
 class PriceAlertResponse(BaseModel):
     """Response for a price alert."""
     id: int
-    user_id: int
+    user_id: str
     paddle_id: int
     target_price_brl: float
     is_active: bool
