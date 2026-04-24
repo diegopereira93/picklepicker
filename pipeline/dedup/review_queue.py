@@ -41,9 +41,9 @@ async def add_to_review_queue(
         result = await conn.execute(
             """
             INSERT INTO review_queue
-                (type, paddle_id, related_paddle_id, data, status, created_at)
+                (type, paddle_id, related_paddle_id, data, status, review_status, created_at)
             VALUES
-                (%(type)s, %(paddle_id)s, %(related_paddle_id)s, %(data)s, 'pending', NOW())
+                (%(type)s, %(paddle_id)s, %(related_paddle_id)s, %(data)s, 'pending', 'pending', NOW())
             RETURNING id
             """,
             {
@@ -85,7 +85,7 @@ async def get_review_queue_items(
         if queue_type:
             result = await conn.execute(
                 """
-                SELECT id, type, paddle_id, related_paddle_id, data, status, created_at
+                SELECT id, type, paddle_id, related_paddle_id, data, status, review_status, created_at
                 FROM review_queue
                 WHERE type = %(type)s AND status = %(status)s
                 ORDER BY created_at DESC
@@ -101,7 +101,7 @@ async def get_review_queue_items(
         else:
             result = await conn.execute(
                 """
-                SELECT id, type, paddle_id, related_paddle_id, data, status, created_at
+                SELECT id, type, paddle_id, related_paddle_id, data, status, review_status, created_at
                 FROM review_queue
                 WHERE status = %(status)s
                 ORDER BY created_at DESC
@@ -124,7 +124,8 @@ async def get_review_queue_items(
             "related_paddle_id": row[3],
             "data": json.loads(row[4]) if row[4] else {},
             "status": row[5],
-            "created_at": row[6].isoformat() if row[6] else None,
+            "review_status": row[6],
+            "created_at": row[7].isoformat() if row[7] else None,
         })
 
     return items

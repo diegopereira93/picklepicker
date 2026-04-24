@@ -37,7 +37,7 @@ CREATE TABLE retailers (
     name             TEXT NOT NULL,
     base_url         TEXT NOT NULL,
     integration_type TEXT NOT NULL CHECK (integration_type IN ('firecrawl', 'ml_api', 'pa_api', 'shopify_json')),
-    is_active        BOOLEAN DEFAULT TRUE
+    is_active        BOOLEAN DEFAULT TRUE  -- controle de ativação do varejista; FALSE = crawler ignora
 );
 
 -- ============================================================
@@ -106,6 +106,7 @@ CREATE TABLE review_queue (
     related_paddle_id BIGINT REFERENCES paddles(id),
     data              JSONB,
     status            TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'resolved', 'dismissed')),
+    review_status     TEXT DEFAULT 'pending' CHECK (review_status IN ('pending', 'auto_approved', 'manually_reviewed')),
     resolved_at       TIMESTAMPTZ,
     resolved_by       TEXT,
     created_at        TIMESTAMPTZ DEFAULT NOW()
