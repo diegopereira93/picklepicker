@@ -2,6 +2,78 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.7.0] - 2026-04-24
+
+### Changed
+- **Build quality gates active** — `next build` and `next lint` pass with zero errors
+- **Test suite hardened** — 208/212 backend, 170/170 frontend, 146+ pipeline tests passing
+- **23 Next.js pages generated without errors**
+
+### Fixed
+- TypeScript strict mode errors resolved across all frontend modules
+- ESLint errors cleared (0 errors, 0 warnings)
+- Pre-existing test failures documented and categorized
+
+---
+
+## [2.6.0] - 2026-04-22
+
+### Added
+- **Pipeline reliability** — Auto-refresh `latest_prices` materialized view after every crawler run
+- **Reembed worker** — Processes `needs_reembed` flag via GitHub Actions workflow (`reembed.yml`)
+- **Migration system** — Numbered SQL migrations with `schema_migrations` tracking table and `run_migrations.py`
+- **BaseCrawler** — Abstract base class for pipeline crawlers with shared retry/dedup/insert logic
+- **Retailer expansion foundation** — `retailers.is_active` column, review queue status tracking
+- **Security hardening** — CSP headers, HSTS, restricted image domains, consolidated scraper workflow
+
+### Changed
+- **Review queue** — Added `review_status` column (pending/auto-approved/manually-reviewed)
+- **Crawler architecture** — All 3 crawlers refactored to extend BaseCrawler
+
+---
+
+## [2.5.0] - 2026-04-20
+
+### Added
+- **Production Redis cache** — Caching layer with configurable TTL
+- **Clerk JWT auth middleware** — Token validation for protected endpoints
+- **Auth middleware tests** — 140 new tests for authentication edge cases
+
+### Changed
+- **RAG pipeline reliability** — Embedding error handling, eval gate quality metrics, structlog logging
+- **Backend hygiene** — Dev deps separated, version read from VERSION file, CORS validation
+- **Embedding service** — Robust error handling with fallback support
+
+---
+
+## [2.4.0] - 2026-04-16
+
+### Fixed
+- **Broken Gift page** — Fixed rendering and navigation issues
+- **Quiz results page** — Fixed profile storage mismatch
+- **HTML lang attribute** — Corrected from `en` to `pt-BR`
+
+### Added
+- **Catalog text search** — Full-text search across paddle names and brands
+- **Chat without quiz** — Users can chat without completing quiz first
+- **Filter result count** — Shows number of matching results
+- **Catalog pagination** — Paginated product listing
+- **Gift & Blog in navigation** — Added to header/nav
+- **Landing page visual overhaul** — Redesigned hero, stats, feature steps sections
+- **SEO fundamentals** — Meta tags, sitemap, structured data
+- **Expanded footer** — Links, branding, legal info
+- **Compare 3-4 paddles** — Extended comparison from 2 to 4 paddles
+- **Breadcrumbs** — Navigation breadcrumbs on catalog/detail pages
+- **Error boundaries** — Custom error and not-found pages
+- **Skip-to-content link** — Accessibility skip link
+
+### Changed
+- **DESIGN.md** — Updated to match implementation
+- **Price alerts frontend** — Completed frontend flow
+- **Button text** — Fixed English text to PT-BR
+
+---
+
 ## [2.3.0] - 2026-04-19
 
 ### Changed
