@@ -145,6 +145,30 @@ class RAGAgent:
                 profile.in_stock_only,
             )
 
+            # Fallback: if strict budget/stock filters returned nothing, relax them
+            if not paddles and similar_ids:
+                relaxed_budget = profile.budget_max_brl * 1.2
+                logger.info(
+                    "RAG fallback: zero results with strict filters, "
+                    "retrying with budget +20%% (%.0f → %.0f)",
+                    profile.budget_max_brl,
+                    relaxed_budget,
+                )
+                paddles = await self._get_paddle_details(
+                    similar_ids,
+                    relaxed_budget,
+                    in_stock_only=False,
+                )
+
+            # Final fallback: price-based search if semantic search yielded nothing
+            if not paddles:
+                logger.info("RAG fallback: semantic search empty, falling back to price-based")
+                return await self.get_top_by_price(
+                    budget_max_brl=profile.budget_max_brl * 1.2,
+                    limit=limit,
+                    in_stock_only=False,
+                )
+
             recommendations = []
             for paddle in paddles[:limit]:
                 recommendation = RecommendationResult(
@@ -176,24 +200,25 @@ class RAGAgent:
         ]
 
         recommendations = []
-        for paddle in mock_paddles[:limit]:
+        for paddle in mock_paddles:
             if profile.in_stock_only and not paddle["in_stock"]:
                 continue
             if paddle["price"] > profile.budget_max_brl:
                 continue
 
-            recommendation = RecommendationResult(
-                paddle_id=paddle["id"],
-                name=paddle["name"],
-                brand=paddle["brand"],
-                reasoning=f"Recommended for {profile.skill_level} players.",
-                price_min_brl=paddle["price"],
-                affiliate_url=paddle["affiliate_url"],
-                similarity_score=paddle["similarity"],
+            recommendations.append(
+                RecommendationResult(
+                    paddle_id=paddle["id"],
+                    name=paddle["name"],
+                    brand=paddle["brand"],
+                    reasoning=f"Recommended for {profile.skill_level} players.",
+                    price_min_brl=paddle["price"],
+                    affiliate_url=paddle["affiliate_url"],
+                    similarity_score=paddle["similarity"],
+                )
             )
-            recommendations.append(recommendation)
 
-        return recommendations
+        return recommendations[:limit]
 
     async def get_top_by_price(
         self,

@@ -4,7 +4,7 @@ import asyncio
 import json
 import os
 import time
-from typing import Optional
+from typing import ClassVar, Optional
 
 import structlog
 from groq import AsyncGroq
@@ -21,6 +21,13 @@ groq_client = None
 
 router = APIRouter()
 
+_SKILL_LEVEL_MAP = {
+    "beginner": "beginner",
+    "intermediate": "intermediate",
+    "advanced": "advanced",
+    "competitive": "advanced",
+}
+
 
 class ChatRequest(BaseModel):
     """Chat request with user profile."""
@@ -33,11 +40,12 @@ class ChatRequest(BaseModel):
     @field_validator("skill_level")
     @classmethod
     def validate_skill_level(cls, v: str) -> str:
-        """Validate skill_level is one of allowed values."""
-        allowed = ["beginner", "intermediate", "advanced"]
-        if v.lower() not in allowed:
+        """Normalize skill_level (maps competitive → advanced)."""
+        normalized = _SKILL_LEVEL_MAP.get(v.lower())
+        if normalized is None:
+            allowed = list(_SKILL_LEVEL_MAP.keys())
             raise ValueError(f"skill_level must be one of {allowed}")
-        return v.lower()
+        return normalized
 
     @field_validator("budget_brl")
     @classmethod
