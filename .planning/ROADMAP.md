@@ -20,7 +20,7 @@ Full Playwright E2E analysis found 2 site-breaking + 4 high-priority issues. All
 
 | Phase | Goal | Status |
 |-------|------|--------|
-| 40 | Critical Frontend Fixes (Clerk + Docker) | 📋 Pending |
+| 40 | Critical Frontend Fixes (Clerk + Docker) | ○ Planned |
 | 41 | API & Route Fixes (Slugs + Similar + Auth + Routes) | 📋 Pending |
 | 42 | Data Quality & E2E Verification | 📋 Pending |
 
@@ -57,6 +57,12 @@ Full Playwright E2E analysis found 2 site-breaking + 4 high-priority issues. All
 2. Chat proxy returns 200 with SSE stream (not 503)
 3. Zero `@clerk/nextjs: useAuth can only be used within ClerkProvider` errors
 4. Docker Compose `make dev` produces a fully functional site
+
+**Plans:** 2 plans (Wave 1 — all parallel)
+
+Plans:
+- [ ] 40-01-PLAN.md — Fix ClerkAuthButtons Rules of Hooks violation + tests (E2E-CR1)
+- [ ] 40-02-PLAN.md — Verify Docker networking + chat proxy env var tests (E2E-CR2)
 
 ---
 
