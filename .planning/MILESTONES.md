@@ -73,3 +73,22 @@
 **Stats:** 98 files changed (cumulative v2.4-v2.7 merge), +6,251/-896 LOC
 
 ---
+
+## v2.8.0 E2E Critical Fixes (Planning: 2026-04-25)
+
+**Source:** Playwright E2E Analysis — full browser automation of 15 routes + 17 API endpoints
+
+**Issues found:** 2 critical (site-breaking), 4 high, 1 medium, 2 low
+
+**Key findings:**
+- 🔴 ALL 15 pages render EMPTY — ClerkAuthButtons crashes without ClerkProvider
+- 🔴 Chat proxy returns 503 — Docker networking broken (frontend can't reach backend)
+- 🟠 Similar Paddles always 404, Paddle slugs null, Admin unauthenticated, Price history route mismatch
+
+| Phase | Goal | Status |
+|-------|------|--------|
+| 40 | Critical Frontend Fixes (Clerk + Docker) | 📋 Pending |
+| 41 | API & Route Fixes (Slugs + Similar + Auth + Routes) | 📋 Pending |
+| 42 | Data Quality & E2E Verification | 📋 Pending |
+
+---

@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import { Paddle } from '@/types/paddle'
 
-const FASTAPI_URL = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
+const FASTAPI_URL = process.env.FASTAPI_INTERNAL_URL || process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000'
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://pickleiq.com'
 
 export async function fetchProductData(brand: string, modelSlug: string): Promise<Paddle | null> {

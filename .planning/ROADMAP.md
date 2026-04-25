@@ -9,18 +9,107 @@
 - ✅ **v2.5.0** — Backend Hardening & RAG Reliability (Phases 32-34) — shipped 2026-04-24
 - ✅ **v2.6.0** — Pipeline & Infra Hardening (Phases 35-37) — shipped 2026-04-24
 - ✅ **v2.7.0** — Build & Test Quality (Phases 38-39) — shipped 2026-04-24
+- 📋 **v2.8.0** — E2E Critical Fixes (Phases 40-42) — **CURRENT**
 - 📋 **v1.5.0** — Production Infrastructure (Phase 15) — deferred
 
 ## Current Focus
 
-**v2.7.0 — Build & Test Quality ✅ COMPLETE (2026-04-24)**
+**v2.8.0 — E2E Critical Fixes 📋 PLANNING (2026-04-25)**
 
-Build quality gates active. `next build` and `next lint` pass with zero errors.
+Full Playwright E2E analysis found 2 site-breaking + 4 high-priority issues. All pages render EMPTY due to Clerk crash.
 
 | Phase | Goal | Status |
 |-------|------|--------|
-| 38 | Build Quality Gates | ✅ Complete |
-| 39 | Test Suite Hardening | ✅ Complete |
+| 40 | Critical Frontend Fixes (Clerk + Docker) | 📋 Pending |
+| 41 | API & Route Fixes (Slugs + Similar + Auth + Routes) | 📋 Pending |
+| 42 | Data Quality & E2E Verification | 📋 Pending |
+
+---
+
+## Milestone v2.8.0 — E2E Critical Fixes
+
+*Created: 2026-04-25*
+*Source: Playwright E2E Analysis — 15 frontend routes + 17 backend API endpoints tested*
+*Goal: Restore full site functionality. All 15 routes must render content, all user flows must work end-to-end.*
+
+**Requirements:** See `.planning/REQUIREMENTS.md` (E2E-CR1, E2E-CR2, E2E-H1–H4, E2E-M1, E2E-L1–L2)
+
+### Phase 40: Critical Frontend Fixes (Clerk + Docker Networking)
+
+**Goal:** Fix the two issues that make the entire site non-functional.
+
+**Root causes:**
+1. `ClerkWrapper` renders `<>{children}</>` without `ClerkProvider` when `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` is absent. `ClerkAuthButtons` calls `useAuth()` outside provider → throws → `NotFoundErrorBoundary` catches → page body = EMPTY.
+2. Frontend Docker container uses `FASTAPI_URL=http://localhost:8000` (container's own loopback), not `http://backend:8000` (Docker service name). Chat proxy returns 503.
+
+**Tasks:**
+
+| Task | File(s) | Description |
+|------|---------|-------------|
+| 40.1 | `frontend/src/components/layout/clerk-available-provider.tsx`, `frontend/src/components/layout/clerk-auth-buttons.tsx` | Create a `useClerkAvailable()` hook that checks if ClerkProvider is active. Make `ClerkAuthButtons` and `MobileClerkAuth` return `null` when Clerk is unavailable. No `useAuth()` call outside provider. |
+| 40.2 | `frontend/src/components/clerk-provider.tsx` | Verify `ClerkWrapper` properly signals availability to children (context or global flag). |
+| 40.3 | `docker-compose.yml` | Set `FASTAPI_URL=http://backend:8000` for frontend service. Verify `NEXT_PUBLIC_FASTAPI_URL` for client-side calls (may need to remain `http://localhost:8000` for browser access). |
+| 40.4 | `frontend/src/app/api/chat/route.ts` | Verify `FASTAPI_URL` env var is read correctly from Docker env. Add fallback logic for Docker vs local dev. |
+| 40.5 | All pages | Manual E2E: all 15 routes render content. Chat proxy returns 200. Zero `pageerror` events. |
+
+**Success criteria:**
+1. All 15 frontend routes render content (body text length > 0) after 3s
+2. Chat proxy returns 200 with SSE stream (not 503)
+3. Zero `@clerk/nextjs: useAuth can only be used within ClerkProvider` errors
+4. Docker Compose `make dev` produces a fully functional site
+
+---
+
+### Phase 41: API & Route Fixes
+
+**Goal:** Fix paddle slugs, similar paddles, admin auth, and price history route mismatch.
+
+**Root causes:**
+1. Most paddles have `model_slug: null` — detail route `/paddles/[brand]/[model-slug]` fails.
+2. Similar paddles endpoint finds no matches — returns 404 instead of 200 + empty array.
+3. Admin endpoints have no auth dependency despite docstring claims.
+4. Frontend calls wrong path for price history data.
+
+**Tasks:**
+
+| Task | File(s) | Description |
+|------|---------|-------------|
+| 41.1 | `scripts/` or SQL migration | Generate `model_slug` for all paddles: `LOWER(REPLACE(REPLACE(REPLACE(name, ' ', '-'), '--', '-'), '"', ''))`. Update all rows where `model_slug IS NULL`. |
+| 41.2 | `backend/app/api/paddles.py` | Change similar paddles endpoint: return 200 + `[]` when no matches found (not 404). Add `min_similarity` parameter (default 0.5, lower than current threshold). |
+| 41.3 | `backend/app/api/admin.py` | Add `Depends(require_admin)` dependency to all admin endpoints. Extract `require_admin` function from existing pattern in other modules. |
+| 41.4 | `frontend/src/components/price-history-chart.tsx` (or relevant file) | Fix price history API call to use correct backend route `GET /paddles/{id}/price-history`. |
+| 41.5 | `backend/tests/` | Add tests: (a) similar paddles returns 200 + `[]` for paddle with no matches, (b) admin endpoints return 401 without auth, (c) price history route works. |
+
+**Success criteria:**
+1. `GET /api/v1/paddles/{id}/similar` returns 200 (not 404) for all paddles
+2. Paddle detail pages resolve via brand + slug (not 404)
+3. Admin endpoints return 401 without `Authorization: Bearer` header
+4. Price history chart loads real data on paddle detail page
+5. All existing tests pass
+
+---
+
+### Phase 42: Data Quality & E2E Verification
+
+**Goal:** Fix remaining low-priority issues and run comprehensive E2E verification to prove everything works.
+
+**Tasks:**
+
+| Task | File(s) | Description |
+|------|---------|-------------|
+| 42.1 | `frontend/src/app/blog/pillar-page/page.tsx` | Update blog title from "2025" to "2026". |
+| 42.2 | `frontend/.env` or `docker-compose.yml` | Ensure all env vars documented. Verify `frontend/.env.example` matches actual needs. |
+| 42.3 | Docker Compose | Run full E2E Playwright test suite against `make dev`. All 15 routes must render. All user flows must complete. |
+| 42.4 | Backend | Run full API smoke test: health, paddles, chat, similar, price-history, admin auth. |
+| 42.5 | Tests | Run full test suites: backend (pytest), frontend (vitest), pipeline (pytest). No regressions. |
+
+**Success criteria:**
+1. E2E smoke test passes for all 15 routes (see REQUIREMENTS.md verification table)
+2. Backend API smoke test passes for all critical endpoints
+3. Chat flow works end-to-end: type message → receive SSE response
+4. Quiz flow works: step 1 → step 7 → results
+5. All existing test suites pass (170 frontend, 208+ backend)
+6. Blog title updated to 2026
 
 ---
 

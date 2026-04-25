@@ -300,12 +300,12 @@ async def get_paddle_latest_prices(paddle_id: int):
 
 
 @router.get("/{paddle_id}/similar", response_model=SimilarPaddlesResponse, status_code=status.HTTP_200_OK)
-async def get_similar_paddles(paddle_id: int, limit: int = Query(5, ge=1, le=10)):
-    similar_ids = await _get_similar_paddle_ids(paddle_id, top_k=limit)
+async def get_similar_paddles(paddle_id: int, limit: int = Query(5, ge=1, le=10), min_similarity: float = Query(0.5, ge=0.0, le=1.0)):
+    similar_ids = await _get_similar_paddle_ids(paddle_id, top_k=limit, threshold=min_similarity)
     similar_ids = [id for id in similar_ids if id != paddle_id]
 
     if not similar_ids:
-        raise HTTPException(status_code=404, detail="No similar paddles found")
+        return SimilarPaddlesResponse(similar_paddles=[], query_paddle_id=paddle_id, limit=limit)
 
     paddle_details = await _get_paddle_details(similar_ids)
     items = [

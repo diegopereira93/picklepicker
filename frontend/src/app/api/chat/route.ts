@@ -4,7 +4,7 @@ export const maxDuration = 30
 import { createUIMessageStream, createUIMessageStreamResponse } from 'ai'
 import type { ChatRequest } from '@/types/paddle'
 
-const FASTAPI_URL = process.env.FASTAPI_URL ?? 'http://localhost:8000'
+const FASTAPI_URL = process.env.FASTAPI_INTERNAL_URL || process.env.FASTAPI_URL || 'http://localhost:8000'
 
 export async function POST(request: Request) {
   let body: {

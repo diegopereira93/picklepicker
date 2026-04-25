@@ -1,256 +1,163 @@
-# Requirements: v2.4.0 — Site Quality & UX Polish
+# Requirements: v2.8.0 — E2E Critical Fixes
 
-*Created: 2026-04-20*
-*Source: SITE-INSPECTION-REPORT.md — Full-stack inspection of localhost:3000*
+*Created: 2026-04-25*
+*Source: Playwright E2E Analysis — 15 frontend routes + 17 backend API endpoints*
 
 ## Overview
 
-Comprehensive site quality milestone addressing 27 issues identified during full inspection. Fixes critical bugs (broken pages), closes UX gaps (no search, forced quiz flow), improves conversion (landing page, SEO), and polishes remaining rough edges.
+Critical fixes discovered during full Playwright E2E analysis of the Docker Compose environment. Two site-breaking issues render the entire frontend non-functional, plus four high-priority feature fixes.
 
-**Goal:** Transform the site from "functional beta" to "polished, trustworthy product" ready for organic traffic growth.
+**Goal:** Restore full site functionality in Docker Compose. All 15 frontend routes must render content. All user flows (catalog, quiz, chat, compare) must work end-to-end.
 
 ---
 
-## Functional Requirements
+## Critical Requirements
 
-### FR-01: Fix Broken Gift & Quiz Results Pages
+### E2E-CR1: Fix ClerkAuthButtons Crash (ALL pages empty)
 **Priority:** P0 (Critical)
-**Source:** SITE-INSPECTION C1
+**Source:** E2E-1
 
-Gift page (`/gift`) and Quiz Results (`/quiz/results`) use legacy CSS classes (`wg-button-coral`, `wg-button-ghost`, `wg-recommendation-card`, `wg-animate-fade-up`) that don't exist in the current Tailwind config. Pages render with no button styling, no card styling, broken layout.
+`ClerkWrapper` skips `ClerkProvider` when `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` is missing, but `ClerkAuthButtons` calls `useAuth()` outside `ClerkProvider`, throwing `"@clerk/nextjs: useAuth can only be used within the <ClerkProvider /> component"`. Error propagates to `NotFoundErrorBoundary`, rendering all 15 pages with empty body.
+
+**Root cause chain:**
+```
+No Clerk key → ClerkWrapper renders <>{children}</> without ClerkProvider
+  → ClerkAuthButtons calls useAuth() outside provider
+  → Error thrown → NotFoundErrorBoundary catches → page body = EMPTY
+```
 
 **Acceptance:**
-- Gift page renders with current design system (dark theme, brand colors)
-- Quiz results page renders with current design system
-- All `wg-*` classes replaced with Tailwind/shadcn equivalents
-- Gift page uses `bg-base`/`bg-surface` instead of `var(--warm-white)`
+- All 15 frontend routes render content when Clerk keys are absent
+- `ClerkAuthButtons` gracefully degrades (no auth buttons shown, no crash)
+- No `useAuth()` call outside `ClerkProvider`
+- No `pageerror` events on any route
+- `document.body.innerText.length > 0` on all pages after hydration
 
-### FR-02: Fix HTML Language Attribute
+### E2E-CR2: Fix Docker Networking (Chat returns 503)
 **Priority:** P0 (Critical)
-**Source:** SITE-INSPECTION C2
+**Source:** E2E-2
 
-`<html lang="en">` but all content is PT-BR. Screen readers mispronounce, SEO wrong locale, browsers auto-translate incorrectly.
-
-**Acceptance:**
-- `<html lang="pt-BR">` in root layout
-- All metadata descriptions in Portuguese
-- `hreflang` consideration for future i18n
-
-### FR-03: Fix Quiz Profile Storage Mismatch
-**Priority:** P0 (Critical)
-**Source:** SITE-INSPECTION C3
-
-Quiz page saves to `@/lib/quiz-profile` but Results page reads from `@/lib/profile`. Different modules → potential infinite redirect or empty results.
+Frontend Docker container uses `FASTAPI_URL=http://localhost:8000` which points to the container's own loopback, not the backend container. Chat proxy returns `{"error":"FastAPI unreachable"}` with 503 status.
 
 **Acceptance:**
-- Single source of truth for quiz profile (one module)
-- Quiz saves → Results reads from same storage
-- No redirect loops
-
-### FR-04: Catalog Text Search
-**Priority:** P1
-**Source:** SITE-INSPECTION H1
-
-No way to search for paddle names or brands by text. Only brand/price filters exist.
-
-**Acceptance:**
-- Search input in catalog header
-- Filters by `name` and `brand` (client-side, data already loaded)
-- Optional: backend `?search=` param for server-side filtering
-- Clear button to reset search
-- URL sync: `?q=selkirk`
-
-### FR-05: Allow Chat Without Quiz
-**Priority:** P1
-**Source:** SITE-INSPECTION H12
-
-Chat requires completed quiz profile. New users who just want to ask "which paddle for beginners?" must complete 7-step quiz first.
-
-**Acceptance:**
-- Chat accessible without quiz
-- Generic "all-purpose" profile used when no quiz completed
-- Suggestion card: "Complete o quiz para recomendações personalizadas"
-- No redirect to quiz
-
-### FR-06: Filter Result Count
-**Priority:** P1
-**Source:** SITE-INSPECTION H11
-
-No indication of how many results match current filters.
-
-**Acceptance:**
-- "Mostrando X de Y raquetes" header above grid
-- Updates dynamically with filter changes
-
-### FR-07: Catalog Pagination
-**Priority:** P1
-**Source:** SITE-INSPECTION H9
-
-Loads all 200 products at once (`limit: 200`). No pagination, infinite scroll, or "load more".
-
-**Acceptance:**
-- 24 products per page
-- Page-based pagination with URL sync (`?page=2`)
-- Previous/Next navigation
-- Total count visible
-
-### FR-08: Add Gift & Blog to Navigation
-**Priority:** P1
-**Source:** SITE-INSPECTION H5
-
-Gift finder and Blog pillar page exist but aren't in header navigation.
-
-**Acceptance:**
-- "Presente" link in header nav
-- "Blog" link in header nav
-- Both visible on desktop and mobile nav
-
-### FR-09: Landing Page Visual Overhaul
-**Priority:** P1
-**Source:** SITE-INSPECTION H3
-
-Landing page is visually flat: all sections same dark background, no scroll animations, fake stats, ALL CAPS buttons, no social proof, no product images.
-
-**Acceptance:**
-- Section background alternation (base/surface/elevated)
-- Scroll-triggered fade-in animations (IntersectionObserver, staggered delays)
-- Real stats from API (paddle count from `/api/v1/paddles`)
-- Sentence-case buttons (not ALL CAPS)
-- At least one testimonial or trust signal section
-- Hero section with pickleball imagery
-
-### FR-10: SEO Fundamentals
-**Priority:** P1
-**Source:** SITE-INSPECTION H6
-
-Missing JSON-LD, OG images, sitemap, robots.txt, canonical URLs.
-
-**Acceptance:**
-- JSON-LD Product schema on product detail pages
-- JSON-LD Organization schema on homepage
-- OG images (use `next/og` ImageResponse API or static images)
-- `app/sitemap.ts` with all routes
-- `app/robots.ts`
-- `<link rel="canonical">` on all pages
-
-### FR-11: Expand Footer
-**Priority:** P1
-**Source:** SITE-INSPECTION H8
-
-Footer has only 3 links, no social media, no blog, no contact info.
-
-**Acceptance:**
-- 4 columns: Product, Content, Legal, Social
-- Links to: Quiz, Catalog, Compare, Gift, Blog, Privacy
-- Social media links (Instagram, YouTube placeholder)
-- Affiliate disclosure retained
-
-### FR-12: Update DESIGN.md to Match Implementation
-**Priority:** P1
-**Source:** SITE-INSPECTION H7
-
-DESIGN.md says "light-first" but app is all dark. Says "Inter" but uses Source Sans 3. Says "Sentence case" but buttons are ALL CAPS.
-
-**Acceptance:**
-- DESIGN.md reflects current dark-theme implementation
-- Font references match (Bebas Neue, Source Sans 3, JetBrains Mono)
-- Color palette matches Tailwind config
-- Component specs match actual implementation
-- Remove references to "warm-white" and "light-first"
-
-### FR-13: Complete Price Alerts Frontend Flow
-**Priority:** P1
-**Source:** SITE-INSPECTION H10
-
-Price alerts backend exists, Bell icon exists, modal component exists, but flow appears disconnected.
-
-**Acceptance:**
-- Bell icon on product cards opens price alert modal
-- Modal creates alert via `POST /api/v1/price-alerts`
-- Success/error feedback via toast
-- User can see active alerts (in profile or dedicated page)
-
-### FR-14: Fix English Button Text
-**Priority:** P1
-**Source:** SITE-INSPECTION H4
-
-"Details" button on product cards is English. Everything else is Portuguese.
-
-**Acceptance:**
-- "Details" → "Detalhes"
-- Scan all components for remaining English text
-
-### FR-15: Allow 3-4 Paddle Comparison
-**Priority:** P2
-**Source:** SITE-INSPECTION H2
-
-Compare limited to 2 paddles. Market standard is 3-4.
-
-**Acceptance:**
-- Allow up to 4 paddles in comparison
-- Responsive layout: 2-col mobile, 3-col tablet, 4-col desktop
-- CompareRow supports N columns
-- URL sync: `?a=1&b=2&c=3`
+- Frontend container can reach backend via Docker service name (`http://backend:8000`)
+- Chat proxy returns 200 with SSE stream
+- `NEXT_PUBLIC_FASTAPI_URL` still works for client-side API calls
+- Both `FASTAPI_URL` (server-side) and `NEXT_PUBLIC_FASTAPI_URL` (client-side) configured correctly
 
 ---
 
-## Non-Functional Requirements
+## High Requirements
 
-### NFR-01: Design System Compliance
-All changes must follow DESIGN.md (after it's updated per FR-12). No `wg-*` legacy classes. No hardcoded colors outside Tailwind tokens.
+### E2E-H1: Fix Similar Paddles Endpoint (returns 404)
+**Priority:** P1 (High)
+**Source:** E2E-3
 
-### NFR-02: Test Coverage
-No regressions in existing tests:
-- Frontend: 179/179 Vitest
-- Backend: 196+/198 pytest
-- E2E: 23/23 Playwright
+`GET /api/v1/paddles/{id}/similar` returns `{"detail":"No similar paddles found"}` for all paddles. Only 2 of ~60 paddles have `face_material` specs. Vector similarity search finds no matches.
 
-New tests for:
-- Catalog search functionality
-- Chat without quiz flow
-- Pagination
+**Acceptance:**
+- Similar paddles returns 200 with results for paddles that have embeddings
+- Returns empty array (not 404) when no similar paddles found
+- At least 50% of paddles have usable embeddings after fix
 
-### NFR-03: Performance
-- Lighthouse Performance ≥ 85
-- No increase in bundle size > 10KB
-- Catalog page loads first 24 products in < 2s
+### E2E-H2: Fix Paddle Detail Pages (model_slug null)
+**Priority:** P1 (High)
+**Source:** E2E-4
 
-### NFR-04: Accessibility
-- `lang="pt-BR"` on all pages
-- Skip-to-content link in root layout
-- ARIA labels on interactive elements
-- `prefers-reduced-motion` respected
+Most paddles have `model_slug: null` in the database. Route `/paddles/[brand]/[model-slug]` fails because no slug exists. `/paddles/3rdshot/3rdshot-oberon-mini` returns 404.
 
-### NFR-05: Locale
-All user-facing text in PT-BR. No English strings in UI.
+**Acceptance:**
+- All paddles have a non-null `model_slug` generated from name
+- Paddle detail pages resolve correctly via brand + slug
+- Existing URL patterns continue to work
+
+### E2E-H3: Fix Admin API Authentication
+**Priority:** P1 (High)
+**Source:** E2E-5
+
+Admin endpoints (`/admin/queue/*`, `/admin/paddles/*`) docstrings claim "Protected by Authorization: Bearer {ADMIN_SECRET}" but no `Depends()` auth guard exists.
+
+**Acceptance:**
+- Admin endpoints require `Authorization: Bearer {ADMIN_SECRET}` header
+- Unauthenticated requests return 401
+- Health and public endpoints remain unprotected
+
+### E2E-H4: Fix Price History Route Mismatch
+**Priority:** P1 (High)
+**Source:** E2E-6
+
+Backend registers price history at `GET /paddles/{id}/price-history` but frontend expects `/api/v1/admin/price-history/{id}`. Price charts won't load data.
+
+**Acceptance:**
+- Frontend calls the correct backend route for price history
+- Price history charts render with real data on paddle detail pages
 
 ---
 
-## Out of Scope
+## Medium Requirements
 
-- Production infrastructure (T1 — deferred)
-- Legal/compliance (T3 — deferred)
-- Performance load testing (T5 — deferred)
-- Backend architecture changes
-- New backend endpoints (unless needed for search)
-- Mobile app / PWA
-- Internationalization (i18n)
-- Payment integration
-- Admin dashboard improvements
+### E2E-M1: Fix React setState-During-Render Warning
+**Priority:** P2 (Medium)
+**Source:** E2E-7
+
+`ClerkAuthButtons` triggers `Cannot update a component while rendering a different component` warning. React anti-pattern.
+
+**Acceptance:**
+- No setState-during-render warnings in console
+- ClerkAuthButtons follows React best practices
 
 ---
 
-## Success Metrics
+## Low Requirements
 
-| Metric | Current | Target |
-|--------|---------|--------|
-| Broken pages | 2 (Gift, Quiz Results) | 0 |
-| `lang` attribute | `en` | `pt-BR` |
-| Catalog search | None | Text search with filters |
-| Landing page sections | All same bg | Alternating backgrounds |
-| SEO structured data | None | JSON-LD on all pages |
-| Footer links | 3 | 12+ |
-| Navigation links | 4 | 6 |
-| ALL CAPS buttons | 2 (landing CTAs) | 0 |
-| English text in UI | "Details" button | None |
-| Profile storage modules | 2 (mismatched) | 1 (unified) |
+### E2E-L1: Fix Blog Title Year
+**Priority:** P3 (Low)
+**Source:** E2E-8
+
+Blog pillar page title says "Guia Completo 2025" but current year is 2026.
+
+**Acceptance:**
+- Blog title updated to current year
+
+### E2E-L2: Add frontend/.env file
+**Priority:** P3 (Low)
+**Source:** E2E-9
+
+`frontend/.env` doesn't exist. Relies on root `.env` and Docker Compose env vars.
+
+**Acceptance:**
+- `frontend/.env` exists with correct `NEXT_PUBLIC_FASTAPI_URL`
+- Or documented that Docker Compose provides all needed env vars
+
+---
+
+## Verification Criteria
+
+### E2E Smoke Test (MUST pass after all fixes)
+
+| Route | Must Show | Must NOT Show |
+|-------|-----------|---------------|
+| `/` | Hero content, nav, CTA | Empty body |
+| `/paddles` | Product listing | "Carregando..." stuck |
+| `/paddles/{brand}/{slug}` | Paddle details, specs, price | 404 |
+| `/catalog` | Product grid with cards | Empty body |
+| `/catalog/{slug}` | Product detail | Empty body |
+| `/chat` | Chat input, empty state | Missing input |
+| `/quiz` | Quiz step 1 | Empty body |
+| `/gift` | Gift finder flow | Empty body |
+| `/compare?a=3&b=2` | Comparison table | Empty body |
+| `/blog/pillar-page` | Blog content | Empty body |
+
+### Backend API Smoke Test (MUST pass)
+
+| Endpoint | Expected | Must NOT |
+|----------|----------|----------|
+| `GET /health` | 200 | Error |
+| `GET /api/v1/paddles?limit=5` | 200 + items | Empty |
+| `GET /api/v1/paddles/{id}/similar` | 200 + array | 404 |
+| `POST /chat` (correct body) | 200 + SSE stream | 422/503 |
+| `GET /paddles/{id}/price-history` | 200 + history | 404 |
+| `GET /api/v1/admin/queue` (no auth) | 401 | 200 |
+
+---
+*Requirements created: 2026-04-25 — v2.8.0 (E2E Critical Fixes)*

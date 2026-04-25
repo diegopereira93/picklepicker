@@ -111,15 +111,18 @@ def test_list_paddles_model_slug_not_found():
 
 
 
-def test_get_similar_paddles__no_embeddings_returns_404():
-    """Test endpoint returns 404 when no embeddings exist for paddle."""
+def test_get_similar_paddles__no_embeddings_returns_200_empty():
+    """Test endpoint returns 200 with empty array when no embeddings exist for paddle."""
     response = client.get("/api/v1/paddles/1/similar?limit=3")
-    assert response.status_code == 404
+    assert response.status_code == 200
     data = response.json()
-    assert "detail" in data
+    assert data["similar_paddles"] == []
+    assert data["query_paddle_id"] == 1
 
 
 def test_get_similar_paddles__endpoint_exists():
-    """Test GET /api/v1/paddles/{id}/similar endpoint returns 404 with mock DB."""
+    """Test GET /api/v1/paddles/{id}/similar endpoint returns 200 with mock DB."""
     response = client.get("/api/v1/paddles/1/similar")
-    assert response.status_code == 404
+    assert response.status_code == 200
+    data = response.json()
+    assert "similar_paddles" in data
