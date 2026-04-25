@@ -3,13 +3,38 @@
 Protected by Authorization: Bearer {ADMIN_SECRET} middleware.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+import os
+
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 from pydantic import BaseModel
 from pipeline.dedup.review_queue import (
     get_review_queue_items,
     resolve_queue_item,
     dismiss_queue_item,
 )
+
+ADMIN_SECRET = os.getenv("ADMIN_SECRET", "")
+
+
+async def require_admin(authorization: str = Header(..., alias="Authorization")):
+    """Require Bearer token matching ADMIN_SECRET env var."""
+    if not ADMIN_SECRET:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Admin authentication not configured (ADMIN_SECRET env var missing)",
+        )
+    if not authorization.lower().startswith("bearer "):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authorization header must be 'Bearer <token>'",
+        )
+    token = authorization[7:].strip()
+    if token != ADMIN_SECRET:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid admin token",
+        )
+    return True
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -39,6 +64,7 @@ async def get_queue(
     status: str = Query("pending", description="Filter by status"),
     limit: int = Query(50, ge=1, le=500),
     offset: int = Query(0, ge=0),
+    auth: bool = Depends(require_admin),
 ):
     """Get review queue items.
 
@@ -61,7 +87,7 @@ async def get_queue(
 
 
 @router.get("/queue/{queue_id}")
-async def get_queue_item(queue_id: int):
+async def get_queue_item(queue_id: int, auth: bool = Depends(require_admin)):
     """Get single review queue item by ID."""
     items = await get_review_queue_items(limit=1, offset=0)
     # Filter to find the item
@@ -72,7 +98,7 @@ async def get_queue_item(queue_id: int):
 
 
 @router.patch("/queue/{queue_id}/resolve")
-async def resolve_item(queue_id: int, request: ResolveQueueItemRequest):
+async def resolve_item(queue_id: int, request: ResolveQueueItemRequest, auth: bool = Depends(require_admin)):
     """Resolve a review queue item.
 
     Body:
@@ -95,7 +121,7 @@ async def resolve_item(queue_id: int, request: ResolveQueueItemRequest):
 
 
 @router.patch("/queue/{queue_id}/dismiss")
-async def dismiss_item(queue_id: int, request: DismissQueueItemRequest):
+async def dismiss_item(queue_id: int, request: DismissQueueItemRequest, auth: bool = Depends(require_admin)):
     """Dismiss a review queue item."""
     success = await dismiss_queue_item(queue_id=queue_id, reason=request.reason)
 
@@ -106,7 +132,7 @@ async def dismiss_item(queue_id: int, request: DismissQueueItemRequest):
 
 
 @router.get("/paddles")
-async def get_paddles(limit: int = Query(50, ge=1, le=500), offset: int = Query(0, ge=0)):
+async def get_paddles(limit: int = Query(50, ge=1, le=500), offset: int = Query(0, ge=0), auth: bool = Depends(require_admin)):
     """Get all paddles from catalog.
 
     Used for admin catalog browsing.
@@ -116,7 +142,7 @@ async def get_paddles(limit: int = Query(50, ge=1, le=500), offset: int = Query(
 
 
 @router.patch("/paddles/{paddle_id}")
-async def update_paddle(paddle_id: int):
+async def update_paddle(paddle_id: int, auth: bool = Depends(require_admin)):
     """Update paddle specs or metadata.
 
     Future endpoint for admin catalog management.

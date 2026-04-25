@@ -4,7 +4,7 @@ export const maxDuration = 30
 import { createUIMessageStream, createUIMessageStreamResponse } from 'ai'
 import type { ChatRequest } from '@/types/paddle'
 
-const FASTAPI_URL = process.env.FASTAPI_URL ?? 'http://localhost:8000'
+const FASTAPI_URL = process.env.FASTAPI_INTERNAL_URL || process.env.FASTAPI_URL || 'http://localhost:8000'
 
 export async function POST(request: Request) {
   let body: {
@@ -39,11 +39,15 @@ export async function POST(request: Request) {
   }
 
   // Sanitize skill_level to match backend validator (beginner | intermediate | advanced)
-  const VALID_LEVELS = ['beginner', 'intermediate', 'advanced'] as const
+  // Map 'competitive' → 'advanced' (quiz uses 4 levels, backend uses 3)
+  const LEVEL_MAP: Record<string, ChatRequest['skill_level']> = {
+    beginner: 'beginner',
+    intermediate: 'intermediate',
+    advanced: 'advanced',
+    competitive: 'advanced',
+  }
   const rawLevel = profile?.level?.toLowerCase() ?? ''
-  const skill_level: ChatRequest['skill_level'] = VALID_LEVELS.includes(rawLevel as typeof VALID_LEVELS[number])
-    ? (rawLevel as ChatRequest['skill_level'])
-    : 'beginner'
+  const skill_level: ChatRequest['skill_level'] = LEVEL_MAP[rawLevel] ?? 'beginner'
 
   const trimmedMessage = extractText(lastUserMessage).trim()
   if (!trimmedMessage) {
@@ -102,21 +106,32 @@ export async function POST(request: Request) {
           if (done) break
 
           buffer += decoder.decode(value, { stream: true })
-          const lines = buffer.split('\n')
-          buffer = lines.pop() ?? ''
 
-          let eventType = ''
-          let dataLine = ''
+          while (buffer.includes('\n\n')) {
+            const eventEnd = buffer.indexOf('\n\n')
+            const eventBlock = buffer.slice(0, eventEnd)
+            buffer = buffer.slice(eventEnd + 2)
 
-          for (const line of lines) {
-            if (line.startsWith('event: ')) {
-              eventType = line.slice(7).trim()
-            } else if (line.startsWith('data: ')) {
-              dataLine = line.slice(6).trim()
-            } else if (line === '' && eventType && dataLine) {
-              try {
-                const data = JSON.parse(dataLine)
-                switch (eventType) {
+            let eventType = ''
+            const dataLines: string[] = []
+
+            for (const line of eventBlock.split('\n')) {
+              if (line.startsWith('event: ')) {
+                eventType = line.slice(7).trim()
+              } else if (line.startsWith('data: ')) {
+                dataLines.push(line.slice(6).trim())
+              }
+            }
+
+            const dataLine = dataLines.join('\n')
+
+            if (!eventType || !dataLine) {
+              continue
+            }
+
+            try {
+              const data = JSON.parse(dataLine)
+              switch (eventType) {
                   case 'reasoning': {
                     const text = data.text ?? ''
                     if (text) {
@@ -173,13 +188,13 @@ export async function POST(request: Request) {
                   }
                 }
               } catch {
-                // skip malformed events
+                console.error('SSE JSON parse error:', dataLine.slice(0, 200))
               }
               eventType = ''
-              dataLine = ''
+              dataLines.length = 0
             }
           }
-        }
+
         // Ensure text part is closed
         if (textPartId) {
           writer.write({ type: 'text-end', id: textPartId })

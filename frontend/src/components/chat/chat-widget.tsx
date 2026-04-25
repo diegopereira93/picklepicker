@@ -22,14 +22,16 @@ const SUGGESTED_QUESTIONS = [
 
 interface ChatWidgetProps {
   profile: UserProfile
+  initialMessage?: string
   onRecommendations?: (recs: ChatRecommendation[]) => void
 }
 
-export function ChatWidget({ profile, onRecommendations }: ChatWidgetProps) {
+export function ChatWidget({ profile, initialMessage, onRecommendations }: ChatWidgetProps) {
   const endRef = useRef<HTMLDivElement>(null)
   const [input, setInput] = useState('')
   const [lastMessage, setLastMessage] = useState('')
   const prevRecCount = useRef(0)
+  const initialSentRef = useRef(false)
 
   const { messages, sendMessage, status, error } = useChat({
     transport: new DefaultChatTransport({ api: '/api/chat', body: { profile } }),
@@ -37,6 +39,18 @@ export function ChatWidget({ profile, onRecommendations }: ChatWidgetProps) {
 
   const isLoading = status === 'submitted' || status === 'streaming'
   const showTheater = status === 'submitted'
+  const isSendingInitial = initialSentRef.current && messages.length === 0 && !error
+
+  useEffect(() => {
+    if (initialMessage && messages.length === 0 && !initialSentRef.current && !isLoading) {
+      initialSentRef.current = true
+      setLastMessage(initialMessage)
+      // Defer to next frame to ensure useChat transport is fully initialized
+      requestAnimationFrame(() => {
+        sendMessage({ text: initialMessage })
+      })
+    }
+  }, [initialMessage, messages.length, isLoading, sendMessage])
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -71,7 +85,9 @@ export function ChatWidget({ profile, onRecommendations }: ChatWidgetProps) {
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto px-4 py-4">
-        {messages.length === 0 ? (
+        {isSendingInitial ? (
+          <LoadingTheater />
+        ) : messages.length === 0 ? (
           <ChatEmptyState questions={SUGGESTED_QUESTIONS} onAsk={handleAsk} disabled={isLoading} />
         ) : (
           messages.map((msg) => {

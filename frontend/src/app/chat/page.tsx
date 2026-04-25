@@ -20,6 +20,47 @@ const GENERIC_PROFILE: UserProfile = {
   budget_max: 2000,
 }
 
+const LEVEL_LABELS: Record<QuizProfile['level'], string> = {
+  beginner: 'iniciante',
+  intermediate: 'intermediário',
+  advanced: 'avançado',
+  competitive: 'competitivo',
+}
+
+const STYLE_LABELS: Record<QuizProfile['style'], string> = {
+  'baseline-grinder': 'power (fundo de quadra)',
+  'dink-control': 'controle (precisão na rede)',
+  'power-hitter': 'spin (efeitos técnicos)',
+  'all-round': 'equilibrado (versátil)',
+}
+
+const PRIORITY_LABELS: Record<QuizProfile['priority'], string> = {
+  power: 'potência',
+  control: 'controle',
+  spin: 'spin',
+  speed: 'velocidade',
+}
+
+const BUDGET_LABELS: Record<QuizProfile['budget'], string> = {
+  'under-80': 'até R$200',
+  '80-150': 'até R$400',
+  '150-250': 'até R$600',
+  '250-plus': 'R$600+',
+}
+
+function buildQuizInitialMessage(profile: QuizProfile): string {
+  const parts = [
+    `Sou jogador ${LEVEL_LABELS[profile.level]}`,
+    `jogo com estilo ${STYLE_LABELS[profile.style]}`,
+    `priorizo ${PRIORITY_LABELS[profile.priority]}`,
+    `orçamento ${BUDGET_LABELS[profile.budget]}`,
+  ]
+  if (profile.targetPaddle) {
+    parts.push(`tenho interesse na ${profile.targetPaddle}`)
+  }
+  return `${parts.join(', ')}. Quais raquetes você recomenda para mim?`
+}
+
 export default function ChatPage() {
   const router = useRouter()
   const [profile, setProfile] = useState<QuizProfile | null>(null)
@@ -62,6 +103,7 @@ export default function ChatPage() {
     : GENERIC_PROFILE
 
   const recCount = accumulatedRecs.size
+  const initialMessage = hasProfile ? buildQuizInitialMessage(profile) : undefined
 
   return (
     <main className="h-screen bg-base flex overflow-hidden">
@@ -156,6 +198,7 @@ export default function ChatPage() {
           <div className="flex-1 bg-base overflow-hidden">
             <ChatWidget
               profile={userProfile}
+              initialMessage={initialMessage}
               onRecommendations={handleRecommendations}
             />
           </div>

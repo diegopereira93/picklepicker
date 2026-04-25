@@ -1,10 +1,16 @@
 """Tests for admin API endpoints and review_queue module."""
 
+import os
 import pytest
 from unittest.mock import AsyncMock, patch
 from fastapi.testclient import TestClient
 from fastapi import FastAPI
 from datetime import datetime
+
+# Set admin secret for all tests
+os.environ["ADMIN_SECRET"] = "test-admin-secret"
+
+ADMIN_HEADERS = {"Authorization": "Bearer test-admin-secret"}
 
 
 # Admin endpoint tests
@@ -32,7 +38,7 @@ def test_get_queue__returns_200_with_items():
     with patch("backend.app.api.admin.get_review_queue_items") as mock_get_items:
         mock_get_items.return_value = mock_items
 
-        response = client.get("/admin/queue")
+        response = client.get("/admin/queue", headers=ADMIN_HEADERS)
 
         assert response.status_code == 200
         assert len(response.json()) == 1
@@ -50,7 +56,7 @@ def test_get_queue__filters_by_type():
     with patch("backend.app.api.admin.get_review_queue_items") as mock_get_items:
         mock_get_items.return_value = []
 
-        response = client.get("/admin/queue?type=duplicate&status=pending")
+        response = client.get("/admin/queue?type=duplicate&status=pending", headers=ADMIN_HEADERS)
 
         assert response.status_code == 200
         # Verify the mock was called with correct params
@@ -58,6 +64,32 @@ def test_get_queue__filters_by_type():
         call_kwargs = mock_get_items.call_args[1]
         assert call_kwargs["queue_type"] == "duplicate"
         assert call_kwargs["status"] == "pending"
+
+
+def test_get_queue__returns_401_without_auth():
+    """GET /admin/queue returns 401 without Authorization header."""
+    from backend.app.api.admin import router
+
+    app = FastAPI()
+    app.include_router(router)
+    client = TestClient(app)
+
+    with patch("backend.app.api.admin.get_review_queue_items"):
+        response = client.get("/admin/queue")
+        assert response.status_code == 422
+
+
+def test_get_queue__returns_401_with_wrong_secret():
+    """GET /admin/queue returns 401 with wrong admin token."""
+    from backend.app.api.admin import router
+
+    app = FastAPI()
+    app.include_router(router)
+    client = TestClient(app)
+
+    with patch("backend.app.api.admin.get_review_queue_items"):
+        response = client.get("/admin/queue", headers={"Authorization": "Bearer wrong-secret"})
+        assert response.status_code == 401
 
 
 def test_resolve_queue_item__updates_status():
@@ -76,7 +108,8 @@ def test_resolve_queue_item__updates_status():
             json={
                 "action": "merge",
                 "decision_data": {"merged_into": 10}
-            }
+            },
+            headers=ADMIN_HEADERS,
         )
 
         assert response.status_code == 200
@@ -97,7 +130,8 @@ def test_resolve_queue_item__returns_404_if_not_found():
 
         response = client.patch(
             "/admin/queue/999/resolve",
-            json={"action": "merge"}
+            json={"action": "merge"},
+            headers=ADMIN_HEADERS,
         )
 
         assert response.status_code == 404
@@ -116,7 +150,8 @@ def test_dismiss_queue_item__marks_dismissed():
 
         response = client.patch(
             "/admin/queue/1/dismiss",
-            json={"reason": "False positive"}
+            json={"reason": "False positive"},
+            headers=ADMIN_HEADERS,
         )
 
         assert response.status_code == 200

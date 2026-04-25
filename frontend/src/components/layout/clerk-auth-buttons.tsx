@@ -2,8 +2,11 @@
 
 import { SignInButton, UserButton, useAuth } from "@clerk/nextjs"
 import { Button } from "@/components/ui/button"
+import { useClerkAvailable } from "@/components/clerk-provider"
 
 export function ClerkAuthButtons() {
+  const clerkAvailable = useClerkAvailable()
+  if (!clerkAvailable) return null
   const { isSignedIn } = useAuth()
   return (
     <>
@@ -18,6 +21,8 @@ export function ClerkAuthButtons() {
 }
 
 export function MobileClerkAuth() {
+  const clerkAvailable = useClerkAvailable()
+  if (!clerkAvailable) return null
   const { isSignedIn } = useAuth()
   return (
     <>

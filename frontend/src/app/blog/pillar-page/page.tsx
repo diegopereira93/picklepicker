@@ -5,14 +5,14 @@ import Link from 'next/link'
 export const revalidate = 86400 // ISR: 24 hours
 
 export const metadata: Metadata = {
-  title: 'Melhor Raquete de Pickleball para Iniciantes - Guia Completo 2025',
+  title: 'Melhor Raquete de Pickleball para Iniciantes - Guia Completo 2026',
   description:
     'Guia completo sobre as melhores raquetes de pickleball para iniciantes. Análise de specs, comparação e recomendações para começar bem.',
   keywords: ['melhor raquete', 'pickleball iniciante', 'guia completo', 'comparação'],
   robots: 'index, follow',
   openGraph: {
     type: 'article',
-    title: 'Melhor Raquete de Pickleball para Iniciantes - Guia Completo 2025',
+    title: 'Melhor Raquete de Pickleball para Iniciantes - Guia Completo 2026',
     description:
       'Guia completo sobre as melhores raquetes de pickleball para iniciantes.',
     url: 'https://pickleiq.com/blog/pillar-page',
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 export default function PillarPage() {
   return (
     <article className="prose prose-lg dark:prose-invert max-w-3xl mx-auto">
-      <h1>Melhor Raquete de Pickleball para Iniciantes: Guia Completo 2025</h1>
+      <h1>Melhor Raquete de Pickleball para Iniciantes: Guia Completo 2026</h1>
 
       <p className="text-lg text-slate-600 dark:text-slate-400">
         Começar no pickleball é emocionante, mas escolher a raquete certa pode ser confuso.

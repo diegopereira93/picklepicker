@@ -6,6 +6,8 @@ from psycopg_pool import AsyncConnectionPool
 
 _pool: AsyncConnectionPool | None = None
 
+_POOL_TIMEOUT = 30.0
+
 
 async def get_pool() -> AsyncConnectionPool:
     """Get or create the global async connection pool."""
@@ -16,6 +18,7 @@ async def get_pool() -> AsyncConnectionPool:
             min_size=2,
             max_size=10,
             open=False,
+            timeout=_POOL_TIMEOUT,
         )
         await _pool.open()
     return _pool
@@ -25,7 +28,7 @@ async def get_pool() -> AsyncConnectionPool:
 async def get_connection():
     """Get a connection from the pool as an async context manager."""
     pool = await get_pool()
-    async with pool.connection() as conn:
+    async with pool.connection(timeout=_POOL_TIMEOUT) as conn:
         yield conn
 
 

@@ -10,7 +10,7 @@ export async function POST(req: Request) {
 
   const { paddle_id, price_target } = await req.json();
 
-  const backendUrl = process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000';
+  const backendUrl = process.env.FASTAPI_INTERNAL_URL || process.env.NEXT_PUBLIC_FASTAPI_URL || 'http://localhost:8000';
   const res = await fetch(`${backendUrl}/price-alerts`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

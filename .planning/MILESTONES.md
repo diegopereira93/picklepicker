@@ -73,3 +73,30 @@
 **Stats:** 98 files changed (cumulative v2.4-v2.7 merge), +6,251/-896 LOC
 
 ---
+
+## v2.8.0 E2E Critical Fixes (Shipped: 2026-04-25)
+
+**Phases completed:** 4 (Phases 40-43) | **Commits:** 2+ | **Timeline:** 1 day
+
+**Source:** Playwright E2E Analysis — full browser automation of 15 routes + 17 API endpoints
+
+**Issues found & fixed:** 2 critical (site-breaking), 4 high, 1 medium, 2 low + quiz→chat flow
+
+**Key accomplishments:**
+
+- 🔴 ALL 15 pages render EMPTY — ClerkAuthButtons crashes without ClerkProvider → ✅ Fixed
+- 🔴 Chat proxy returns 503 — Docker networking broken → ✅ Fixed
+- 🟠 Similar Paddles always 404 → ✅ Returns 200 + []
+- 🟠 Paddle slugs null → ✅ Generated model_slug for all paddles
+- 🟠 Admin unauthenticated → ✅ Added require_admin dependency
+- 🟠 Price history route mismatch → ✅ Fixed Docker env var
+- Quiz → Chat auto-recommendation broken → ✅ Fixed 5 bugs (level mapping, SSE parser, RAG fallback, DB timeout, transport race)
+
+| Phase | Goal | Status |
+|-------|------|--------|
+| 40 | Critical Frontend Fixes (Clerk + Docker) | ✅ Complete |
+| 41 | API & Route Fixes (Slugs + Similar + Auth + Routes) | ✅ Complete |
+| 42 | Data Quality & E2E Verification | ✅ Complete |
+| 43 | Quiz → Chat Auto-Recommendation Fix | ✅ Complete |
+
+---

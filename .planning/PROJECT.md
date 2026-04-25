@@ -37,12 +37,18 @@ Users can confidently choose the right pickleball paddle through AI-powered reco
 
 ### Active
 
+- [ ] E2E-1: Fix ClerkAuthButtons crash when ClerkProvider absent — ALL pages render EMPTY
+- [ ] E2E-2: Fix Docker networking (FASTAPI_URL) — frontend can't reach backend
+- [ ] E2E-3: Fix Similar Paddles endpoint (returns 404 for all paddles)
+- [ ] E2E-4: Fix Paddle detail pages (model_slug is null)
+- [ ] E2E-5: Fix Admin API authentication (no Depends() guard)
+- [ ] E2E-6: Fix Price History route mismatch (frontend vs backend)
 - [ ] T1: Provision Supabase/Railway production infrastructure
 - [ ] T2: Eval gate as monthly CI job (currently mock scores)
 - [ ] T3: Legal assessment of scraping BR retailer data
 - [ ] T5: Load test /chat endpoint (P95 < 3s target)
 - [ ] T6: Zero-paddle alert in crawler GitHub Actions
-- [ ] Embedding provider reliability (local fallback for Jina/HuggingFace outages)
+- [ ] T7: Embedding provider reliability (local fallback for Jina/HuggingFace outages)
 
 ### Out of Scope
 
@@ -52,14 +58,19 @@ Users can confidently choose the right pickleball paddle through AI-powered reco
 
 ## Context
 
-**Current state (v2.4.0):** Starting Site Quality & UX Polish milestone. Source: SITE-INSPECTION-REPORT.md (27 findings). 3 critical bugs (broken Gift/Quiz Results pages, lang=en, profile mismatch), 12 high-priority UX gaps (no search, forced quiz, flat landing, missing SEO), 15 medium-priority polish items. All previous milestones shipped: v2.2.0 (Launch Readiness), v1.7.0 (Backend API), v1.6.0 (UI Redesign).
+**Current state (v2.8.0):** E2E Critical Fixes milestone. Source: Full Playwright E2E analysis (2026-04-25, 15 routes + 17 API endpoints). 2 site-breaking issues found: (1) ClerkAuthButtons crash without ClerkProvider renders ALL pages EMPTY, (2) Docker networking prevents frontend from reaching backend (chat returns 503). Plus 4 high-priority issues: similar paddles 404, paddle slugs null, admin unauthenticated, price history route mismatch.
 
 **Tech stack:** Python 3.12 + FastAPI | Next.js 14 App Router | PostgreSQL + pgvector | Groq (LLM) | Jina AI (embeddings)
 
 **Known issues:**
+- 🔴 E2E-1: ClerkAuthButtons crash renders ALL pages empty (missing ClerkProvider when no keys)
+- 🔴 E2E-2: Frontend Docker container can't reach backend (FASTAPI_URL config)
+- 🟠 E2E-3: Similar Paddles endpoint returns 404 (no embedding matches)
+- 🟠 E2E-4: Paddle detail pages 404 (model_slug is null for most paddles)
+- 🟠 E2E-5: Admin API endpoints unauthenticated (no Depends() guard)
+- 🟠 E2E-6: Price History route mismatch (frontend vs backend paths differ)
 - 2 pre-existing backend chat test failures (Jina/HF/Groq API keys not set in test env)
 - 2 pre-existing pipeline embedding placeholder tests (require real DB)
-- `vercel.json` security headers duplicated in root and `frontend/` — should reconcile
 
 ## Constraints
 
@@ -104,4 +115,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-20 — v2.4.0 milestone created (Site Quality & UX Polish)*
+*Last updated: 2026-04-25 — v2.8.0 milestone created (E2E Critical Fixes)*
