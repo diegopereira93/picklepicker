@@ -9,20 +9,21 @@
 - ✅ **v2.5.0** — Backend Hardening & RAG Reliability (Phases 32-34) — shipped 2026-04-24
 - ✅ **v2.6.0** — Pipeline & Infra Hardening (Phases 35-37) — shipped 2026-04-24
 - ✅ **v2.7.0** — Build & Test Quality (Phases 38-39) — shipped 2026-04-24
-- 📋 **v2.8.0** — E2E Critical Fixes (Phases 40-42) — **CURRENT**
+- ✅ **v2.8.0** — E2E Critical Fixes (Phases 40-43) — shipped 2026-04-25
 - 📋 **v1.5.0** — Production Infrastructure (Phase 15) — deferred
 
 ## Current Focus
 
-**v2.8.0 — E2E Critical Fixes 📋 PLANNING (2026-04-25)**
+**v2.8.0 — E2E Critical Fixes ✅ COMPLETE (2026-04-25)**
 
-Full Playwright E2E analysis found 2 site-breaking + 4 high-priority issues. All pages render EMPTY due to Clerk crash.
+Full Playwright E2E analysis found 2 site-breaking + 4 high-priority issues + quiz→chat flow broken. All issues fixed.
 
 | Phase | Goal | Status |
 |-------|------|--------|
-| 40 | Critical Frontend Fixes (Clerk + Docker) | ○ Planned |
-| 41 | API & Route Fixes (Slugs + Similar + Auth + Routes) | 📋 Pending |
-| 42 | Data Quality & E2E Verification | 📋 Pending |
+| 40 | Critical Frontend Fixes (Clerk + Docker) | ✅ Complete |
+| 41 | API & Route Fixes (Slugs + Similar + Auth + Routes) | ✅ Complete |
+| 42 | Data Quality & E2E Verification | ✅ Complete |
+| 43 | Quiz → Chat Auto-Recommendation Fix | ✅ Complete |
 
 ---
 

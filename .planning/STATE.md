@@ -6,8 +6,8 @@ status: Complete
 last_updated: "2026-04-25"
 last_activity: 2026-04-25
 progress:
-  total_phases: 3
-  completed_phases: 3
+  total_phases: 4
+  completed_phases: 4
   total_plans: 0
   completed_plans: 0
 ---
@@ -20,7 +20,7 @@ Milestone: v2.8.0 — E2E Critical Fixes
 Status: ✅ Complete
 Last activity: 2026-04-25
 
-**All 3 phases executed. All E2E findings addressed.**
+**All 4 phases executed. All E2E findings addressed. Phase 43 (Quiz→Chat Fix) complete.**
 
 ## Milestone Overview
 
@@ -29,6 +29,7 @@ Last activity: 2026-04-25
 | 40 | Critical Frontend Fixes (Clerk + Docker Networking) | ✅ Complete |
 | 41 | API & Route Fixes (Slugs + Similar + Auth + Routes) | ✅ Complete |
 | 42 | Data Quality & Verification | ✅ Complete |
+| 43 | Quiz → Chat Auto-Recommendation Fix | ✅ Complete |
 
 ## E2E Finding Resolution
 
@@ -60,9 +61,17 @@ Last activity: 2026-04-25
 |----|---------|-----|
 | E2E-8 | Blog title says "2025" | ✅ Updated to 2026 |
 
-## Files Changed (23 files)
+## Files Changed (29 files)
 
-**Frontend (13 files):**
+**Phase 43 — Quiz → Chat Auto-Recommendation Fix (7 files):**
+- `frontend/src/app/chat/page.tsx` — Added `buildQuizInitialMessage()` with PT-BR label maps, passes `initialMessage` to ChatWidget
+- `frontend/src/components/chat/chat-widget.tsx` — Added `initialMessage` prop, `initialSentRef`, auto-send `useEffect`, `requestAnimationFrame` transport fix, `isSendingInitial` loading state
+- `frontend/src/app/api/chat/route.ts` — Replaced `VALID_LEVELS` with `LEVEL_MAP` (competitive→advanced), refactored SSE parser to use `\n\n` buffer
+- `backend/app/api/chat.py` — Added `_SKILL_LEVEL_MAP` dict, updated `validate_skill_level` to normalize competitive→advanced
+- `backend/app/agents/rag_agent.py` — Two-stage fallback in `search_by_profile`, fixed `_search_mock` iteration
+- `backend/app/db.py` — Added `_POOL_TIMEOUT=30.0` to pool and connection calls
+
+**Frontend (13 files — Phases 40-42):**
 - `frontend/src/components/clerk-provider.tsx` — Added ClerkAvailableContext + useClerkAvailable hook
 - `frontend/src/components/layout/clerk-auth-buttons.tsx` — Early return when Clerk unavailable
 - `frontend/src/app/api/chat/route.ts` — FASTAPI_INTERNAL_URL fallback
@@ -112,4 +121,4 @@ Requirements: .planning/REQUIREMENTS.md
 Source: E2E Playwright analysis (2026-04-25)
 
 ---
-*State updated: 2026-04-25 — v2.8.0 milestone complete (all phases executed)*
+*State updated: 2026-04-25 — v2.8.0 milestone complete (all 4 phases executed including Phase 43 Quiz→Chat fix)*
